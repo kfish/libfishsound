@@ -45,8 +45,12 @@
 
 #if HAVE_VORBIS
 
+#if FS_FLOAT
 #include <vorbis/codec.h>
 #include <vorbis/vorbisenc.h>
+#else
+#include <ivorbisfile.h>
+#endif
 
 typedef struct _FishSoundVorbisInfo {
   int packetno;
@@ -184,7 +188,7 @@ fs_vorbis_command (FishSound * fsound, int command, void * data,
 
 #if FS_DECODE
 static void
-fs_vorbis_short_dispatch (FishSound * fsound, float ** pcm, long samples)
+fs_vorbis_short_dispatch (FishSound * fsound, ogg_int32_t ** pcm, long samples)
 {
   FishSoundVorbisInfo * fsv = (FishSoundVorbisInfo *)fsound->codec_data;
   short ** retpcm;
@@ -195,8 +199,8 @@ fs_vorbis_short_dispatch (FishSound * fsound, float ** pcm, long samples)
 			   fsound->info.channels);
       fsv->max_pcm = samples;
     }
-    _fs_interleave_f_s (pcm, (short **)fsv->ipcm, samples,
-			fsound->info.channels, 32767.0);
+    _fs_interleave_i_s (pcm, (short **)fsv->ipcm, samples,
+      fsound->info.channels, (1<<16));
     retpcm = (short **)fsv->ipcm;
   } else {
     /* XXX: fixme */
@@ -217,6 +221,7 @@ fs_vorbis_short_dispatch (FishSound * fsound, float ** pcm, long samples)
   }
 }
 
+#if FS_FLOAT
 static void
 fs_vorbis_float_dispatch (FishSound * fsound, float ** pcm, long samples)
 {
@@ -249,13 +254,14 @@ fs_vorbis_float_dispatch (FishSound * fsound, float ** pcm, long samples)
     }
   }
 }
+#endif
 
 static long
 fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
 {
   FishSoundVorbisInfo * fsv = (FishSoundVorbisInfo *)fsound->codec_data;
   ogg_packet op;
-  float ** pcm;
+  ogg_int32_t ** pcm;
   long samples;
   int ret, retval;
 
@@ -301,13 +307,15 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
 
       switch (fsound->pcm_type) {
       case FISH_SOUND_PCM_SHORT:
-	fs_vorbis_short_dispatch (fsound, pcm, samples);
-	break;
+        fs_vorbis_short_dispatch (fsound, pcm, samples);
+        break;
+#if FS_FLOAT
       case FISH_SOUND_PCM_FLOAT:
-	fs_vorbis_float_dispatch (fsound, pcm, samples);
-	break;
+        fs_vorbis_float_dispatch (fsound, pcm, samples);
+        break;
+#endif
       default:
-	break;
+        break;
       }
 
       if (fsound->frameno != -1)
