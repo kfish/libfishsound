@@ -43,11 +43,11 @@ fish_sound_identify (unsigned char * buf, long bytes)
   if (bytes < 8) return FISH_SOUND_ERR_SHORT_IDENTIFY;
 
   if (HAVE_VORBIS &&
-      fish_sound_vorbis.identify (buf, bytes) != FISH_SOUND_UNKNOWN)
+      fish_sound_vorbis_identify (buf, bytes) != FISH_SOUND_UNKNOWN)
     return FISH_SOUND_VORBIS;
 
   if (HAVE_SPEEX &&
-      fish_sound_speex.identify (buf, bytes) != FISH_SOUND_UNKNOWN)
+      fish_sound_speex_identify (buf, bytes) != FISH_SOUND_UNKNOWN)
     return FISH_SOUND_SPEEX;
 
   return FISH_SOUND_UNKNOWN;
@@ -57,9 +57,9 @@ static int
 fish_sound_set_format (FishSound * fsound, int format)
 {
   if (format == FISH_SOUND_VORBIS) {
-    fsound->codec = &fish_sound_vorbis;
+    fsound->codec = fish_sound_vorbis_codec ();
   } else if (format == FISH_SOUND_SPEEX) {
-    fsound->codec = &fish_sound_speex;
+    fsound->codec = fish_sound_speex_codec ();
   } else {
     return -1;
   }

@@ -64,9 +64,14 @@ typedef long        (*FSCodecEncodeN) (FishSound * fsound, float ** pcm,
 				       long frames);
 typedef long        (*FSCodecFlush) (FishSound * fsound);
 
+struct _FishSoundFormat {
+  int format;
+  const char * name;
+  const char * extension;
+};
+
 struct _FishSoundCodec {
-  FishSoundFormat * format;
-  FSCodecIdentify identify;
+  struct _FishSoundFormat format;
   FSCodecInit init;
   FSCodecDelete del;
   FSCodecReset reset;
@@ -135,21 +140,18 @@ struct _FishSound {
   FishSoundVector * comments;
 };
 
-struct _FishSoundFormat {
-  int format;
-  const char * name;
-  const char * extension;
-};
-
 typedef int (*FishSoundDecoded) (FishSound * fsound, float ** pcm,
 				 long frames, void * user_data);
 
 typedef int (*FishSoundEncoded) (FishSound * fsound, unsigned char * buf,
 				 long bytes, void * user_data);
 
-/* data */
-extern FishSoundCodec fish_sound_vorbis;
-extern FishSoundCodec fish_sound_speex;
+/* Format specific interfaces */
+int fish_sound_vorbis_identify (unsigned char * buf, long bytes);
+FishSoundCodec * fish_sound_vorbis_codec (void);
+
+int fish_sound_speex_identify (unsigned char * buf, long bytes);
+FishSoundCodec * fish_sound_speex_codec (void);
 
 /* comments */
 int fish_sound_comments_init (FishSound * fsound);

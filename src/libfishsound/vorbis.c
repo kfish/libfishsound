@@ -134,8 +134,8 @@ int my_vorbis_synthesis_headerin(vorbis_info *vi,vorbis_comment *vc,ogg_packet *
 
 #endif
 
-static int
-fs_vorbis_identify (unsigned char * buf, long bytes)
+int
+fish_sound_vorbis_identify (unsigned char * buf, long bytes)
 {
   struct vorbis_info vi;
   struct vorbis_comment vc;
@@ -502,36 +502,39 @@ fs_vorbis_delete (FishSound * fsound)
   return fsound;
 }
 
-static FishSoundFormat fs_vorbis_format = {
-  FISH_SOUND_VORBIS,
-  "Vorbis (Xiph.Org)",
-  "ogg"
-};
+FishSoundCodec *
+fish_sound_vorbis_codec (void)
+{
+  FishSoundCodec * codec;
 
-FishSoundCodec fish_sound_vorbis = {
-  &fs_vorbis_format,
-  fs_vorbis_identify,
-  fs_vorbis_init,
-  fs_vorbis_delete,
-  fs_vorbis_reset,
-  fs_vorbis_command,
-  fs_vorbis_decode,
-  fs_vorbis_encode_i,
-  fs_vorbis_encode_n,
-  NULL /* flush */
-};
+  codec = (FishSoundCodec *) malloc (sizeof (FishSoundCodec));
+
+  codec->format.format = FISH_SOUND_VORBIS;
+  codec->format.name = "Vorbis (Xiph.Org)";
+  codec->format.extension = "ogg";
+
+  codec->init = fs_vorbis_init;
+  codec->del = fs_vorbis_delete;
+  codec->reset = fs_vorbis_reset;
+  codec->command = fs_vorbis_command;
+  codec->decode = fs_vorbis_decode;
+  codec->encode_i = fs_vorbis_encode_i;
+  codec->encode_n = fs_vorbis_encode_n;
+  codec->flush = NULL;
+
+  return codec;
+}
 
 #else /* !HAVE_VORBIS */
 
-static int
-fs_novorbis_identify (unsigned char * buf, long bytes)
+int
+fish_sound_vorbis_identify (unsigned char * buf, long bytes)
 {
   return FISH_SOUND_UNKNOWN;
 }
 
 FishSoundCodec fish_sound_vorbis = {
   NULL, /* format */
-  fs_novorbis_identify, /* identify */
   NULL, /* init */
   NULL, /* delete */
   NULL, /* reset */
@@ -541,5 +544,11 @@ FishSoundCodec fish_sound_vorbis = {
   NULL, /* encode_n */
   NULL  /* flush */
 };
+
+FishSoundCodec *
+fish_sound_vorbis_codec (void)
+{
+  return NULL;
+}
 
 #endif

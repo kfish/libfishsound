@@ -79,8 +79,8 @@ typedef struct _FishSoundSpeexInfo {
   FishSoundSpeexEnc * enc;
 } FishSoundSpeexInfo;
 
-static int
-fs_speex_identify (unsigned char * buf, long bytes)
+int
+fish_sound_speex_identify (unsigned char * buf, long bytes)
 {
   SpeexHeader * header;
 
@@ -602,9 +602,9 @@ fs_speex_delete (FishSound * fsound)
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
 
   if (fsound->mode == FISH_SOUND_DECODE) {
-    speex_decoder_destroy (fss->st);
+    if (fss->st) speex_decoder_destroy (fss->st);
   } else if (fsound->mode == FISH_SOUND_ENCODE) {
-    speex_encoder_destroy (fss->st);
+    if (fss->st) speex_encoder_destroy (fss->st);
   }
   speex_bits_destroy (&fss->bits);
 
@@ -614,45 +614,42 @@ fs_speex_delete (FishSound * fsound)
   return fsound;
 }
 
-static FishSoundFormat fs_speex_format = {
-  FISH_SOUND_SPEEX,
-  "Speex (Xiph.Org)",
-  "spx"
-};
+FishSoundCodec *
+fish_sound_speex_codec (void)
+{
+  FishSoundCodec * codec;
 
-FishSoundCodec fish_sound_speex = {
-  &fs_speex_format,
-  fs_speex_identify,
-  fs_speex_init,
-  fs_speex_delete,
-  fs_speex_reset,
-  fs_speex_command,
-  fs_speex_decode,
-  fs_speex_encode_i,
-  fs_speex_encode_n,
-  fs_speex_flush
-};
+  codec = (FishSoundCodec *) malloc (sizeof (FishSoundCodec));
+
+  codec->format.format = FISH_SOUND_SPEEX;
+  codec->format.name = "Speex (Xiph.Org)";
+  codec->format.extension = "spx";
+
+  codec->init = fs_speex_init;
+  codec->del = fs_speex_delete;
+  codec->reset = fs_speex_reset;
+  codec->command = fs_speex_command;
+  codec->decode = fs_speex_decode;
+  codec->encode_i = fs_speex_encode_i;
+  codec->encode_n = fs_speex_encode_n;
+  codec->flush = fs_speex_flush;
+
+  return codec;
+}
 
 #else /* !HAVE_SPEEX */
 
-static int
-fs_nospeex_identify (unsigned char * buf, long bytes)
+int
+fish_sound_speex_identify (unsigned char * buf, long bytes)
 {
   return FISH_SOUND_UNKNOWN;
 }
 
-FishSoundCodec fish_sound_speex = {
-  NULL, /* format */
-  fs_nospeex_identify, /* identify */
-  NULL, /* init */
-  NULL, /* delete */
-  NULL, /* reset */
-  NULL, /* command */
-  NULL, /* decode */
-  NULL, /* encode_i */
-  NULL, /* encode_n */
-  NULL  /* flush */
-};
+FishSoundCodec *
+fish_sound_speex_codec (void)
+{
+  return NULL;
+}
 
 #endif
 
