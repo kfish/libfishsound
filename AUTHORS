@@ -1,5 +1,8 @@
 Conrad Parker <conrad@metadecks.org>
 
+Zentaro Kavanagh <zen@illiminable.com>
+	- Windows porting and packaging.
+
 based on code from:
 
 libvorbis, by Monty <monty@xiph.org> and the rest of
