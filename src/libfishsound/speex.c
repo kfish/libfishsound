@@ -689,13 +689,22 @@ fs_speex_enc_headers (FishSound * fsound)
 {
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
   SpeexMode * mode = NULL;
+  int modeID;
   SpeexHeader header;
   unsigned char * buf;
   int bytes;
 
   /* XXX: set wb, nb, uwb modes */
-  /* These modes are declared const in speex 1.1.x, hence the explicit cast */
-  mode = (SpeexMode *)&speex_wb_mode;
+  modeID = 1;
+
+#ifdef SPEEX_DISABLE_GLOBAL_POINTERS
+  mode = (SpeexMode *)speex_mode_new_byID (modeID);
+  fss->mode = mode;
+  fss->modeID = modeID;
+#else
+  /* speex_mode_list[] is declared const in speex 1.1.x, hence the cast */
+  mode = (SpeexMode *)speex_mode_list[modeID];
+#endif
 
   speex_init_header (&header, fsound->info.samplerate, 1, mode);
   header.frames_per_packet = fss->nframes; /* XXX: frames per packet */
@@ -957,10 +966,11 @@ fs_speex_delete (FishSound * fsound)
 {
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
 
-  if (fsound->mode == FISH_SOUND_DECODE) {
 #ifdef SPEEX_DISABLE_GLOBAL_POINTERS
-    speex_mode_free_byID (fss->mode, fss->modeID);
+  speex_mode_free_byID (fss->mode, fss->modeID);
 #endif
+
+  if (fsound->mode == FISH_SOUND_DECODE) {
     if (fss->st) speex_decoder_destroy (fss->st);
   } else if (fsound->mode == FISH_SOUND_ENCODE) {
     if (fss->st) speex_encoder_destroy (fss->st);
