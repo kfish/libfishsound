@@ -11,6 +11,8 @@ FISHSOUND_LIBS = $(FISHSOUNDDIR)/libfishsound.la $(VORBIS_LIBS) $(SPEEX_LIBS)
 
 test: check
 
+TESTS_ENVIRONMENT = $(VALGRIND_ENVIRONMENT)
+
 if FS_ENCODE
 encode_tests = comment-test
 endif
