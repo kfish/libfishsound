@@ -202,11 +202,11 @@ fs_vorbis_short_dispatch (FishSound * fsound, float ** pcm, long samples)
     /* XXX: fixme */
     retpcm = (short **)pcm;
   }
-  
+
   if (fsound->callback.decoded_short) {
     FishSoundDecoded_ShortIlv ds;
     FishSoundDecoded_Short dsi;
-    
+
     if (fsound->interleave) {
       dsi = (FishSoundDecoded_ShortIlv)fsound->callback.decoded_short_ilv;
       dsi (fsound, (short **)retpcm, samples, fsound->user_data);
@@ -235,11 +235,11 @@ fs_vorbis_float_dispatch (FishSound * fsound, float ** pcm, long samples)
   } else {
     retpcm = pcm;
   }
-  
+
   if (fsound->callback.decoded_float) {
     FishSoundDecoded_FloatIlv df;
     FishSoundDecoded_Float dfi;
-    
+
     if (fsound->interleave) {
       dfi = (FishSoundDecoded_FloatIlv)fsound->callback.decoded_float_ilv;
       dfi (fsound, (float **)retpcm, samples, fsound->user_data);
@@ -257,7 +257,10 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
   ogg_packet op;
   float ** pcm;
   long samples;
-  int ret;
+  int ret, retval;
+
+  /* Assume success */
+  retval=0;
 
   /* Make an ogg_packet structure to pass the data to libvorbis */
   op.packet = buf;
@@ -284,7 +287,7 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
      * start of vorbiscomment packet. */
     if (fsv->packetno == 1 && bytes > 7 && buf[0] == 0x03 &&
 	!strncmp ((char *)&buf[1], "vorbis", 6)) {
-      fish_sound_comments_decode (fsound, buf+7, bytes-7);
+      retval=fish_sound_comments_decode (fsound, buf+7, bytes-7);
     } else if (fsv->packetno == 2) {
       vorbis_synthesis_init (&fsv->vd, &fsv->vi);
       vorbis_block_init (&fsv->vd, &fsv->vb);
@@ -319,7 +322,7 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
 
   fsv->packetno++;
 
-  return 0;
+  return retval;
 }
 #else /* !FS_DECODE */
 
