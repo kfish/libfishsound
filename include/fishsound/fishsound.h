@@ -62,6 +62,10 @@
  * - \link fishsound.h fishsound.h \endlink:
  * Documentation of the FishSound API.
  *
+ * - \link comments.h Handling comments \endlink:
+ * How to add and retrieve \a name = \a value metadata in Vorbis and Speex
+ * streams.
+ *
  * - \link decode Decoding audio data \endlink:
  * How to decode audio data with FishSound, including source for a fully
  * working Ogg Vorbis and Ogg Speex decoder.
