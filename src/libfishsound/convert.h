@@ -217,17 +217,17 @@ static inline ogg_int32_t CLIP_TO_15(ogg_int32_t x) {
 }
 
 static inline void
-_fs_interleave_i_s (int * src[], short ** dest,
+_fs_interleave_i_s (ogg_int32_t * src[], short ** dest,
 		    long frames, int channels, int shift)
 {
   int i, j;
-  int * s;
+  ogg_int32_t * s;
   short * d = (short *)dest;
 
   for (i = 0; i < frames; i++) {
     for (j = 0; j < channels; j++) {
       s = src[j];
-      d[i*channels + j] = CLIP_TO_15(s[i]>>9);
+      d[i*channels + j] = (short) CLIP_TO_15(s[i]>>9);
     }
   }
 }
@@ -367,7 +367,7 @@ _fs_convert_f_i (float * src, int * dest, long samples, float mult)
   int i;
 
   for (i = 0; i < samples; i++) {
-    dest[i] = (int) src[i] * mult;
+    dest[i] = (int) (src[i] * mult);
   }
 }
 
