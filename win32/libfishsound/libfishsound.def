@@ -15,7 +15,7 @@ EXPORTS
 		fish_sound_get_frameno
 		fish_sound_set_frameno
 		fish_sound_prepare_truncation
-		fish_sound_get_vendor
+		fish_sound_comment_get_vendor
 		fish_sound_comment_first
 		fish_sound_comment_next
 		fish_sound_comment_first_byname

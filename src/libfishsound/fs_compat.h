@@ -37,5 +37,7 @@
 #define inline __inline
 #define alloca _alloca
 #define strncasecmp _strnicmp
+#define strcasecmp _stricmp
+#define snprintf _snprintf
 #endif
  

@@ -39,6 +39,7 @@ EXTRA_DIST = fishsound.pc.in README.win32 \
 	win32/identify.dsp \
 	win32/decode.dsp \
 	win32/encode.dsp \
+	win32/info.dsp \
 	win32/libfishsound/libfishsound.sln \
 	win32/libfishsound/libfishsound.vcproj
 

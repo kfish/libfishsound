@@ -21,7 +21,7 @@ CFLAGS=/nologo /MD /W1 /GX /O2 /I"." /I"..\src\libfishsound" /I"..\include" /I"$
 #====================================================================
 # Targets
 
-ALL :  "libfishsound.dll" "identify.exe" "encode.exe" "decode.exe"
+ALL :  "libfishsound.dll" "fishsound-identify.exe" "fishsound-info.exe" "fishsound-encode.exe" "fishsound-decode.exe"
 
 CLEAN:
 	-@erase ".\*.obj"
@@ -34,23 +34,29 @@ CLEAN:
 
 LINK32_OBJS= \
 	".\fishsound.obj" \
+	".\comments.obj" \
 	".\speex.obj" \
-	".\vorbis.obj"
+	".\vorbis.obj" \
+	".\fs_vector.obj"
 
 "libfishsound.dll" : $(LINK32_OBJS) ".\libfishsound\libfishsound.def"
     $(LINK32) $(LINK32_FLAGS) /def:".\libfishsound\libfishsound.def" $(LINK32_OBJS)
 
-"identify.exe" : "..\src\examples\identify.c"
-	$(CPP) $(CFLAGS) /Fo".\identify.obj" /c "..\src\examples\identify.c"
-	$(LINK32) $(PROG_LINK_FLAGS) /out:"identify.exe" ".\identify.obj" liboggz.lib libfishsound.lib
+"fishsound-identify.exe" : "..\src\examples\fishsound-identify.c"
+	$(CPP) $(CFLAGS) /Fo".\fishsound-identify.obj" /c "..\src\examples\fishsound-identify.c"
+	$(LINK32) $(PROG_LINK_FLAGS) /out:"fishsound-identify.exe" ".\fishsound-identify.obj" liboggz.lib libfishsound.lib
 
-"encode.exe" : "..\src\examples\encode.c"
-	$(CPP) $(CFLAGS) /Fo".\encode.obj" /c "..\src\examples\encode.c"
-	$(LINK32) $(PROG_LINK_FLAGS) /out:"encode.exe" ".\encode.obj" liboggz.lib libfishsound.lib libspeex.lib libsndfile.lib
+"fishsound-info.exe" : "..\src\examples\fishsound-info.c"
+	$(CPP) $(CFLAGS) /Fo".\fishsound-info.obj" /c "..\src\examples\fishsound-info.c"
+	$(LINK32) $(PROG_LINK_FLAGS) /out:"fishsound-info.exe" ".\fishsound-info.obj" liboggz.lib libfishsound.lib
 
-"decode.exe" : "..\src\examples\decode.c"
-	$(CPP) $(CFLAGS) /Fo".\decode.obj" /c "..\src\examples\decode.c"
-	$(LINK32) $(PROG_LINK_FLAGS) /out:"decode.exe" ".\decode.obj" liboggz.lib libfishsound.lib libspeex.lib vorbis.lib libsndfile.lib
+"fishsound-encode.exe" : "..\src\examples\fishsound-encode.c"
+	$(CPP) $(CFLAGS) /Fo".\fishsound-encode.obj" /c "..\src\examples\fishsound-encode.c"
+	$(LINK32) $(PROG_LINK_FLAGS) /out:"fishsound-encode.exe" ".\fishsound-encode.obj" liboggz.lib libfishsound.lib libspeex.lib libsndfile.lib
+
+"fishsound-decode.exe" : "..\src\examples\fishsound-decode.c"
+	$(CPP) $(CFLAGS) /Fo".\fishsound-decode.obj" /c "..\src\examples\fishsound-decode.c"
+	$(LINK32) $(PROG_LINK_FLAGS) /out:"fishsound-decode.exe" ".\fishsound-decode.obj" liboggz.lib libfishsound.lib libspeex.lib vorbis.lib libsndfile.lib
 
 
 #====================================================================
@@ -59,11 +65,17 @@ LINK32_OBJS= \
 .\fishsound.obj:
 	$(CPP) $(CFLAGS) /Fo".\fishsound.obj" /c "..\src\libfishsound\fishsound.c"
 
+.\comments.obj:
+	$(CPP) $(CFLAGS) /Fo".\comments.obj" /c "..\src\libfishsound\comments.c"
+
 .\speex.obj:
 	$(CPP) $(CFLAGS) /Fo".\speex.obj" /c "..\src\libfishsound\speex.c"
 
 .\vorbis.obj:
 	$(CPP) $(CFLAGS) /Fo".\vorbis.obj" /c "..\src\libfishsound\vorbis.c"
+
+.\fs_vector.obj:
+	$(CPP) $(CFLAGS) /Fo".\fs_vector.obj" /c "..\src\libfishsound\fs_vector.c"
 
 # End of Makefile
 #====================================================================
