@@ -335,8 +335,8 @@
  * callback you provided earlier each time it has a block of audio ready.
  * - when finished, call fish_sound_delete().
  *
- * This procedure is illustrated in src/examples/decode.c. Note that this
- * example additionally:
+ * This procedure is illustrated in src/examples/fishsound-decode.c.
+ * Note that this example additionally:
  * - uses <a href="http://www.annodex.net/software/liboggz/">liboggz</a> to
  * demultiplex audio data from an Ogg encapsulated Vorbis or Speex stream.
  * Hence, the step of feeding encoded data to libfishsound is done within
@@ -347,7 +347,7 @@
  * Hence this example code demonstrates all that is needed to decode both
  * Ogg Vorbis and Ogg Speex files:
  *
- * \include decode.c
+ * \include fishsound-decode.c
  */
 
 /** \defgroup encode Encoding audio data
@@ -369,8 +369,8 @@
  * ready.
  * - when finished, call fish_sound_delete().
  *
- * This procedure is illustrated in src/examples/encode.c. Note that this
- * example additionally:
+ * This procedure is illustrated in src/examples/fishsound-encode.c.
+ * Note that this example additionally:
  * - uses <a href="http://www.mega-nerd.com/libsndfile/">libsndfile</a> to
  * read input from a PCM audio file (WAV, AIFF, etc.)
  * - uses <a href="http://www.annodex.net/software/liboggz/">liboggz</a> to
@@ -379,7 +379,7 @@
  * Hence this example code demonstrates all that is needed to encode
  * Ogg Vorbis and Ogg Speex files:
  *
- * \include encode.c
+ * \include fishsound-encode.c
  */
 
 /**
