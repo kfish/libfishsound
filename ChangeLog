@@ -1,3 +1,16 @@
+Thu Jun 24 18:48:46 EST 2004 Conrad Parker <conrad@metadecks.org>
+
+	* Version 0.6.3
+
+	Bug fixes:
+	* non-interleaved Speex encoding re-written and tested
+	* memory leak in comments API closed
+
+	Tests and examples:
+	* new examples fishsound-encdec and fishsound-decenc to trial
+	encode<->decode pipelines
+	* improved testing of Speex non-interleaved encoding
+
 Fri May 21 14:32:41 EST 2004 Conrad Parker <conrad@metadecks.org>
 
 	* Version 0.6.2
