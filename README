@@ -1,3 +1,12 @@
+FishSound, the sound of fish!
+-----------------------------
+
+  Full documentation is available in doc/fishsound/html/index.html,
+  or online at http://www.annodex.net/software/libfishsound/html/
+
+  Updates are available online at the FishSound homepage:
+  http://www.annodex.net/software/libfishsound/
+
 libfishsound provides a simple programming interface for decoding and
 encoding audio data using Xiph.Org codecs (Vorbis and Speex).
 
@@ -6,22 +15,22 @@ lower level layer such as UDP datagrams. When these codecs are used in
 files, they are commonly encapsulated in Ogg to produce Ogg Vorbis
 and Speex files.
 
-The src/ directory contains the source code.
-The src/libfishsound/ directory has the library source code.
-The src/tools/ directory has some command line tools showing 
-               how to program with libfishsound.
+This source tarball
+-------------------
+
+FishSound has been developed and tested on GNU/Linux, Darwin/MacOSX
+and MS Windows.  Installation uses the standard configure, make, make
+install sequence; Full details are in the file INSTALL. Read the file
+README.win32 for installing under MS Windows.
+
+  src/libfishsound/  the library source code.
+  src/examples/      example tools for programming with libfishsound.
  
-The include/ directory contains the libsishound include files that
-will be installed into the system include directory.
+  include/           the libfishound include files that will be installed
+                     into the system include directory.
+
+  doc/               documentation for libfishsound. The subdirectory
+                     doc/libfishsound is autocreated by doxygen from
+		     comments contained in <fishsound/fishsound.h>
   
-The doc/ directory contains some documentation for libfishsound. The
-subdirectory libfishsound is autocreated by doxygen from comments
-contained in the source code.
-  
-The win32/ directory contains the files necessary to compile the
-library for MS Windows.
-  
-This library is installed using the standard configure, make, make
-install sequence. Full details in the file INSTALL.
-  
-Read the file README.win32 for installing under MS Windows.
+  win32/             files necessary to compile under MS Windows.
