@@ -226,8 +226,8 @@ fish_sound_delete (FishSound * fsound)
 {
   if (fsound == NULL) return NULL;
 
-  if (fsound->codec && fsound->codec->delete)
-    fsound->codec->delete (fsound);
+  if (fsound->codec && fsound->codec->del)
+    fsound->codec->del (fsound);
 
   free (fsound);
 

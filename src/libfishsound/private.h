@@ -63,7 +63,7 @@ struct _FishSoundCodec {
   FishSoundFormat * format;
   FSCodecIdentify identify;
   FSCodecInit init;
-  FSCodecDelete delete;
+  FSCodecDelete del;
   FSCodecReset reset;
   FSCodecCommand command;
   FSCodecDecode decode;

@@ -279,7 +279,7 @@ fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
 	  }
 	} else {
 	  _fs_deinterleave ((float **)fss->ipcm, fss->pcm,
-			    fss->frame_size, 2, (1/32767.0));
+			    fss->frame_size, 2, (float)(1/32767.0));
 	}
       } else {
 	for (j = 0; j < fss->frame_size; j++) {
@@ -425,7 +425,7 @@ fs_speex_encode_i (FishSound * fsound, float ** pcm, long frames)
     start = fse->pcm_offset * channels;
     end = (len + fse->pcm_offset) * channels;
     for (j = start; j < end; j++) {
-      fss->ipcm[j] = *p++ * 32767.0;
+      fss->ipcm[j] = *p++ * (float)32767.0;
     }
 
     fse->pcm_offset += len;
@@ -480,7 +480,7 @@ fs_speex_encode_n (FishSound * fsound, float * pcm[], long frames)
 	speex_encode_stereo (fss->ipcm, len, &fss->bits);
       } else {
 	for (j = 0; j < len; j++) {
-	  fss->ipcm[j] = fss->pcm[0][j] * 32767.0;
+	  fss->ipcm[j] = fss->pcm[0][j] * (float)32767.0;
 	}
       }
 

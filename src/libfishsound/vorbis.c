@@ -60,7 +60,7 @@ typedef struct _FishSoundVorbisInfo {
 
 static void _v_readstring(oggpack_buffer *o,char *buf,int bytes){
   while(bytes--){
-    *buf++=oggpack_read(o,8);
+    *buf++=(char)oggpack_read(o,8);
   }
 }
 
@@ -412,7 +412,7 @@ fs_vorbis_enc_init (FishSound * fsound)
 
 
   vorbis_encode_init_vbr (&fsv->vi, fsound->info.channels,
-			  fsound->info.samplerate, 0.3 /* quality */);
+			  fsound->info.samplerate, (float)0.3 /* quality */);
 
   vorbis_encode_setup_init (&fsv->vi);
 
