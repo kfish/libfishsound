@@ -401,7 +401,38 @@ fs_encdec_test (FishSoundPCM pcm_type, int samplerate, int channels,
     ed->frames_in += blocksize;
     fish_sound_prepare_truncation (ed->encoder, ed->frames_in,
 				   (i == (iter - 1)));
-    fish_sound_encode (ed->encoder, ed->pcm.f, blocksize);
+    switch (pcm_type) {
+    case FISH_SOUND_PCM_SHORT:
+      if (interleave) {
+	fish_sound_encode_short_ilv (ed->encoder, ed->pcm.s, blocksize);
+      } else {
+	fish_sound_encode_short (ed->encoder, ed->pcm.s, blocksize);
+      }
+      break;
+    case FISH_SOUND_PCM_INT:
+      if (interleave) {
+	fish_sound_encode_int_ilv (ed->encoder, ed->pcm.i, blocksize);
+      } else {
+	fish_sound_encode_int (ed->encoder, ed->pcm.i, blocksize);
+      }
+      break;
+    case FISH_SOUND_PCM_FLOAT:
+      if (interleave) {
+	fish_sound_encode_float_ilv (ed->encoder, ed->pcm.f, blocksize);
+      } else {
+	fish_sound_encode_float (ed->encoder, ed->pcm.f, blocksize);
+      }
+      break;
+    case FISH_SOUND_PCM_DOUBLE:
+      if (interleave) {
+	fish_sound_encode_double_ilv (ed->encoder, ed->pcm.d, blocksize);
+      } else {
+	fish_sound_encode_double (ed->encoder, ed->pcm.d, blocksize);
+      }
+      break;
+    default:
+      break;
+    }
   }
 
   fish_sound_flush (ed->encoder);
