@@ -211,7 +211,7 @@ _fs_interleave_s_f (short * src[], float ** dest,
 
 static inline void
 _fs_interleave_i_s (int * src[], short ** dest,
-		    long frames, int channels, int div)
+		    long frames, int channels, int shift)
 {
   int i, j;
   int * s;
@@ -220,7 +220,7 @@ _fs_interleave_i_s (int * src[], short ** dest,
   for (i = 0; i < frames; i++) {
     for (j = 0; j < channels; j++) {
       s = src[j];
-      d[i*channels + j] = s[i] / div;
+      d[i*channels + j] = s[i] >> shift;
     }
   }
 }

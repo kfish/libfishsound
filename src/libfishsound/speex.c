@@ -1077,7 +1077,7 @@ fs_speex_encode_i (FishSound * fsound, int * pcm[], long frames)
 
 #if HAVE_SPEEX_1_1
     _fs_interleave_i_s (fss->pcm_out.i, (short **)&fss->ipcm.s[start*channels],
-			len, channels, (1<<16));
+			len, channels, 16);
 #elif FS_FLOAT
     _fs_interleave_i_f (fss->pcm_out.i, (float **)&fss->ipcm.f[start*channels],
 			len, channels, (1/32767.0));
