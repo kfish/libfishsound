@@ -59,7 +59,7 @@
 
 /* Use fixed point arithmetic when decoding on the device */
 
-#define FS_FLOAT 1
+#define FS_FLOAT 0
 
 #endif /* __WINS__ */
 
