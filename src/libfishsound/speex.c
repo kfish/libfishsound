@@ -72,6 +72,13 @@
 
 #define MAX_FRAME_BYTES 2000
 
+/* The type of audio PCM used natively by libspeex */
+#if HAVE_SPEEX_1_1
+typedef short FS_SpeexPCM;
+#else
+typedef float FS_SpeexPCM;
+#endif
+
 typedef struct _FishSoundSpeexEnc {
   int frame_offset; /* number of speex frames done in this packet */
   int pcm_offset;
@@ -537,11 +544,7 @@ fs_speex_update (FishSound * fsound, int interleave, FishSoundPCM pcm_type)
   size_t pcm_size, pcm_out_size = 0, ilv_len;
   short * tmp;
 
-  if (HAVE_SPEEX_1_1) {
-    pcm_size = sizeof (short);
-  } else {
-    pcm_size = sizeof (float);
-  }
+  pcm_size = sizeof (FS_SpeexPCM);
 
   switch (pcm_type) {
   case FISH_SOUND_PCM_SHORT:
@@ -658,12 +661,8 @@ fs_speex_update (FishSound * fsound, int interleave, FishSoundPCM pcm_type)
   printf ("[fs_speex_update] %s %d\n", interleave ? "ilv" : "non-ilv",
 	  pcm_type);
 #endif
-  
-  if (HAVE_SPEEX_1_1) {
-    pcm_size = sizeof (short);
-  } else {
-    pcm_size = sizeof (float);
-  }
+
+  pcm_size = sizeof (FS_SpeexPCM);
 
   switch (pcm_type) {
   case FISH_SOUND_PCM_SHORT:
