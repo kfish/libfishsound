@@ -247,6 +247,21 @@ _fs_deinterleave_short (short ** src, short * dest[],
 }
 
 static inline void
+_fs_deinterleave_s_i (short ** src, int * dest[], long frames, int channels)
+{
+  int i, j;
+  short * s = (short *)src;
+  int * d;
+
+  for (i = 0; i < frames; i++) {
+    for (j = 0; j < channels; j++) {
+      d = dest[j];
+      d[i] = (int) s[i*channels + j];
+    }
+  }
+}
+
+static inline void
 _fs_interleave (float * src[], float ** dest,
 		long frames, int channels, float mult_factor)
 {
@@ -258,6 +273,18 @@ _fs_interleave (float * src[], float ** dest,
       s = src[j];
       d[i*channels + j] = s[i] * mult_factor;
     }
+  }
+}
+
+static inline void
+_fs_convert_s_i (short ** src, int ** dest, long samples)
+{
+  int i;
+  short * s = (short *)src;
+  int * d = (int *)dest;
+
+  for (i = 0; i < samples; i++) {
+    d[i] = (int) s[i];
   }
 }
 
