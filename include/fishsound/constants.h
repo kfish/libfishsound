@@ -36,15 +36,17 @@
  * Constants used by libfishsound
  */
 
-enum FishSoundMode {
+/** Mode of operation (encode or decode) */
+typedef enum _FishSoundMode {
   /** Decode */
   FISH_SOUND_DECODE = 0x10,
 
   /** Encode */
   FISH_SOUND_ENCODE = 0x20
-};
+} FishSoundMode;
 
-enum FishSoundCodecID {
+/** Identifiers for supported codecs */
+typedef enum _FishSoundCodecID {
   /** Unknown */
   FISH_SOUND_UNKNOWN = 0x00,
 
@@ -53,9 +55,10 @@ enum FishSoundCodecID {
 
   /** Speex */
   FISH_SOUND_SPEEX   = 0x02
-};
+} FishSoundCodecID;
 
-enum FishSoundCommand {
+/** Command codes */
+typedef enum _FishSoundCommand {
   /** No operation */
   FISH_SOUND_COMMAND_NOP                = 0x0000,
 
@@ -71,9 +74,10 @@ enum FishSoundCommand {
   FISH_SOUND_SET_ENCODE_VBR             = 0x4000,
   
   FISH_SOUND_COMMAND_MAX
-};
+} FishSoundCommand;
 
-enum FishSoundError {
+/** Error values */
+typedef enum _FishSoundError {
   /** No error */
   FISH_SOUND_OK                         = 0,
 
@@ -82,6 +86,6 @@ enum FishSoundError {
 
   /** Too few bytes passed to fish_sound_identify() */
   FISH_SOUND_ERR_SHORT_IDENTIFY         = -20
-};
+} FishSoundError;
 
 #endif /* __FISH_SOUND_CONSTANTS_H__ */

@@ -80,7 +80,7 @@ struct _FishSoundInfo {
 
 struct _FishSound {
   /** FISH_SOUND_DECODE or FISH_SOUND_ENCODE */
-  int mode;
+  FishSoundMode mode;
 
   /** General info related to sound */
   FishSoundInfo info;
