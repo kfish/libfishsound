@@ -379,7 +379,7 @@ fs_speex_enc_headers (FishSound * fsound)
   /* XXX: blah blah blah ... set VBR etc. */
 
   fss->ipcm = fs_malloc (fss->frame_size * fsound->info.channels
-		      * sizeof (float));
+			 * sizeof (float));
 
   return fsound;
 }
@@ -466,43 +466,40 @@ static long
 fs_speex_encode_n (FishSound * fsound, float * pcm[], long frames)
 {
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
-  long remaining = frames, len;
-  int i, j;
+  FishSoundSpeexEnc * fse = (FishSoundSpeexEnc *)fss->enc;
+  long remaining = frames, len, n = 0, nencoded = 0;
+  int j, start;
 
   if (fss->packetno == 0)
     fs_speex_enc_headers (fsound);
 
-  fss->pcm[0] = pcm[0];
-  if (fsound->info.channels == 2)
-    fss->pcm[1] = pcm[1];
+  while (remaining > 0) {
+    len = MIN (remaining, fss->frame_size - fse->pcm_offset);
 
-  for (i = 0; i < fss->nframes; i++) {
-    if (remaining > 0) {
-      len = MIN (remaining, fss->frame_size);
+    start = fse->pcm_offset;
+    fss->pcm[0] = &pcm[0][n];
 
-      if (fsound->info.channels == 2) {
-	_fs_interleave (fss->pcm, (float **)fss->ipcm,
-			fss->frame_size, 2, 32767.0);
-	speex_encode_stereo (fss->ipcm, len, &fss->bits);
-      } else {
-	for (j = 0; j < len; j++) {
-	  fss->ipcm[j] = fss->pcm[0][j] * (float)32767.0;
-	}
-      }
-
-      speex_encode (fss->st, fss->ipcm, &fss->bits);
-
-      fss->pcm[0] += len;
-      if (fsound->info.channels == 2)
-	fss->pcm[1] += len;
-
-      remaining -= len;
+    if (fsound->info.channels == 2) {
+      fss->pcm[1] = &pcm[1][n];
+      _fs_interleave (fss->pcm, (float **)&fss->ipcm[start*2],
+		      len, 2, 32767.0);
     } else {
-      speex_bits_pack (&fss->bits, 15, 5);
+      for (j = 0; j < len; j++) {
+	fss->ipcm[start + j] = fss->pcm[0][j] * (float)32767.0;
+      }
     }
+
+    fse->pcm_offset += len;
+
+    if (fse->pcm_offset == fss->frame_size) {
+      nencoded += fs_speex_encode_block (fsound);
+    }
+
+    remaining -= len;
+    n += len;
   }
 
-  return fs_speex_encode_write (fsound);
+  return nencoded;
 }
 
 static long
