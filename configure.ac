@@ -163,6 +163,10 @@ if test "x${ac_enable_liboil}" = xyes ; then
   if test "$HAVE_LIBOIL" = "no"; then
     AC_DEFINE(HAVE_LIBOIL, [0], [Define to 1 if you have liboil])
     LIBOIL_SUPPORT="no"
+    AC_MSG_WARN([
+*** liboil not found, falling back to inline C conversions.
+*** liboil provides optimized routines for Altivec, MMX and SSE etc.
+*** liboil is available from http://www.schleef.org/liboil/])
   else
     AC_DEFINE(HAVE_LIBOIL, [1], [Define to 1 if you have liboil])
     LIBOIL_SUPPORT="yes"
