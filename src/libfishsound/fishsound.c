@@ -98,6 +98,7 @@ fish_sound_new (int mode, FishSoundInfo * fsinfo)
 
   fsound->mode = mode;
   fsound->interleave = 0;
+  fsound->frameno = 0;
   fsound->codec = NULL;
   fsound->codec_data = NULL;
   fsound->callback = NULL;
@@ -276,6 +277,24 @@ fish_sound_set_interleave (FishSound * fsound, int interleave)
   if (fsound == NULL) return -1;
 
   fsound->interleave = (interleave ? 1 : 0);
+
+  return 0;
+}
+
+long
+fish_sound_get_frameno (FishSound * fsound)
+{
+  if (fsound == NULL) return -1L;
+
+  return fsound->frameno;
+}
+
+int
+fish_sound_set_frameno (FishSound * fsound, long frameno)
+{
+  if (fsound == NULL) return -1;
+
+  fsound->frameno = frameno;
 
   return 0;
 }

@@ -294,6 +294,8 @@ fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
 	retpcm = (float **)fss->pcm;
       }
 
+      fsound->frameno += fss->frame_size;
+
       /* fss->pcm is ready to go! */
       if (fsound->callback) {
 	((FishSoundDecoded)fsound->callback) (fsound, retpcm,
@@ -398,6 +400,7 @@ fs_speex_encode_block (FishSound * fsound)
   
   fse->frame_offset++;
   if (fse->frame_offset == fss->nframes) {
+    fsound->frameno += fss->frame_size * fss->nframes;
     nencoded = fs_speex_encode_write (fsound);
     fse->frame_offset = 0;
   }

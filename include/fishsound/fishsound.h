@@ -519,7 +519,11 @@ long fish_sound_encode (FishSound * fsound, float ** pcm, long frames);
 long fish_sound_flush (FishSound * fsound);
 
 /**
- * Reset the codec state of a FishSound object
+ * Reset the codec state of a FishSound object.
+ *
+ * When decoding from a seekable file, fish_sound_reset() should be called
+ * after any seek operations. See also fish_sound_set_frameno().
+ *
  * \param fsound A FishSound* handle
  * \returns 0 on success, -1 on failure
  */
@@ -562,5 +566,39 @@ int fish_sound_get_interleave (FishSound * fsound);
  * \retval -1 Invalid \a fsound
  */
 int fish_sound_set_interleave (FishSound * fsound, int interleave);
+
+/**
+ * Query the current frame number of a FishSound object.
+ *
+ * For decoding, this is the greatest frame index that has been decoded and
+ * made available to a FishSoundDecoded callback. This function is safe to
+ * call from within a FishSoundDecoded callback, and corresponds to the frame
+ * number of the last frame in the current decoded block.
+ *
+ * For encoding, this is the greatest frame index that has been encoded. This
+ * function is safe to call from within a FishSoundEncoded callback, and
+ * corresponds to the frame number of the last frame encoded in the current
+ * block.
+ *
+ * \param fsound A FishSound* handle
+ * \returns The current frame number
+ * \retval -1 Invalid \a fsound
+ */
+long fish_sound_get_frameno (FishSound * fsound);
+
+/**
+ * Set the current frame number of a FishSound object.
+ *
+ * When decoding from a seekable file, fish_sound_set_frameno() should be
+ * called after any seek operations, otherwise the value returned by
+ * fish_sound_get_frameno() will simply continue to increment. See also
+ * fish_sound_reset().
+ *
+ * \param fsound A FishSound* handle
+ * \param frameno The current frame number.
+ * \retval 0 Success
+ * \retval -1 Invalid \a fsound
+ */
+int fish_sound_set_frameno (FishSound * fsound, long frameno);
 
 #endif /* __FISH_SOUND_H__ */

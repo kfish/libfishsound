@@ -89,6 +89,7 @@ struct _FishSound {
   FishSoundInfo info;
 
   int interleave;
+  long frameno;
 
   /** The codec class structure */
   FishSoundCodec * codec;

@@ -232,6 +232,8 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
 	retpcm = pcm;
       }
 
+      fsound->frameno += samples;
+      
       if (fsound->callback) {
 	((FishSoundDecoded)fsound->callback) (fsound, retpcm, samples,
 					      fsound->user_data);
@@ -299,7 +301,8 @@ fs_vorbis_encode_write (FishSound * fsound, long len)
     while (vorbis_bitrate_flushpacket (&fsv->vd, &op)) {
       if (fsound->callback) {
 	FishSoundEncoded encoded = (FishSoundEncoded)fsound->callback;
-	
+
+	fsound->frameno = op.granulepos;
 	encoded (fsound, op.packet, op.bytes, fsound->user_data);
 	fsv->packetno++;
       }
