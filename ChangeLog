@@ -1,3 +1,17 @@
+Wed May  5 21:44:26 EST 2004 Conrad Parker <conrad@metadecks.org>
+
+	* Version 0.6.1
+
+	Added support for comment packets, tests, and various bugfixes.
+	* Added fish_sound_comment_() API, <fishsound/comments.h>
+	* Fixed segv bug in decoding stereo Speex to non-interleaved
+	* Added test for encode/decode pipeline with a variety of
+	  combinations of format, interleave, samplerate, channels and
+	  buffer size.
+	* Added tests for comments data structure and encode/decode pipeline
+
+	* Added fish_sound_{get,set}_frameno() API calls
+
 Wed Mar 24 17:53:55 EST 2004 Conrad Parker <conrad@metadecks.org>
 
 	* Version 0.6.0

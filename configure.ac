@@ -6,7 +6,7 @@ AC_PREREQ(2.53)
 
 AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE(libfishsound, 0.6.0)
+AM_INIT_AUTOMAKE(libfishsound, 0.6.1)
 AM_CONFIG_HEADER(config.h)
 
 SHARED_VERSION_INFO="1:0:0"
@@ -336,17 +336,17 @@ AC_SUBST(SHLIB_VERSION_ARG)
 AC_SUBST(SHARED_VERSION_INFO)
 
 if test "x$HAVE_OGGZ" = xyes ; then
-  fishsound_examples="identify"
+  fishsound_examples="fishsound-identify"
 
   if test "x$HAVE_LIBSNDFILE1" = xyes ; then
     if test "x${ac_enable_decode}" = xyes ; then
-      fishsound_examples="$fishsound_examples decode"
+      fishsound_examples="$fishsound_examples fishsound-decode"
     fi
     if test "x${ac_enable_encode}" = xyes ; then
-      fishsound_examples="$fishsound_examples encode"
+      fishsound_examples="$fishsound_examples fishsound-encode"
     fi
   else
-    fishsound_examples="$fishsound_examples (decode and encode require libsndfile)"
+    fishsound_examples="$fishsound_examples (fishsound-decode and fishsound-encode require libsndfile)"
   fi
 else
   fishsound_examples="(none; liboggz and libsndfile required)"
