@@ -9,11 +9,11 @@ FISHSOUNDDIR = ../libfishsound
 FISHSOUND_LIBS = $(FISHSOUNDDIR)/libfishsound.la $(VORBIS_LIBS) $(SPEEX_LIBS)
 
 if HAVE_OGGZ
-oggz_examples = fishsound-identify fishsound-info
+oggz_examples = fishsound-identify fishsound-info fishsound-decenc
 endif
 
 if HAVE_LIBSNDFILE1
-sndfile_examples = fishsound-decenc fishsound-encdec
+sndfile_examples = fishsound-encdec
 endif
 
 if HAVE_OGGZ
@@ -39,7 +39,7 @@ fishsound_encode_SOURCES = fishsound-encode.c
 fishsound_encode_LDADD = $(FISHSOUND_LIBS) $(OGGZ_LIBS) $(SNDFILE_LIBS)
 
 fishsound_decenc_SOURCES = fishsound-decenc.c
-fishsound_decenc_LDADD = $(FISHSOUND_LIBS) $(SNDFILE_LIBS)
+fishsound_decenc_LDADD = $(FISHSOUND_LIBS) $(OGGZ_LIBS)
 
 fishsound_encdec_SOURCES = fishsound-encdec.c
 fishsound_encdec_LDADD = $(FISHSOUND_LIBS) $(SNDFILE_LIBS)
