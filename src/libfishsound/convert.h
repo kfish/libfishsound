@@ -180,7 +180,7 @@ _fs_interleave_f_s (float * src[], short ** dest,
 
 static inline void
 _fs_interleave_s_s (short * src[], short ** dest,
-		    long frames, int channels, float mult)
+		    long frames, int channels)
 {
   int i, j;
   short * s, * d = (short *)dest;
@@ -188,7 +188,7 @@ _fs_interleave_s_s (short * src[], short ** dest,
   for (i = 0; i < frames; i++) {
     for (j = 0; j < channels; j++) {
       s = src[j];
-      d[i*channels + j] = s[i] * mult;
+      d[i*channels + j] = s[i];
     }
   }
 }
@@ -211,7 +211,7 @@ _fs_interleave_s_f (short * src[], float ** dest,
 
 static inline void
 _fs_interleave_i_s (int * src[], short ** dest,
-		    long frames, int channels, float mult)
+		    long frames, int channels, int div)
 {
   int i, j;
   int * s;
@@ -220,7 +220,7 @@ _fs_interleave_i_s (int * src[], short ** dest,
   for (i = 0; i < frames; i++) {
     for (j = 0; j < channels; j++) {
       s = src[j];
-      d[i*channels + j] = s[i] * mult;
+      d[i*channels + j] = s[i] / div;
     }
   }
 }
