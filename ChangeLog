@@ -1,3 +1,16 @@
+Fri May 21 14:32:41 EST 2004 Conrad Parker <conrad@metadecks.org>
+
+	* Version 0.6.2
+
+	Improved handling of first and last blocks of data (bos and eos
+	packets in Ogg):
+        * new fish_sound_prepare_truncation() API call
+        * improved encdec-audio test to keep track of frames in and out,
+          and warn if unequal. (Currently not set to FAIL on this condition
+          as it appears to be common for Speex)
+
+	Updates to Win32 nmake build files
+
 Wed May  5 21:44:26 EST 2004 Conrad Parker <conrad@metadecks.org>
 
 	* Version 0.6.1
