@@ -112,8 +112,8 @@ typedef int (*FishSoundDecoded) (FishSound * fsound, float ** pcm,
 typedef int (*FishSoundEncoded) (FishSound * fsound, unsigned char * buf,
 				 long bytes, void * user_data);
 
-FishSoundCodec fish_sound_vorbis;
-FishSoundCodec fish_sound_speex;
+extern FishSoundCodec fish_sound_vorbis;
+extern FishSoundCodec fish_sound_speex;
 
 /* inline functions */
 

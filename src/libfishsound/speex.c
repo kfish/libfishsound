@@ -41,7 +41,7 @@
 
 /*#define DEBUG*/
 
-#ifdef HAVE_SPEEX
+#if HAVE_SPEEX
 
 #include <speex.h>
 #include <speex_header.h>
