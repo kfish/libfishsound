@@ -21,6 +21,13 @@ AC_PROG_MAKE_SET
 AC_C_CONST
 AC_C_BIGENDIAN
 
+# Check for doxygen
+AC_CHECK_PROG(HAVE_DOXYGEN, doxygen, true, false)
+AM_CONDITIONAL(HAVE_DOXYGEN,$HAVE_DOXYGEN)
+if test $HAVE_DOXYGEN = "false"; then
+             AC_MSG_WARN([*** doxygen not found, docs will not be built])
+fi
+
 dnl Overall configuration success flag
 fishsound_config_ok=yes
 
