@@ -214,6 +214,8 @@ if test "x${ac_enable_vorbis}" = xyes ; then
     else
       AC_DEFINE(HAVE_VORBISENC, [0], [Define to 1 if you have libvorbisenc])
     fi
+  else
+    AC_DEFINE(HAVE_VORBISENC, [0], [Define to 1 if you have libvorbisenc])
   fi
 
   if test "x$HAVE_VORBIS" = "xyes" && test "x$HAVE_VORBISENC" = "xyes" ; then
