@@ -417,7 +417,8 @@ fs_speex_decode_short_dlv (FishSound * fsound)
     /* Decode frame */
     speex_decode_int (fss->st, &fss->bits, fss->ipcm.s);
 
-    speex_decode_stereo_int (fss->ipcm.s, fss->frame_size, &fss->stereo);
+    if (channels == 2)
+      speex_decode_stereo_int (fss->ipcm.s, fss->frame_size, &fss->stereo);
 
     fsound->frameno += fss->frame_size;
 
@@ -514,7 +515,8 @@ fs_speex_decode_float_dlv (FishSound * fsound)
     /* Decode frame */
     speex_decode (fss->st, &fss->bits, fss->ipcm.f);
 
-    speex_decode_stereo (fss->ipcm.f, fss->frame_size, &fss->stereo);
+    if (channels == 2)
+      speex_decode_stereo (fss->ipcm.f, fss->frame_size, &fss->stereo);
 
     fsound->frameno += fss->frame_size;
 
