@@ -191,8 +191,7 @@ _fs_convert_s_f (short * src, float * dest, long samples, float mult)
   int i;
 
   for (i = 0; i < samples; i++) {
-    dest[i] = (float) src[i];
-    dest[i] *= mult;
+    dest[i] = (float) src[i] * mult;
   }
 }
 
