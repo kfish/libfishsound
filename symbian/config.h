@@ -79,7 +79,7 @@
 
 #define HAVE_SPEEX_FREE
 
-/* We have speex_lib_get_mode()
+/* We have speex_lib_get_mode() */
 
 #define HAVE_SPEEX_LIB_GET_MODE
 
