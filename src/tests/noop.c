@@ -46,9 +46,6 @@ static int
 noop_test (int format)
 {
   FishSoundInfo fsinfo;
-  const FishSoundComment * comment, * comment2;
-  FishSoundComment mycomment;
-  int err;
 
   fsinfo.samplerate = 16000;
   fsinfo.channels = 1;
@@ -69,6 +66,8 @@ noop_test (int format)
   INFO ("+ Deleteing FishSound (decode)");
   fish_sound_delete (fsound);
 #endif
+
+  return 0;
 }
 
 int
