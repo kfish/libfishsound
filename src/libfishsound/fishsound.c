@@ -101,6 +101,8 @@ fish_sound_new (int mode, FishSoundInfo * fsinfo)
   fsound->mode = mode;
   fsound->interleave = 0;
   fsound->frameno = 0;
+  fsound->next_granulepos = -1;
+  fsound->next_eos = 0;
   fsound->codec = NULL;
   fsound->codec_data = NULL;
   fsound->callback = NULL;
@@ -300,6 +302,18 @@ fish_sound_set_frameno (FishSound * fsound, long frameno)
   if (fsound == NULL) return -1;
 
   fsound->frameno = frameno;
+
+  return 0;
+}
+
+int
+fish_sound_prepare_truncation (FishSound * fsound, long next_granulepos,
+			       int next_eos)
+{
+  if (fsound == NULL) return -1;
+
+  fsound->next_granulepos = next_granulepos;
+  fsound->next_eos = next_eos;
 
   return 0;
 }

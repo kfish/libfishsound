@@ -42,16 +42,53 @@
 
 #define DEBUG
 
+#define DEFAULT_ITER 2
+
+static void
+usage (char * progname)
+{
+  printf ("Usage: %s [options]\n\n", progname);
+  printf ("Options:\n");
+  printf ("  --iter n                  Specify iterations per test (default %d)\n", DEFAULT_ITER);
+  printf ("  --nasty                   Run with large test parameters\n");
+  printf ("  --disable-vorbis          Disable testing of Vorbis codec\n");
+  printf ("  --disable-speex           Disable testing of Speex codec\n");
+  printf ("  --disable-interleave      Disable testing of interleave\n");
+  printf ("  --disable-non-interleave  Disable testing of non-interleave\n");
+  exit (1);
+}
+
+/* For one-time tests, configure these by commandline args */
+static int * test_blocksizes, * test_samplerates, * test_channels;
+static int iter = DEFAULT_ITER;
+static int test_vorbis = 1, test_speex = 1;
+static int test_interleave = 1, test_non_interleave = 1;
+
+static int nasty_blocksizes[] = {128, 256, 512, 1024, 2048, 4096, 0};
+static int nasty_samplerates[] = {8000, 16000, 32000, 48000, 0};
+static int nasty_channels[] = {1, 2, 4, 5, 6, 8, 10, 16, 32, 0};
+
+static int default_blocksizes[] = {128, 1024, 0};
+static int default_samplerates[] = {8000, 48000, 0};
+static int default_channels[] = {1, 2, 6, 16, 0};
+
 typedef struct {
   FishSound * encoder;
   FishSound * decoder;
+  int interleave;
+  int channels;
   float ** pcm;
+  long frames_in;
+  long frames_out;
 } FS_EncDec;
 
 static int
 decoded (FishSound * fsound, float ** pcm, long frames, void * user_data)
 {
-  /* Boo! */
+  FS_EncDec * ed = (FS_EncDec *) user_data;
+
+  ed->frames_out += frames;
+
   return 0;
 }
 
@@ -101,6 +138,9 @@ fs_encdec_new (int samplerate, int channels, int format, int interleave,
   fish_sound_set_encoded_callback (ed->encoder, encoded, ed);
   fish_sound_set_decoded_callback (ed->decoder, decoded, ed);
 
+  ed->interleave = interleave;
+  ed->channels = channels;
+
   if (interleave) {
     ed->pcm = (float **) malloc (sizeof (float) * channels * blocksize);
     fs_fill_square ((float *)ed->pcm, channels * blocksize);
@@ -112,16 +152,28 @@ fs_encdec_new (int samplerate, int channels, int format, int interleave,
     }
   }
 
+  ed->frames_in = 0;
+  ed->frames_out = 0;
+
   return ed;
 }
 
 static int
 fs_encdec_delete (FS_EncDec * ed)
 {
+  int i;
+
   if (!ed) return -1;
 
   fish_sound_delete (ed->encoder);
   fish_sound_delete (ed->decoder);
+
+  if (!ed->interleave) {
+    for (i = 0; i < ed->channels; i++)
+      free (ed->pcm[i]);
+  }
+  free (ed->pcm);
+  
   free (ed);
 
   return 0;
@@ -132,12 +184,33 @@ fs_encdec_test (int samplerate, int channels, int format, int interleave,
 		int blocksize)
 {
   FS_EncDec * ed;
+  char msg[128];
   int i;
+
+  snprintf (msg, 128,
+	    "+ %2d channel %6d Hz %s, %d frame buffer (%s)",
+	    channels, samplerate,
+	    format == FISH_SOUND_VORBIS ? "Vorbis" : "Speex",
+	    blocksize,
+	    interleave ? "interleave" : "non-interleave");
+  INFO (msg);
   
   ed = fs_encdec_new (samplerate, channels, format, interleave, blocksize);
 
-  for (i = 0; i < 2; i++) {
+  for (i = 0; i < iter; i++) {
+    ed->frames_in += blocksize;
+    fish_sound_prepare_truncation (ed->encoder, ed->frames_in,
+				   (i == (iter - 1)));
     fish_sound_encode (ed->encoder, ed->pcm, blocksize);
+  }
+
+  fish_sound_flush (ed->encoder);
+
+  if (ed->frames_in != ed->frames_out) {
+    snprintf (msg, 128,
+	      "%ld frames encoded, %ld frames decoded",
+	      ed->frames_in, ed->frames_out);
+    WARN (msg);
   }
 
   fs_encdec_delete (ed);
@@ -145,48 +218,95 @@ fs_encdec_test (int samplerate, int channels, int format, int interleave,
   return 0;
 }
 
-int
-main (int argc, char * argv[])
+static void
+parse_args (int argc, char * argv[])
 {
+  int i;
 
-#ifdef NASTY
-  int blocksizes[6] = {128, 256, 512, 1024, 2048, 4096};
-  int samplerates[4] = {8000, 16000, 32000, 48000};
-  int channels[9] = {1, 2, 4, 5, 6, 8, 10, 16, 32};
-#else
-  int blocksizes[2] = {128, 1024};
-  int samplerates[2] = {8000, 48000};
-  int channels[4] = {1, 2, 6, 16};
-#endif
-  int interleave, b, s, c;
-  char buf[128];
+  for (i = 1; i < argc; i++) {
+    if (!strcmp (argv[i], "--nasty")) {
+      test_blocksizes = nasty_blocksizes;
+      test_samplerates = nasty_samplerates;
+      test_channels = nasty_channels;
+    } else if (!strcmp (argv[i], "--iter")) {
+      i++; if (i >= argc) usage(argv[0]);
+      iter = atoi (argv[i]);
+    } else if (!strcmp (argv[i], "--disable-vorbis")) {
+      test_vorbis = 0;
+    } else if (!strcmp (argv[i], "--disable-speex")) {
+      test_speex = 0;
+    } else if (!strcmp (argv[i], "--disable-interleave")) {
+      test_interleave = 0;
+    } else if (!strcmp (argv[i], "--disable-non-interleave")) {
+      test_non_interleave = 0;
+    } else if (!strcmp (argv[i], "--help") || !strcmp (argv[i], "-h")) {
+      usage(argv[0]);
+    }
+  }
 
   INFO ("Testing encode/decode pipeline for audio");
 
-  for (b = 0; b < sizeof (blocksizes) / sizeof (int); b++) {
-    for (s = 0; s < sizeof (samplerates) / sizeof (int); s++) {
-      for (c = 0; c < sizeof (channels) / sizeof (int); c++) {
-	for (interleave = 0; interleave < 2; interleave++) {
+  /* Report abnormal options */
 
+  if (test_blocksizes == nasty_blocksizes)
+    INFO ("* Running NASTY large test parameters");
+
+  if (!test_vorbis) INFO ("* DISABLED testing of Vorbis");
+  if (!test_speex) INFO ("* DISABLED testing of Speex");
+  if (!test_interleave) INFO ("* DISABLED testing of INTERLEAVE");
+  if (!test_non_interleave) INFO ("* DISABLED testing of NON-INTERLEAVE");
+}
+
+int
+main (int argc, char * argv[])
+{
+  int b, s, c;
+
+  test_blocksizes = default_blocksizes;
+  test_samplerates = default_samplerates;
+  test_channels = default_channels;
+
+  parse_args (argc, argv);
+  
+  for (b = 0; test_blocksizes[b]; b++) {
+    for (s = 0; test_samplerates[s]; s++) {
+      for (c = 0; test_channels[c]; c++) {
+
+	if (test_non_interleave) {
 	  /* Test VORBIS */
-	  snprintf (buf, 128, "+ %2d channel %6d Hz Vorbis, %d frame buffer (%s)",
-		    channels[c], samplerates[s], blocksizes[b],
-		    interleave ? "interleave" : "non-interleave");
-	  INFO (buf);
-	  fs_encdec_test (samplerates[s], channels[c], FISH_SOUND_VORBIS,
-			  interleave, blocksizes[b]);
-
+	  if (test_vorbis) {
+	    fs_encdec_test (test_samplerates[s], test_channels[c],
+			    FISH_SOUND_VORBIS, 0, test_blocksizes[b]);
+	  }
+	  
 	  /* Test SPEEX */
-	  if (channels[c] <= 2) {
-	    snprintf (buf, 128, "+ %2d channel %6d Hz Speex,  %d frame buffer (%s)",
-		      channels[c], samplerates[s], blocksizes[b],
-		      interleave ? "interleave" : "non-interleave");
-	    INFO (buf);
-	    fs_encdec_test (samplerates[s], channels[c], FISH_SOUND_SPEEX,
-			    interleave, blocksizes[b]);
-
+	  if (test_speex) {
+	    if (test_channels[c] <= 2) {
+	      fs_encdec_test (test_samplerates[s], test_channels[c],
+			      FISH_SOUND_SPEEX, 0, test_blocksizes[b]);
+	      
+	    }
 	  }
 	}
+
+	if (test_interleave) {
+	  /* Test VORBIS */
+	  if (test_vorbis) {
+	    fs_encdec_test (test_samplerates[s], test_channels[c],
+			    FISH_SOUND_VORBIS, 1, test_blocksizes[b]);
+	  }
+	  
+	  /* Test SPEEX */
+	  if (test_speex) {
+	    if (test_channels[c] <= 2) {
+	      fs_encdec_test (test_samplerates[s], test_channels[c],
+			      FISH_SOUND_SPEEX, 1, test_blocksizes[b]);
+	      
+	    }
+	  }
+	}
+
+
       }
     }
   }

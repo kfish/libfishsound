@@ -609,6 +609,39 @@ long fish_sound_get_frameno (FishSound * fsound);
  */
 int fish_sound_set_frameno (FishSound * fsound, long frameno);
 
+/**
+ * Prepare truncation details for the next block of data.
+ * The semantics of these parameters derives directly from Ogg encapsulation
+ * of Vorbis, described
+ * <a href="http://www.xiph.org/ogg/vorbis/doc/Vorbis_I_spec.html#vorbis-over-ogg">here</a>.
+ *
+ * When decoding from Ogg, you should call this function with the \a granulepos
+ * and \a eos of the \a ogg_packet structure. This call should be made before
+ * passing the packet's data to fish_sound_decode(). Failure to do so may
+ * result in minor decode errors on the first and/or last packet of the stream.
+ *
+ * When encoding into Ogg, you should call this function with the \a granulepos
+ * and \a eos that will be used for the \a ogg_packet structure. This call
+ * should be made before passing the block of audio data to
+ * fish_sound_encode(). Failure to do so may result in minor encoding errors
+ * on the first and/or last packet of the stream.
+ *
+ * \param fsound A FishSound* handle
+ * \param next_granulepos The "granulepos" for the next block to decode.
+ *        If unknown, set \a next_granulepos to -1. Otherwise,
+ *        \a next_granulepos specifies the frameno of the final frame in the
+ *        block. This is authoritative, hence can be used to indicate
+ *        various forms of truncation at the beginning or end of a stream.
+ *        Mid-stream, a later-than-expected "granulepos" indicates that some
+ *        data was missing. 
+ * \param next_eos A boolean indicating whether the next data block will be
+ *        the last in the stream.
+ * \retval 0 Success
+ * \retval -1 Invalid \a fsound
+ */
+int fish_sound_prepare_truncation (FishSound * fsound, long next_granulepos,
+                                   int next_eos);
+
 #ifdef __cplusplus
 }
 #endif

@@ -188,12 +188,12 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
   long samples;
   int ret;
 
-  /* Make a fake ogg_packet structure to pass the data to libvorbis */
+  /* Make an ogg_packet structure to pass the data to libvorbis */
   op.packet = buf;
   op.bytes = bytes;
   op.b_o_s = (fsv->packetno == 0) ? 1 : 0;
-  op.e_o_s = 0;
-  op.granulepos = 7;
+  op.e_o_s = fsound->next_eos;
+  op.granulepos = fsound->next_granulepos;
   op.packetno = fsv->packetno;
 
   if (fsv->packetno < 3) {
@@ -237,14 +237,20 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
       } else {
 	retpcm = pcm;
       }
-
-      fsound->frameno += samples;
       
       if (fsound->callback) {
 	((FishSoundDecoded)fsound->callback) (fsound, retpcm, samples,
 					      fsound->user_data);
       }
+
+      if (fsound->frameno != -1)
+	fsound->frameno += samples;
     }
+  }
+
+  if (fsound->next_granulepos != -1) {
+    fsound->frameno = fsound->next_granulepos;
+    fsound->next_granulepos = -1;
   }
 
   fsv->packetno++;
@@ -321,8 +327,11 @@ fs_vorbis_encode_write (FishSound * fsound, long len)
       if (fsound->callback) {
 	FishSoundEncoded encoded = (FishSoundEncoded)fsound->callback;
 
-	fsound->frameno = op.granulepos;
 	encoded (fsound, op.packet, op.bytes, fsound->user_data);
+
+	if (op.granulepos != -1)
+	  fsound->frameno = op.granulepos;
+
 	fsv->packetno++;
       }
     }
@@ -357,6 +366,13 @@ fs_vorbis_encode_i (FishSound * fsound, float ** pcm, long frames)
 
     remaining -= len;
   }
+
+  /**
+   * End of input. Tell libvorbis we're at the end of stream so that it can
+   * handle the last frame and marke end of stream in the output properly.
+   */
+  if (fsound->next_eos)
+    fs_vorbis_encode_write (fsound, 0);
 
   return 0;
 }
@@ -396,6 +412,13 @@ fs_vorbis_encode_n (FishSound * fsound, float * pcm[], long frames)
 
     remaining -= len;
   }
+
+  /**
+   * End of input. Tell libvorbis we're at the end of stream so that it can
+   * handle the last frame and marke end of stream in the output properly.
+   */
+  if (fsound->next_eos)
+    fs_vorbis_encode_write (fsound, 0);
 
   return 0;
 }

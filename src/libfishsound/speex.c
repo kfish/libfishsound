@@ -512,6 +512,9 @@ fs_speex_flush (FishSound * fsound)
   FishSoundSpeexEnc * fse = (FishSoundSpeexEnc *)fss->enc;
   long nencoded = 0;
 
+  if (fsound->mode != FISH_SOUND_ENCODE)
+    return 0;
+
   if (fse->pcm_offset > 0) {
     nencoded += fs_speex_encode_block (fsound);
   }

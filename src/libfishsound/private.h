@@ -95,8 +95,28 @@ struct _FishSound {
   /** General info related to sound */
   FishSoundInfo info;
 
+  /** Interleave boolean */
   int interleave;
+
+  /**
+   * Current frameno.
+   */
   long frameno;
+
+  /**
+   * Truncation frameno for the next block of data sent to decode.
+   * In Ogg encapsulation, this is represented by the Ogg packet's
+   * "granulepos" field.
+   */
+  long next_granulepos;
+
+  /**
+   * Flag if the next block of data sent to decode will be the last one
+   * for this stream (eos = End Of Stream).
+   * In Ogg encapsulation, this is represented by the Ogg packet's
+   * "eos" field.
+   */
+  int next_eos;
 
   /** The codec class structure */
   FishSoundCodec * codec;

@@ -79,6 +79,7 @@ read_packet (OGGZ * oggz, ogg_packet * op, long serialno, void * user_data)
 {
   FishSound * fsound = (FishSound *)user_data;
 
+  fish_sound_prepare_truncation (fsound, op->granulepos, op->e_o_s);
   fish_sound_decode (fsound, op->packet, op->bytes);
 
   return 0;
