@@ -96,7 +96,7 @@ fish_sound_new (int mode, FishSoundInfo * fsinfo)
     return NULL;
   }
 
-  fsound = malloc (sizeof (FishSound));
+  fsound = fs_malloc (sizeof (FishSound));
 
   fsound->mode = mode;
   fsound->interleave = 0;
@@ -120,7 +120,7 @@ fish_sound_new (int mode, FishSoundInfo * fsinfo)
     fsound->info.format = fsinfo->format;
 
     if (fish_sound_set_format (fsound, fsinfo->format) == -1) {
-      free (fsound);
+      fs_free (fsound);
       return NULL;
     }
   }
@@ -240,7 +240,7 @@ fish_sound_delete (FishSound * fsound)
 
   fish_sound_comments_free (fsound);
 
-  free (fsound);
+  fs_free (fsound);
 
   return NULL;
 }

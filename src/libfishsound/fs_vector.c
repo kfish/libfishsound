@@ -34,6 +34,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "fs_compat.h"
+
 typedef int (*FishSoundFunc) (void * data);
 typedef int (*FishSoundCmpFunc) (const void * data1, const void * data2);
 
@@ -55,7 +57,7 @@ fs_vector_new (FishSoundCmpFunc cmp)
 {
   FishSoundVector * vector;
 
-  vector = malloc (sizeof (FishSoundVector));
+  vector = fs_malloc (sizeof (FishSoundVector));
 
   vector->max_elements = 0;
   vector->nr_elements = 0;
@@ -68,7 +70,7 @@ fs_vector_new (FishSoundCmpFunc cmp)
 static void
 fs_vector_clear (FishSoundVector * vector)
 {
-  free (vector->data);
+  fs_free (vector->data);
   vector->data = NULL;
   vector->nr_elements = 0;
   vector->max_elements = 0;
@@ -78,7 +80,7 @@ void
 fs_vector_delete (FishSoundVector * vector)
 {
   fs_vector_clear (vector);
-  free (vector);
+  fs_free (vector);
 }
 
 int
@@ -157,7 +159,7 @@ fs_vector_grow (FishSoundVector * vector)
     }
 
     new_elements =
-      realloc (vector->data, (size_t)new_max_elements * sizeof (void *));
+      fs_realloc (vector->data, (size_t)new_max_elements * sizeof (void *));
 
     if (new_elements == NULL) {
       vector->nr_elements--;
@@ -203,9 +205,9 @@ fs_vector_remove_nth (FishSoundVector * vector, int n)
       new_max_elements = vector->max_elements/2;
 
       new_elements =
-	realloc (vector->data,
-		 (size_t)new_max_elements * sizeof (void *));
-
+	fs_realloc (vector->data,
+		    (size_t)new_max_elements * sizeof (void *));
+      
       if (new_elements == NULL)
 	return NULL;
 

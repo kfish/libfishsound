@@ -45,7 +45,7 @@ fs_strdup (const char * s)
 {
   char * ret;
   if (!s) return NULL;
-  ret = malloc (strlen(s) + 1);
+  ret = fs_malloc (strlen(s) + 1);
   return strcpy (ret, s);
 }
 
@@ -54,9 +54,9 @@ fs_strdup_len (const char * s, int len)
 {
   char * ret;
   if (!s) return NULL;
-  ret = malloc (len + 1);
+  ret = fs_malloc (len + 1);
   if (!strncpy (ret, s, len)) {
-    free (ret);
+    fs_free (ret);
     return NULL;
   }
 
@@ -118,7 +118,7 @@ comment_init(char **comments, int* length, char *vendor_string)
   int vendor_length=strlen(vendor_string);
   int user_comment_list_length=0;
   int len=4+vendor_length+4;
-  char *p=(char*)malloc(len);
+  char *p=(char*)fs_malloc(len);
   if(p==NULL){
   }
   writeint(p, 0, vendor_length);
@@ -138,7 +138,7 @@ comment_add(char **comments, int* length, char *tag, char *val)
   int val_len=strlen(val);
   int len=(*length)+4+tag_len+val_len;
 
-  p=(char*)realloc(p, len);
+  p=(char*)fs_realloc(p, len);
   if(p==NULL){
   }
 
@@ -178,7 +178,7 @@ fs_comment_new (const char * name, const char * value)
 
   if (!fs_comment_validate_byname (name, value)) return NULL;
 
-  comment = malloc (sizeof (FishSoundComment));
+  comment = fs_malloc (sizeof (FishSoundComment));
   comment->name = fs_strdup (name);
   comment->value = fs_strdup (value);
 
@@ -189,9 +189,9 @@ static void
 fs_comment_free (FishSoundComment * comment)
 {
   if (!comment) return;
-  free (comment->name);
-  free (comment->value);
-  free (comment);
+  fs_free (comment->name);
+  fs_free (comment->value);
+  fs_free (comment);
 }
 
 static int
@@ -221,7 +221,7 @@ fish_sound_comment_set_vendor (FishSound * fsound, const char * vendor_string)
 {
   if (fsound == NULL) return FISH_SOUND_ERR_BAD;
 
-  if (fsound->vendor) free (fsound->vendor);
+  if (fsound->vendor) fs_free (fsound->vendor);
 
   fsound->vendor = fs_strdup (vendor_string);
 
@@ -414,7 +414,7 @@ fish_sound_comments_free (FishSound * fsound)
   fsound->comments = NULL;
 
   if (fsound->vendor)
-    free (fsound->vendor);
+    fs_free (fsound->vendor);
   fsound->vendor = NULL;
 
   return 0;
@@ -474,12 +474,12 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
 #endif
 	comment = fs_comment_new (name, nvalue);
 	_fs_comment_add (fsound, comment);
-	free (nvalue);
+	fs_free (nvalue);
       } else {
 	nvalue = fs_strdup_len (name, len);
 	comment = fs_comment_new (nvalue, NULL);
 	_fs_comment_add (fsound, comment);
-	free (nvalue);
+	fs_free (nvalue);
       }
 
       c+=len;

@@ -468,7 +468,7 @@ fs_vorbis_init (FishSound * fsound)
 {
   FishSoundVorbisInfo * fsv;
 
-  fsv = malloc (sizeof (FishSoundVorbisInfo));
+  fsv = fs_malloc (sizeof (FishSoundVorbisInfo));
   if (fsv == NULL) return NULL;
 
   fsv->packetno = 0;
@@ -500,7 +500,7 @@ fs_vorbis_delete (FishSound * fsound)
   vorbis_comment_clear (&fsv->vc);
   vorbis_info_clear (&fsv->vi);
 
-  free (fsv);
+  fs_free (fsv);
   fsound->codec_data = NULL;
 
   return fsound;
@@ -511,7 +511,7 @@ fish_sound_vorbis_codec (void)
 {
   FishSoundCodec * codec;
 
-  codec = (FishSoundCodec *) malloc (sizeof (FishSoundCodec));
+  codec = (FishSoundCodec *) fs_malloc (sizeof (FishSoundCodec));
 
   codec->format.format = FISH_SOUND_VORBIS;
   codec->format.name = "Vorbis (Xiph.Org)";

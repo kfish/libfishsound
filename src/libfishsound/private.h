@@ -43,7 +43,6 @@
 #undef MIN
 #define MIN(a,b) (((a)<(b))?(a):(b))
 
-
 typedef struct _FishSound FishSound;
 typedef struct _FishSoundInfo FishSoundInfo;
 typedef struct _FishSoundCodec FishSoundCodec;

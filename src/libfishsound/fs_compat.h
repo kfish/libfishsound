@@ -42,3 +42,16 @@
 #define strcasecmp _stricmp
 #endif /* ! __SYMBIAN32__ */
 #endif
+
+/* malloc/realloc/free macros */
+#ifndef fs_malloc
+#define fs_malloc malloc
+#endif
+
+#ifndef fs_realloc
+#define fs_realloc realloc
+#endif
+
+#ifndef fs_free
+#define fs_free free
+#endif
