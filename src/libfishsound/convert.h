@@ -35,6 +35,7 @@
 
 #include <string.h>
 #include <ogg/ogg.h>
+#include <liboil/liboil.h>
 
 /* inline functions */
 
@@ -42,29 +43,25 @@ static inline void
 _fs_deinterleave_s_s (short ** src, short * dest[],
 		      long frames, int channels)
 {
-  int i, j;
-  short * d, * s = (short *)src;
+  int j;
+  short * s = (short *)src;
 
-  for (i = 0; i < frames; i++) {
-    for (j = 0; j < channels; j++) {
-      d = dest[j];
-      d[i] = s[i*channels + j];
-    }
+#define oil_restride_s16(a,b,c,d,e) oil_conv_u16_s16((uint16_t *)a,b,c,d,e)
+  for (j = 0; j < channels; j++) {
+    oil_restride_s16 (dest[j], sizeof(short), s + j,
+        channels * sizeof(short), frames);
   }
 }
 
 static inline void
 _fs_deinterleave_s_i (short ** src, int * dest[], long frames, int channels)
 {
-  int i, j;
+  int j;
   short * s = (short *)src;
-  int * d;
 
-  for (i = 0; i < frames; i++) {
-    for (j = 0; j < channels; j++) {
-      d = dest[j];
-      d[i] = (int) s[i*channels + j];
-    }
+  for (j = 0; j < channels; j++) {
+    oil_conv_s32_s16 (dest[j], sizeof(int), s + j,
+        channels * sizeof(short), frames);
   }
 }
 
@@ -72,15 +69,14 @@ static inline void
 _fs_deinterleave_s_f (short ** src, float * dest[], long frames, int channels,
 		      float mult)
 {
-  int i, j;
+  int j;
   short * s = (short *)src;
-  float * d;
 
-  for (i = 0; i < frames; i++) {
-    for (j = 0; j < channels; j++) {
-      d = dest[j];
-      d[i] = ((float) s[i*channels + j]) * mult;
-    }
+  for (j = 0; j < channels; j++) {
+    oil_conv_f32_s16 (dest[j], sizeof(float), s + j,
+        channels * sizeof(short), frames);
+    oil_scalarmult_f32 (dest[j], sizeof (float), dest[j], sizeof(float),
+        &mult, frames);
   }
 }
 
@@ -88,15 +84,14 @@ static inline void
 _fs_deinterleave_s_d (short ** src, double * dest[], long frames, int channels,
 		      double mult)
 {
-  int i, j;
+  int j;
   short * s = (short *)src;
-  double * d;
 
-  for (i = 0; i < frames; i++) {
-    for (j = 0; j < channels; j++) {
-      d = dest[j];
-      d[i] = ((double) s[i*channels + j]) * mult;
-    }
+  for (j = 0; j < channels; j++) {
+    oil_conv_f64_s16 (dest[j], sizeof(double), s + j,
+        channels * sizeof(short), frames);
+    oil_scalarmult_f64 (dest[j], sizeof (double), dest[j], sizeof (double),
+        &mult, frames);
   }
 }
 
@@ -108,6 +103,7 @@ _fs_deinterleave_f_s (float ** src, short * dest[],
   float * s = (float *)src;
   short * d;
 
+  /* FIXME: this needs a temporary buffer for liboil */
   for (i = 0; i < frames; i++) {
     for (j = 0; j < channels; j++) {
       d = dest[j];
@@ -124,6 +120,7 @@ _fs_deinterleave_f_i (float ** src, int * dest[],
   float * s = (float *)src;
   int * d;
 
+  /* FIXME: this needs a temporary buffer for liboil */
   for (i = 0; i < frames; i++) {
     for (j = 0; j < channels; j++) {
       d = dest[j];
@@ -136,14 +133,12 @@ static inline void
 _fs_deinterleave_f_f (float ** src, float * dest[],
 		      long frames, int channels, float mult)
 {
-  int i, j;
-  float * s = (float *)src, * d;
+  int j;
+  float * s = (float *)src;
 
-  for (i = 0; i < frames; i++) {
-    for (j = 0; j < channels; j++) {
-      d = dest[j];
-      d[i] = s[i*channels + j] * mult;
-    }
+  for (j = 0; j < channels; j++) {
+    oil_scalarmult_f32 (dest[j], sizeof(float), s + j,
+        channels * sizeof(float), &mult, frames);
   }
 }
 
@@ -151,15 +146,14 @@ static inline void
 _fs_deinterleave_f_d (float ** src, double * dest[],
 		      long frames, int channels, double mult)
 {
-  int i, j;
+  int j;
   float * s = (float *)src;
-  double * d;
 
-  for (i = 0; i < frames; i++) {
-    for (j = 0; j < channels; j++) {
-      d = dest[j];
-      d[i] = (double) s[i*channels + j] * mult;
-    }
+  for (j = 0; j < channels; j++) {
+    oil_conv_f64_f32 (dest[j], sizeof(double), s + j,
+        channels * sizeof(float), frames);
+    oil_scalarmult_f64 (dest[j], sizeof(double), dest[j],
+        sizeof(double), &mult, frames);
   }
 }
 
@@ -171,6 +165,7 @@ _fs_interleave_f_s (float * src[], short ** dest,
   float * s;
   short * d = (short *)dest;
 
+  /* FIXME: this needs a temporary buffer for liboil */
   for (i = 0; i < frames; i++) {
     for (j = 0; j < channels; j++) {
       s = src[j];
@@ -183,14 +178,12 @@ static inline void
 _fs_interleave_s_s (short * src[], short ** dest,
 		    long frames, int channels)
 {
-  int i, j;
-  short * s, * d = (short *)dest;
+  int j;
+  short * d = (short *)dest;
 
-  for (i = 0; i < frames; i++) {
-    for (j = 0; j < channels; j++) {
-      s = src[j];
-      d[i*channels + j] = s[i];
-    }
+  for (j = 0; j < channels; j++) {
+    oil_restride_s16 (d + j, sizeof (short) * channels, src[j],
+        sizeof (short), frames);
   }
 }
 
@@ -198,16 +191,15 @@ static inline void
 _fs_interleave_s_f (short * src[], float ** dest,
 		    long frames, int channels, float mult)
 {
-  int i, j;
-  short * s;
+  int j;
   float * d = (float *)dest;
 
-  for (i = 0; i < frames; i++) {
-    for (j = 0; j < channels; j++) {
-      s = src[j];
-      d[i*channels + j] = (float) (s[i] * mult);
-    }
+  for (j = 0; j < channels; j++) {
+    oil_conv_f32_s16 (d + j, sizeof (float) * channels, src[j],
+        sizeof (short), frames);
   }
+  oil_scalarmult_f32 (d, sizeof(float), d, sizeof(float), &mult,
+      channels * frames);
 }
 
 static inline ogg_int32_t CLIP_TO_15(ogg_int32_t x) {
@@ -225,6 +217,7 @@ _fs_interleave_i_s (ogg_int32_t * src[], short ** dest,
   ogg_int32_t * s;
   short * d = (short *)dest;
 
+  /* FIXME: shouldn't this use shift? */
   for (i = 0; i < frames; i++) {
     for (j = 0; j < channels; j++) {
       s = src[j];
@@ -237,30 +230,27 @@ static inline void
 _fs_interleave_i_f (int * src[], float ** dest,
 		    long frames, int channels, float mult)
 {
-  int i, j;
-  int * s;
+  int j;
   float * d = (float *)dest;
 
-  for (i = 0; i < frames; i++) {
-    for (j = 0; j < channels; j++) {
-      s = src[j];
-      d[i*channels + j] = (float) (s[i] * mult);
-    }
+  for (j = 0; j < channels; j++) {
+    oil_conv_f32_s32 (d + j, sizeof (float) * channels, src[j],
+        sizeof (int), frames);
   }
+  oil_scalarmult_f32 (d, sizeof(float), d, sizeof(float), &mult,
+      channels * frames);
 }
 
 static inline void
 _fs_interleave_f_f (float * src[], float ** dest,
 		    long frames, int channels, float mult)
 {
-  int i, j;
-  float * s, * d = (float *)dest;
+  int j;
+  float * d = (float *)dest;
 
-  for (i = 0; i < frames; i++) {
-    for (j = 0; j < channels; j++) {
-      s = src[j];
-      d[i*channels + j] = s[i] * mult;
-    }
+  for (j = 0; j < channels; j++) {
+    oil_scalarmult_f32 (d + j, sizeof (float) * channels, src[j],
+        sizeof (float), &mult, frames);
   }
 }
 
@@ -272,6 +262,7 @@ _fs_interleave_d_s (double * src[], short ** dest,
   double * s;
   short * d = (short *)dest;
 
+  /* FIXME: needs temporary buffer */
   for (i = 0; i < frames; i++) {
     for (j = 0; j < channels; j++) {
       s = src[j];
@@ -284,16 +275,15 @@ static inline void
 _fs_interleave_d_f (double * src[], float ** dest,
 		    long frames, int channels, float mult)
 {
-  int i, j;
-  double * s;
+  int j;
   float * d = (float *)dest;
 
-  for (i = 0; i < frames; i++) {
-    for (j = 0; j < channels; j++) {
-      s = src[j];
-      d[i*channels + j] = (float) s[i] * mult;
-    }
+  for (j = 0; j < channels; j++) {
+    oil_conv_f32_f64 (d + j, sizeof (float) * channels, src[j],
+        sizeof (double), frames);
   }
+  oil_scalarmult_f32 (d, sizeof(float), d, sizeof(float), &mult,
+      channels * frames);
 }
 
 static inline void
@@ -305,51 +295,37 @@ _fs_convert_s_s (short * src, short * dest, long samples)
 static inline void
 _fs_convert_s_i (short * src, int * dest, long samples)
 {
-  int i;
-
-  for (i = 0; i < samples; i++) {
-    dest[i] = (int) src[i];
-  }
+  oil_conv_s32_s16 (dest, sizeof(int), src, sizeof(short), samples);
 }
 
 static inline void
 _fs_convert_s_f (short * src, float * dest, long samples, float mult)
 {
-  int i;
-
-  for (i = 0; i < samples; i++) {
-    dest[i] = (float) src[i] * mult;
-  }
+  oil_conv_f32_s16 (dest, sizeof(float), src, sizeof(short), samples);
+  oil_scalarmult_f32 (dest, sizeof(float), dest, sizeof(float), &mult, samples);
 }
 
 static inline void
 _fs_convert_s_d (short * src, double * dest, long samples, double mult)
 {
-  int i;
-
-  for (i = 0; i < samples; i++) {
-    dest[i] = ((double)src[i]) * mult;
-  }
+  oil_conv_f64_s16 (dest, sizeof(double), src, sizeof(short), samples);
+  oil_scalarmult_f64 (dest, sizeof(double), dest, sizeof(double), &mult,
+      samples);
 }
 
 static inline void
 _fs_convert_i_s (int * src, short * dest, long samples)
 {
-  int i;
-
-  for (i = 0; i < samples; i++) {
-    dest[i] = (short) src[i];
-  }
+  /* FIXME: should this clip? */
+  oil_conv_s16_s32 (dest, sizeof(dest), src, sizeof(int), samples);
+  /* oil_clipconv_s16_s32 (dest, sizeof(dest), src, sizeof(int), samples); */
 }
 
 static inline void
 _fs_convert_i_f (int * src, float * dest, long samples, float mult)
 {
-  int i;
-
-  for (i = 0; i < samples; i++) {
-    dest[i] = (float) src[i] * mult;
-  }
+  oil_conv_f32_s32 (dest, sizeof(float), src, sizeof(int), samples);
+  oil_scalarmult_f32 (dest, sizeof(float), dest, sizeof(float), &mult, samples);
 }
 
 static inline void
@@ -357,6 +333,7 @@ _fs_convert_f_s (float * src, short * dest, long samples, float mult)
 {
   int i;
 
+  /* FIXME: needs temp buffer */
   for (i = 0; i < samples; i++) {
     dest[i] = (short) (src[i] * mult);
   }
@@ -367,6 +344,7 @@ _fs_convert_f_i (float * src, int * dest, long samples, float mult)
 {
   int i;
 
+  /* FIXME: needs temp buffer */
   for (i = 0; i < samples; i++) {
     dest[i] = (int) (src[i] * mult);
   }
@@ -375,21 +353,14 @@ _fs_convert_f_i (float * src, int * dest, long samples, float mult)
 static inline void
 _fs_convert_f_f (float * src, float * dest, long samples, float mult)
 {
-  int i;
-
-  for (i = 0; i < samples; i++) {
-    dest[i] = src[i] * mult;
-  }
+  oil_scalarmult_f32 (dest, sizeof(float), src, sizeof(float), &mult, samples);
 }
 
 static inline void
 _fs_convert_f_d (float * src, double * dest, long samples, double mult)
 {
-  int i;
-
-  for (i = 0; i < samples; i++) {
-    dest[i] = (double)src[i] * mult;
-  }
+  oil_conv_f64_f32 (dest, sizeof(double), src, sizeof(float), samples);
+  oil_scalarmult_f64 (dest, sizeof(double), dest, sizeof(double), &mult, samples);
 }
 
 static inline void
@@ -397,6 +368,7 @@ _fs_convert_d_s (double * src, short * dest, long samples, double mult)
 {
   int i;
 
+  /* FIXME: needs temp buffer */
   for (i = 0; i < samples; i++) {
     dest[i] = (short) (src[i] * mult);
   }
@@ -407,6 +379,7 @@ _fs_convert_d_f (double * src, float * dest, long samples, float mult)
 {
   int i;
 
+  /* FIXME: needs temp buffer */
   for (i = 0; i < samples; i++) {
     dest[i] = (float)src[i] * mult;
   }

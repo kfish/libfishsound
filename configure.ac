@@ -145,6 +145,16 @@ if test "x${ac_enable_decode}" = xno && test "x${ac_enable_encode}" = xno ; then
 fi
 
 dnl
+dnl  Detect liboil
+dnl
+PKG_CHECK_MODULES(LIBOIL, liboil-0.3 >= 0.3.0, HAVE_LIBOIL=yes, HAVE_LIBOIL=no)
+AC_SUBST(LIBOIL_LIBS)
+AC_SUBST(LIBOIL_CFLAGS)
+if test "$HAVE_LIBOIL" = "no"; then
+  AC_MSG_ERROR([cannot find liboil-0.3, which is required for build])
+fi
+
+dnl
 dnl  Detect vorbis
 dnl
 
