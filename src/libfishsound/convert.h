@@ -144,62 +144,52 @@ _fs_interleave_f_f (float * src[], float ** dest,
 }
 
 static inline void
-_fs_convert_s_i (short ** src, int ** dest, long samples)
+_fs_convert_s_i (short * src, int * dest, long samples)
 {
   int i;
-  short * s = (short *)src;
-  int * d = (int *)dest;
 
   for (i = 0; i < samples; i++) {
-    d[i] = (int) s[i];
+    dest[i] = (int) src[i];
   }
 }
 
 static inline void
-_fs_convert_f_s (float ** src, short ** dest, long samples)
+_fs_convert_f_s (float * src, short * dest, long samples)
 {
   int i;
-  float * s = (float *)src;
-  short * d = (short *)dest;
 
   for (i = 0; i < samples; i++) {
-    d[i] = (short) s[i];
+    dest[i] = (short) src[i];
   }
 }
 
 static inline void
-_fs_convert_f_i (float ** src, int ** dest, long samples)
+_fs_convert_f_i (float * src, int * dest, long samples)
 {
   int i;
-  float * s = (float *)src;
-  int * d = (int *)dest;
 
   for (i = 0; i < samples; i++) {
-    d[i] = (int) s[i];
+    dest[i] = (int) src[i];
   }
 }
 
 static inline void
-_fs_convert_f_f (float ** src, float ** dest, long samples, float mult)
+_fs_convert_f_f (float * src, float * dest, long samples, float mult)
 {
   int i;
-  float * s = (float *)src;
-  float * d = (float *)dest;
 
   for (i = 0; i < samples; i++) {
-    d[i] = ((float) s[i]) * mult;
+    dest[i] = src[i] * mult;
   }
 }
 
 static inline void
-_fs_convert_f_d (float ** src, double ** dest, long samples, float mult)
+_fs_convert_f_d (float * src, double * dest, long samples, float mult)
 {
   int i;
-  float * s = (float *)src;
-  double * d = (double *)dest;
 
   for (i = 0; i < samples; i++) {
-    d[i] = ((double) s[i]) * mult;
+    dest[i] = (double) (src[i] * mult);
   }
 }
 

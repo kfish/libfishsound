@@ -317,7 +317,7 @@ fs_speex_decode_short (FishSound * fsound)
       fs_speex_short_dispatch (fsound);
       break;
     case FISH_SOUND_PCM_INT:
-      _fs_convert_s_i ((short **)fss->ipcm.s, (int **)fss->ipcm_out.i,
+      _fs_convert_s_i (fss->ipcm.s, fss->ipcm_out.i,
 		       fss->frame_size * fsound->info.channels);
       fs_speex_int_dispatch (fsound);
       break;
@@ -417,22 +417,22 @@ fs_speex_decode_float (FishSound * fsound)
 
     switch (fsound->pcm_type) {
     case FISH_SOUND_PCM_SHORT:
-      _fs_convert_f_s ((float **)fss->ipcm.f, (short **)fss->ipcm_out.s,
+      _fs_convert_f_s (fss->ipcm.f, fss->ipcm_out.s,
 		       fss->frame_size * fsound->info.channels);
       fs_speex_short_dispatch (fsound);
       break;
     case FISH_SOUND_PCM_INT:
-      _fs_convert_f_i ((float **)fss->ipcm.f, (int **)fss->ipcm_out.i,
+      _fs_convert_f_i (fss->ipcm.f, fss->ipcm_out.i,
 		       fss->frame_size * fsound->info.channels);
       fs_speex_int_dispatch (fsound);
       break;
     case FISH_SOUND_PCM_FLOAT:
-      _fs_convert_f_f ((float **)fss->ipcm.f, (float **)fss->ipcm_out.f,
+      _fs_convert_f_f (fss->ipcm.f, fss->ipcm_out.f,
 		       fss->frame_size * fsound->info.channels, (1/32767.0));
       fs_speex_float_dispatch (fsound);
       break;
     case FISH_SOUND_PCM_DOUBLE:
-      _fs_convert_f_d ((float **)fss->ipcm.f, (double **)fss->ipcm_out.d,
+      _fs_convert_f_d (fss->ipcm.f, fss->ipcm_out.d,
 		       fss->frame_size * fsound->info.channels, (1/32767.0));
       fs_speex_double_dispatch (fsound);
       break;
