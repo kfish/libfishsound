@@ -300,8 +300,8 @@
  * - provide a FishSoundDecoded callback for libfishsound to call when it has
  * decoded audio.
  * - (optionally) specify whether you want to receive interleaved or
- * per-channel PCM data, using a fish_sound_command(). The default is for
- * per-channel (non-interleaved) PCM.
+ * per-channel PCM data, using a fish_sound_set_interleave().
+ * The default is for per-channel (non-interleaved) PCM.
  * - feed encoded audio data to libfishsound via fish_sound_decode().
  * libfishsound will decode the audio for you, calling the FishSoundDecoded
  * callback you provided earlier each time it has a block of audio ready.
@@ -333,8 +333,8 @@
  * - provide a FishSoundEncoded callback for libfishsound to call when it
  * has a block of encoded audio
  * - (optionally) specify whether you will be providing interleaved or
- * per-channel PCM data, using a fish_sound_command(). The default is for
- * per-channel (non-interleaved) PCM.
+ * per-channel PCM data, using a fish_sound_set_interleave().
+ * The default is for per-channel (non-interleaved) PCM.
  * - feed raw PCM audio data to libfishsound via fish_sound_encode().
  * libfishsound will encode the audio for you, calling the FishSoundEncoded
  * callback you provided earlier each time it has a block of encoded audio
@@ -518,5 +518,25 @@ int fish_sound_delete (FishSound * fsound);
  */
 int fish_sound_command (FishSound * fsound, int command, void * data,
 			int datasize);
+
+/**
+ * Query whether a FishSound object is using interleaved PCM
+ * \param fsound A FishSound* handle
+ * \retval 0 \a fsound uses non-interleaved PCM
+ * \retval 1 \a fsound uses interleaved PCM
+ * \retval -1 Invalid \a fsound
+ */
+int fish_sound_get_interleave (FishSound * fsound);
+
+/**
+ * Set the PCM format used by a FishSound object. The default value is
+ * non-interleaved.
+ * \param fsound A FishSound* handle
+ * \param interleave Whether to use interleaved PCM or not. Valid values are
+ * 0 for non-interleaved, and 1 for interleaved.
+ * \retval 0 Success
+ * \retval -1 Invalid \a fsound
+ */
+int fish_sound_set_interleave (FishSound * fsound, int interleave);
 
 #endif /* __FISH_SOUND_H__ */

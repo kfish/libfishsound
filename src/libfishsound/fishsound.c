@@ -260,3 +260,21 @@ fish_sound_command (FishSound * fsound, int command, void * data, int datasize)
 
   return 0;
 }
+
+int
+fish_sound_get_interleave (FishSound * fsound)
+{
+  if (fsound == NULL) return -1;
+
+  return fsound->interleave;
+}
+
+int
+fish_sound_set_interleave (FishSound * fsound, int interleave)
+{
+  if (fsound == NULL) return -1;
+
+  fsound->interleave = (interleave ? 1 : 0);
+
+  return 0;
+}

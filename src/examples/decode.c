@@ -89,7 +89,6 @@ main (int argc, char ** argv)
   OGGZ * oggz;
   FishSound * fsound;
   long n;
-  int i;
 
   if (argc < 3) {
     printf ("usage: %s infilename outfilename\n", argv[0]);
@@ -103,8 +102,7 @@ main (int argc, char ** argv)
 
   fsound = fish_sound_new (FISH_SOUND_DECODE, &fsinfo);
 
-  i = 1;
-  fish_sound_command (fsound, FISH_SOUND_SET_INTERLEAVE, &i, sizeof(int));
+  fish_sound_set_interleave (fsound, 1);
 
   fish_sound_set_decoded_callback (fsound, decoded, NULL);
 

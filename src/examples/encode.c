@@ -79,7 +79,6 @@ main (int argc, char ** argv)
   int format = FISH_SOUND_VORBIS;
 
   float pcm[2048];
-  int i;
   long n;
 
   if (argc < 3) {
@@ -115,8 +114,7 @@ main (int argc, char ** argv)
   fsound = fish_sound_new (FISH_SOUND_ENCODE, &fsinfo);
   fish_sound_set_encoded_callback (fsound, encoded, oggz);
 
-  i = 1;
-  fish_sound_command (fsound, FISH_SOUND_SET_INTERLEAVE, &i, sizeof(int));
+  fish_sound_set_interleave (fsound, 1);
 
   while (sf_readf_float (sndfile, pcm, 1024) > 0) {
     fish_sound_encode (fsound, (float **)pcm, 1024);
