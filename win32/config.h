@@ -84,4 +84,13 @@
 /* #undef WORDS_BIGENDIAN */
 
 /* Define to empty if `const' does not conform to ANSI C. */
-/* #undef const */
+#undef const
+
+/* Define to `long' if <sys/types.h> does not define. */
+/* #undef off_t */
+
+/* Define to rpl_realloc if the replacement function should be used. */
+#undef realloc
+
+/* Define to `unsigned' if <sys/types.h> does not define. */
+#undef size_t
