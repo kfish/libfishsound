@@ -652,6 +652,11 @@ fs_speex_update (FishSound * fsound, int interleave, FishSoundPCM pcm_type)
   size_t pcm_size, pcm_out_size = 0, ilv_len;
   short * tmp;
 
+#ifdef DEBUG
+  printf ("[fs_speex_update] %s %d\n", interleave ? "ilv" : "non-ilv",
+	  pcm_type);
+#endif
+  
   if (HAVE_SPEEX_1_1) {
     pcm_size = sizeof (short);
   } else {
@@ -688,8 +693,11 @@ fs_speex_update (FishSound * fsound, int interleave, FishSoundPCM pcm_type)
     fss->pcm_out.s[1] = NULL;
 
     /* realloc an existing, or malloc a NULL, ipcm_out buffer */
-    fss->ipcm_out.s =
-      (short *) fs_realloc (fss->ipcm_out.s, pcm_out_size * ilv_len);
+    tmp = (short *) fs_realloc (fss->ipcm_out.s, pcm_out_size * ilv_len);
+    if (tmp == NULL)
+      return FISH_SOUND_ERR_OUT_OF_MEMORY;
+    else
+      fss->ipcm_out.s = tmp;
   } else {
     /* free unused ilv buffers */
     if (fss->ipcm_out.s) fs_free (fss->ipcm_out.s);
@@ -724,19 +732,21 @@ fs_speex_free_buffers (FishSound * fsound)
 {
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
 
-  /* free working buffer */
-  if (fss->ipcm.s) fs_free (fss->ipcm.s);
-  fss->ipcm.s = NULL;
+  if (fsound->mode == FISH_SOUND_DECODE) {
+    /* free working buffer */
+    if (fss->ipcm.s) fs_free (fss->ipcm.s);
+    fss->ipcm.s = NULL;
 
-  /* free non-interleave buffers */
-  if (fss->pcm_out.s[0]) fs_free (fss->pcm_out.s[0]);
-  fss->pcm_out.s[0] = NULL;
-  if (fss->pcm_out.s[1]) fs_free (fss->pcm_out.s[1]);
-  fss->pcm_out.s[1] = NULL;
+    /* free non-interleave buffers */
+    if (fss->pcm_out.s[0]) fs_free (fss->pcm_out.s[0]);
+    fss->pcm_out.s[0] = NULL;
+    if (fss->pcm_out.s[1]) fs_free (fss->pcm_out.s[1]);
+    fss->pcm_out.s[1] = NULL;
 
-  /* free ilv buffers */
-  if (fss->ipcm_out.s) fs_free (fss->ipcm_out.s);
-  fss->ipcm_out.s = NULL;
+    /* free ilv buffers */
+    if (fss->ipcm_out.s) fs_free (fss->ipcm_out.s);
+    fss->ipcm_out.s = NULL;
+  }
 
   return 0;
 }
@@ -785,6 +795,10 @@ fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
   } else if (fss->packetno <= 1+fss->extra_headers) {
     /* Unknown extra headers */
   } else {
+#ifdef DEBUG
+    printf ("[fs_speex_decode] decode bits\n");
+#endif
+
     speex_bits_read_from (&fss->bits, (char *)buf, (int)bytes);
 
 #if HAVE_SPEEX_1_1
@@ -871,7 +885,7 @@ fs_speex_enc_headers (FishSound * fsound)
   speex_encoder_ctl (fss->st, SPEEX_GET_FRAME_SIZE, &fss->frame_size);
 
 #ifdef DEBUG
-  printf ("got frame size %d\n", fss->frame_size);
+  printf ("[fs_speex_enc_headers] got frame size %d\n", fss->frame_size);
 #endif
 
   /* XXX: blah blah blah ... set VBR etc. */
