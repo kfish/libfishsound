@@ -54,6 +54,7 @@ typedef struct _FishSoundVorbisInfo {
   struct vorbis_comment vc;
   vorbis_dsp_state vd; /** central working state for the PCM->packet encoder */
   vorbis_block vb;     /** local working space for PCM->packet encode */
+  float * pcm_out;
   float * ipcm;
   long max_pcm;
 } FishSoundVorbisInfo;
@@ -180,12 +181,79 @@ fs_vorbis_command (FishSound * fsound, int command, void * data,
 }
 
 #if FS_DECODE
+static void
+fs_vorbis_short_dispatch (FishSound * fsound, float ** pcm, long samples)
+{
+  FishSoundVorbisInfo * fsv = (FishSoundVorbisInfo *)fsound->codec_data;
+  short ** retpcm;
+
+  if (fsound->interleave) {
+    if (samples > fsv->max_pcm) {
+      fsv->ipcm = realloc (fsv->ipcm, sizeof(float) * samples *
+			   fsound->info.channels);
+      fsv->max_pcm = samples;
+    }
+    _fs_interleave_f_s (pcm, (short **)fsv->ipcm, samples,
+			fsound->info.channels, 32767.0);
+    retpcm = (short **)fsv->ipcm;
+  } else {
+    /* XXX: fixme */
+    retpcm = (short **)pcm;
+  }
+  
+  if (fsound->callback.decoded_short) {
+    FishSoundDecoded_ShortIlv ds;
+    FishSoundDecoded_Short dsi;
+    
+    if (fsound->interleave) {
+      dsi = (FishSoundDecoded_ShortIlv)fsound->callback.decoded_short_ilv;
+      dsi (fsound, (short **)retpcm, samples, fsound->user_data);
+    } else {
+      ds = (FishSoundDecoded_Short)fsound->callback.decoded_short;
+      ds (fsound, retpcm, samples, fsound->user_data);
+    }
+  }
+}
+
+static void
+fs_vorbis_float_dispatch (FishSound * fsound, float ** pcm, long samples)
+{
+  FishSoundVorbisInfo * fsv = (FishSoundVorbisInfo *)fsound->codec_data;
+  float ** retpcm;
+
+  if (fsound->interleave) {
+    if (samples > fsv->max_pcm) {
+      fsv->ipcm = realloc (fsv->ipcm, sizeof(float) * samples *
+			   fsound->info.channels);
+      fsv->max_pcm = samples;
+    }
+    _fs_interleave_f_f (pcm, (float **)fsv->ipcm, samples,
+			fsound->info.channels, 1.0);
+    retpcm = (float **)fsv->ipcm;
+  } else {
+    retpcm = pcm;
+  }
+  
+  if (fsound->callback.decoded_float) {
+    FishSoundDecoded_FloatIlv df;
+    FishSoundDecoded_Float dfi;
+    
+    if (fsound->interleave) {
+      dfi = (FishSoundDecoded_FloatIlv)fsound->callback.decoded_float_ilv;
+      dfi (fsound, (float **)retpcm, samples, fsound->user_data);
+    } else {
+      df = (FishSoundDecoded_Float)fsound->callback.decoded_float;
+      df (fsound, retpcm, samples, fsound->user_data);
+    }
+  }
+}
+
 static long
 fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
 {
   FishSoundVorbisInfo * fsv = (FishSoundVorbisInfo *)fsound->codec_data;
   ogg_packet op;
-  float ** pcm, **retpcm;
+  float ** pcm;
   long samples;
   int ret;
 
@@ -226,30 +294,15 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
     while ((samples = vorbis_synthesis_pcmout (&fsv->vd, &pcm)) > 0) {
       vorbis_synthesis_read (&fsv->vd, samples);
 
-      if (fsound->interleave) {
-	if (samples > fsv->max_pcm) {
-	  fsv->ipcm = realloc (fsv->ipcm, sizeof(float) * samples *
-			       fsound->info.channels);
-	  fsv->max_pcm = samples;
-	}
-	_fs_interleave_f_f (pcm, (float **)fsv->ipcm, samples,
-			    fsound->info.channels, 1.0);
-	retpcm = (float **)fsv->ipcm;
-      } else {
-	retpcm = pcm;
-      }
-
-      if (fsound->callback.decoded_float) {
-	FishSoundDecoded_FloatIlv df;
-	FishSoundDecoded_Float dfi;
-
-	if (fsound->interleave) {
-	  dfi = (FishSoundDecoded_FloatIlv)fsound->callback.decoded_float_ilv;
-	  dfi (fsound, (float **)retpcm, samples, fsound->user_data);
-	} else {
-	  df = (FishSoundDecoded_Float)fsound->callback.decoded_float;
-	  df (fsound, retpcm, samples, fsound->user_data);
-	}
+      switch (fsound->pcm_type) {
+      case FISH_SOUND_PCM_SHORT:
+	fs_vorbis_short_dispatch (fsound, pcm, samples);
+	break;
+      case FISH_SOUND_PCM_FLOAT:
+	fs_vorbis_float_dispatch (fsound, pcm, samples);
+	break;
+      default:
+	break;
       }
 
       if (fsound->frameno != -1)
@@ -483,6 +536,7 @@ fs_vorbis_init (FishSound * fsound)
   fsv->packetno = 0;
   vorbis_info_init (&fsv->vi);
   vorbis_comment_init (&fsv->vc);
+  fsv->pcm_out = NULL;
   fsv->ipcm = NULL;
   fsv->max_pcm = 0;
 

@@ -163,6 +163,22 @@ _fs_deinterleave_f_d (float ** src, double * dest[],
 }
 
 static inline void
+_fs_interleave_f_s (float * src[], short ** dest,
+		    long frames, int channels, float mult)
+{
+  int i, j;
+  float * s;
+  short * d = (short *)dest;
+
+  for (i = 0; i < frames; i++) {
+    for (j = 0; j < channels; j++) {
+      s = src[j];
+      d[i*channels + j] = (short) (s[i] * mult);
+    }
+  }
+}
+
+static inline void
 _fs_interleave_f_f (float * src[], float ** dest,
 		    long frames, int channels, float mult)
 {
