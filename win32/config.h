@@ -16,6 +16,9 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
 
+/* Define to 1 if you have liboil */
+#define HAVE_LIBOIL 0
+
 /* Define if have libsndfile */
 #define HAVE_LIBSNDFILE1 
 

@@ -41,6 +41,10 @@
 
 #define FS_ENCODE 0
 
+/* We do not have liboil */
+
+#define HAVE_LIBOIL 0
+
 /* We have libvorbis */
 
 #define HAVE_VORBIS 1
