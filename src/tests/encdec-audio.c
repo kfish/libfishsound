@@ -61,7 +61,7 @@ usage (char * progname)
 /* For one-time tests, configure these by commandline args */
 static int * test_blocksizes, * test_samplerates, * test_channels;
 static int iter = DEFAULT_ITER;
-static int test_vorbis = 1, test_speex = 1;
+static int test_vorbis = HAVE_VORBIS, test_speex = HAVE_SPEEX;
 static int test_interleave = 1, test_non_interleave = 1;
 
 static int nasty_blocksizes[] = {128, 256, 512, 1024, 2048, 4096, 0};

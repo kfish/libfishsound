@@ -220,11 +220,15 @@ fs_encdec_comments_test (int format, int blocksize)
 int
 main (int argc, char * argv[])
 {
+#if HAVE_VORBIS
   INFO ("Testing encode/decode pipeline for comments: VORBIS");
   fs_encdec_comments_test (FISH_SOUND_VORBIS, 2048);
+#endif
 
+#if HAVE_SPEEX
   INFO ("Testing encode/decode pipeline for comments: SPEEX");
   fs_encdec_comments_test (FISH_SOUND_SPEEX, 2048);
+#endif
 
   exit (0);
 }
