@@ -143,6 +143,8 @@ if test "x${ac_enable_vorbis}" = xyes ; then
     VORBIS_SUPPORT="decode only"
   fi
 else
+  AC_DEFINE(HAVE_VORBIS, [0], [Define to 1 if you have libvorbis])
+  AC_DEFINE(HAVE_VORBISENC, [0], [Define to 1 if you have libvorbisenc])
   VORBIS_SUPPORT="disabled"
 fi
 AM_CONDITIONAL(HAVE_VORBIS, [test "x$HAVE_VORBIS" = "xyes"])
@@ -188,6 +190,7 @@ if test "x${ac_enable_speex}" = xyes ; then
     AC_DEFINE(HAVE_SPEEX, [0], [Define to 1 if you have libspeex])
   fi
 else
+  AC_DEFINE(HAVE_SPEEX, [0], [Define to 1 if you have libspeex])
   SPEEX_SUPPORT=disabled
 fi
 AM_CONDITIONAL(HAVE_SPEEX, [test "x$HAVE_SPEEX" = "xyes"])
