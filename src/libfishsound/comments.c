@@ -82,8 +82,8 @@ static void comment_init(char **comments, int* length, char *vendor_string);
 static void comment_add(char **comments, int* length, char *tag, char *val);
 #endif
 
-/*                 
- Comments will be stored in the Vorbis style.            
+/*
+ Comments will be stored in the Vorbis style.
  It is describled in the "Structure" section of
     http://www.xiph.org/ogg/vorbis/doc/v-comment.html
 
@@ -106,11 +106,10 @@ The comment header is decoded as follows:
                            ((buf[base+2]<<16)&0xff0000)| \
                            ((buf[base+1]<<8)&0xff00)| \
   	           	    (buf[base]&0xff))
-#define writeint(buf, base, val) do{ buf[base+3]=((val)>>24)&0xff; \
-                                     buf[base+2]=((val)>>16)&0xff; \
-                                     buf[base+1]=((val)>>8)&0xff; \
-                                     buf[base]=(val)&0xff; \
-                                 }while(0)
+#define writeint(buf, base, val) buf[base+3]=(char)(((val)>>24)&0xff); \
+                                 buf[base+2]=(char)(((val)>>16)&0xff); \
+                                 buf[base+1]=(char)(((val)>>8)&0xff); \
+                                 buf[base]=(char)((val)&0xff);
 
 #if 0
 static void
@@ -251,7 +250,7 @@ fish_sound_comment_first_byname (FishSound * fsound, char * name)
 
   if (!fs_comment_validate_byname (name, ""))
     return NULL;
-  
+
   for (i = 0; i < fs_vector_size (fsound->comments); i++) {
     comment = (FishSoundComment *) fs_vector_nth (fsound->comments, i);
     if (comment->name && !strcasecmp (name, comment->name))
@@ -439,7 +438,7 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
    char *end;
    char * name, * value, * nvalue = NULL;
    FishSoundComment * comment;
-   
+
    if (length<8)
       return -1;
 
