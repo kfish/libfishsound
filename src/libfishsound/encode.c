@@ -57,6 +57,18 @@ fish_sound_set_encode_quality (FishSound * fsound, float quality)
   return 0;
 }
 
+float
+fish_sound_get_encode_quality (FishSound * fsound)
+{
+  if (fsound == NULL) return FISH_SOUND_ERR_BAD;
+
+#if FS_ENCODE
+  return fsound->encode_quality;
+#else
+  return FISH_SOUND_ERR_DISABLED;
+#endif
+}
+
 int
 fish_sound_set_encoded_callback (FishSound * fsound,
 				 FishSoundEncoded encoded,

@@ -51,6 +51,9 @@
 		fish_sound_comment_add_byname;
 		fish_sound_comment_remove;
 		fish_sound_comment_remove_byname;
+
+		fish_sound_get_encode_quality;
+		fish_sound_set_encode_quality;
         local:
                 *;
 };

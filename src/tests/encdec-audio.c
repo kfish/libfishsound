@@ -43,6 +43,7 @@
 #define DEBUG
 
 #define DEFAULT_ITER 2
+#define DEFAULT_ENCODE_QUALITY 0.1F
 
 static void
 usage (char * progname)
@@ -285,6 +286,11 @@ fs_encdec_new (FishSoundPCM pcm_type, int samplerate, int channels,
   fish_sound_set_interleave (ed->decoder, interleave);
 
   fish_sound_set_encoded_callback (ed->encoder, encoded, ed);
+
+  if (fish_sound_set_encode_quality (ed->encoder, DEFAULT_ENCODE_QUALITY) != 0)
+    FAIL ("Error setting encode quality");
+  if (fish_sound_get_encode_quality (ed->encoder) != DEFAULT_ENCODE_QUALITY)
+    FAIL ("Error retrieving previously set encode quality");
 
   ed->interleave = interleave;
   ed->channels = channels;

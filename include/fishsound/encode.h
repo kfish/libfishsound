@@ -159,7 +159,7 @@ long fish_sound_encode_double (FishSound * fsound, double * pcm[],
 long fish_sound_encode_double_ilv (FishSound * fsound, double ** pcm,
 				   long frames);
 
-/*
+/**
  * Set the encoding quality for an encoder
  * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
  * \param quality A quality setting in the range [0.0 ... 1.0]
@@ -170,11 +170,23 @@ long fish_sound_encode_double_ilv (FishSound * fsound, double ** pcm,
  * \retval FISH_SOUND_ERR_FINALIZED The encoding parameters have already been
  * finalized. This occurs if an attempt is made to set the quality after some
  * PCM audio has alread been encoded.
+ * \retval FISH_SOUND_ERR_BAD \a fsound is not a valid FishSound* handle
  * \retval FISH_SOUND_ERR_DISABLED Encoding support has been disabled in this
  * build of libfishsound
  *
  */
 int fish_sound_set_encode_quality (FishSound * fsound, float quality);
+
+/**
+ * Get the encoding quality for an encoder
+ * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
+ * \returns The encoding quality
+ * \retval FISH_SOUND_ERR_BAD \a fsound is not a valid FishSound* handle
+ * \retval FISH_SOUND_ERR_DISABLED Encoding support has been disabled in this
+ * build of libfishsound
+ *
+ */
+float fish_sound_get_encode_quality (FishSound * fsound);
 
 #ifdef __cplusplus
 }
