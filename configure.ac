@@ -147,11 +147,29 @@ fi
 dnl
 dnl  Detect liboil
 dnl
-PKG_CHECK_MODULES(LIBOIL, liboil-0.3 >= 0.3.0, HAVE_LIBOIL=yes, HAVE_LIBOIL=no)
-AC_SUBST(LIBOIL_LIBS)
-AC_SUBST(LIBOIL_CFLAGS)
-if test "$HAVE_LIBOIL" = "no"; then
-  AC_MSG_ERROR([cannot find liboil-0.3, which is required for build])
+
+HAVE_LIBOIL=no
+LIBOIL_SUPPORT=no
+
+ac_enable_liboil=yes
+AC_ARG_ENABLE(liboil,
+     [  --disable-liboil        enable use of liboil CPU optimizations],
+     [ ac_enable_liboil=no ], [ ac_enable_liboil=yes] )
+
+if test "x${ac_enable_liboil}" = xyes ; then
+  PKG_CHECK_MODULES(LIBOIL, liboil-0.3 >= 0.3.0, HAVE_LIBOIL=yes, HAVE_LIBOIL=no)
+  AC_SUBST(LIBOIL_LIBS)
+  AC_SUBST(LIBOIL_CFLAGS)
+  if test "$HAVE_LIBOIL" = "no"; then
+    AC_DEFINE(HAVE_LIBOIL, [0], [Define to 1 if you have liboil])
+    LIBOIL_SUPPORT="no"
+  else
+    AC_DEFINE(HAVE_LIBOIL, [1], [Define to 1 if you have liboil])
+    LIBOIL_SUPPORT="yes"
+  fi
+else
+  AC_DEFINE(HAVE_LIBOIL, [0], [Define to 1 if you have liboil])
+  LIBOIL_SUPPORT="disabled"
 fi
 
 dnl
@@ -524,6 +542,7 @@ AC_MSG_RESULT([
 
   Library configuration (./src/libfishsound):
 
+    CPU optimizations (liboil): .. $LIBOIL_SUPPORT
     Vorbis support: .............. $VORBIS_SUPPORT
     Speex support: ............... $SPEEX_SUPPORT
 
