@@ -153,8 +153,6 @@ fs_encdec_new (int samplerate, int channels, int format, int interleave,
 
   fish_sound_set_encoded_callback (ed->encoder, encoded, ed);
 
-
-
   ed->interleave = interleave;
   ed->channels = channels;
 

@@ -484,7 +484,9 @@ static long
 fs_speex_decode_float_dlv (FishSound * fsound)
 {
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
-  int i;
+  int i, channels;
+
+  channels = fsound->info.channels;
 
   for (i = 0; i < fss->nframes; i++) {
     /* Decode frame */
@@ -497,22 +499,22 @@ fs_speex_decode_float_dlv (FishSound * fsound)
     switch (fsound->pcm_type) {
     case FISH_SOUND_PCM_SHORT:
       _fs_deinterleave_f_s ((float **)fss->ipcm.f, fss->pcm.s,
-			    fss->frame_size, 2, 1.0);
+			    fss->frame_size, channels, 1.0);
       fs_speex_short_dispatch (fsound);
       break;
     case FISH_SOUND_PCM_INT:
       _fs_deinterleave_f_i ((float **)fss->ipcm.f, fss->pcm.i,
-			    fss->frame_size, 2, 32767.0);
+			    fss->frame_size, channels, 32767.0);
       fs_speex_int_dispatch (fsound);
       break;
     case FISH_SOUND_PCM_FLOAT:
       _fs_deinterleave_f_f ((float **)fss->ipcm.f, fss->pcm.f,
-			    fss->frame_size, 2, (1/32767.0));
+			    fss->frame_size, channels, (1/32767.0));
       fs_speex_float_dispatch (fsound);
     break;
     case FISH_SOUND_PCM_DOUBLE:
       _fs_deinterleave_f_d ((float **)fss->ipcm.f, fss->pcm.d,
-			    fss->frame_size, 2, (1/32767.0));
+			    fss->frame_size, channels, (1/32767.0));
       fs_speex_double_dispatch (fsound);
       break;
     default:
