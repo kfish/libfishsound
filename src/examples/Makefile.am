@@ -9,7 +9,7 @@ FISHSOUNDDIR = ../libfishsound
 FISHSOUND_LIBS = $(FISHSOUNDDIR)/libfishsound.la $(VORBIS_LIBS) $(SPEEX_LIBS)
 
 if HAVE_OGGZ
-oggz_examples = identify fishsound-info
+oggz_examples = fishsound-identify fishsound-info
 
 if HAVE_LIBSNDFILE1
 oggz_sndfile_examples = fishsound-decode fishsound-encode
@@ -18,18 +18,18 @@ endif
 endif
 
 # Programs to build
-#noinst_PROGRAMS = $(oggz_examples) $(oggz_sndfile_examples)
-bin_PROGRAMS = $(oggz_examples) $(oggz_sndfile_examples)
+noinst_PROGRAMS = $(oggz_examples) $(oggz_sndfile_examples)
+#bin_PROGRAMS = $(oggz_examples) $(oggz_sndfile_examples)
 
-identify_SOURCES = identify.c
-identify_LDADD = $(FISHSOUND_LIBS) $(OGGZ_LIBS)
+fishsound_identify_SOURCES = fishsound-identify.c
+fishsound_identify_LDADD = $(FISHSOUND_LIBS) $(OGGZ_LIBS)
 
 fishsound_info_SOURCES = fishsound-info.c
 fishsound_info_LDADD = $(FISHSOUND_LIBS) $(OGGZ_LIBS)
 
-fishsound_decode_SOURCES = decode.c
+fishsound_decode_SOURCES = fishsound-decode.c
 fishsound_decode_LDADD = $(FISHSOUND_LIBS) $(OGGZ_LIBS) $(SNDFILE_LIBS)
 
-fishsound_encode_SOURCES = encode.c
+fishsound_encode_SOURCES = fishsound-encode.c
 fishsound_encode_LDADD = $(FISHSOUND_LIBS) $(OGGZ_LIBS) $(SNDFILE_LIBS)
 
