@@ -239,9 +239,16 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
       }
 
       if (fsound->callback.decoded_float) {
-	((FishSoundDecoded)fsound->callback.decoded_float) (fsound, retpcm,
-							    samples,
-							    fsound->user_data);
+	FishSoundDecoded_FloatIlv df;
+	FishSoundDecoded_Float dfi;
+
+	if (fsound->interleave) {
+	  dfi = (FishSoundDecoded_FloatIlv)fsound->callback.decoded_float_ilv;
+	  dfi (fsound, (float **)retpcm, samples, fsound->user_data);
+	} else {
+	  df = (FishSoundDecoded_Float)fsound->callback.decoded_float;
+	  df (fsound, retpcm, samples, fsound->user_data);
+	}
       }
 
       if (fsound->frameno != -1)
