@@ -607,9 +607,9 @@ fs_vorbis_delete (FishSound * fsound)
   if (fsound->finalized) {
     vorbis_block_clear (&fsv->vb);
     vorbis_dsp_clear (&fsv->vd);
-    vorbis_comment_clear (&fsv->vc);
-    vorbis_info_clear (&fsv->vi);
   }
+  vorbis_comment_clear (&fsv->vc);
+  vorbis_info_clear (&fsv->vi);
 
   fs_free (fsv);
   fsound->codec_data = NULL;
