@@ -748,6 +748,8 @@ fs_speex_free_buffers (FishSound * fsound)
     /* free ilv buffers */
     if (fss->ipcm_out.s) fs_free (fss->ipcm_out.s);
     fss->ipcm_out.s = NULL;
+  } else {
+    fs_free (fss->ipcm.f);
   }
 
   return 0;
