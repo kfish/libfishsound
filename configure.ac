@@ -29,12 +29,20 @@ if test $HAVE_DOXYGEN = "false"; then
 fi
 
 # Check for valgrind
-ac_enable_valgrind=yes
+ac_enable_valgrind=no
 AC_ARG_ENABLE(valgrind-testing,
-     [  --disable-valgrind-testing    disable running of tests inside Valgrind ],
-     [ ac_enable_valgrind=no ], [ ac_enable_valgrind=yes] )
+     [  --enable-valgrind-testing     enable running of tests inside Valgrind ],
+     [ ac_enable_valgrind=yes ], [ ac_enable_valgrind=no] )
 
 if test "x${ac_enable_valgrind}" = xyes ; then
+  if test "x${enable_shared}" = xyes ; then
+    AC_MSG_WARN([
+*** You have requested to test under valgrind, but have not disabled the
+*** building of shared libraries. You usually need to do:
+***   ./configure --disable-shared --enable-valgrind-testing
+*** for Valgrind to produce useful output.])
+  fi
+
   AC_CHECK_PROG(HAVE_VALGRIND, valgrind, yes, no)
   if test "x$HAVE_VALGRIND" = xyes ; then     VALGRIND_ENVIRONMENT="valgrind -q --leak-check=yes --show-reachable=yes --num-callers=100"
     AC_SUBST(VALGRIND_ENVIRONMENT)
@@ -44,7 +52,7 @@ if test "x${ac_enable_valgrind}" = xyes ; then
     TESTS_INFO="'make check' to run test suite (Valgrind not found)"
   fi
 else
-  TESTS_INFO="'make check' to run test suite (Valgrind testing disabled)"
+  TESTS_INFO="'make check' to run test suite (Valgrind testing not enabled)"
 fi
 
 dnl Overall configuration success flag
