@@ -33,6 +33,10 @@
 #ifndef __FISH_SOUND_DECODE_H__
 #define __FISH_SOUND_DECODE_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Signature of a callback for libfishsound to call when it has decoded
  * PCM audio data, and you want this provided as non-interleaved shorts.
@@ -249,5 +253,9 @@ int fish_sound_set_decoded_double_ilv (FishSound * fsound,
  * \returns The number of bytes consumed
  */
 long fish_sound_decode (FishSound * fsound, unsigned char * buf, long bytes);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __FISH_SOUND_DECODE_H__ */
