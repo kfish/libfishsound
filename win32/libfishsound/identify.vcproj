@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="libfishsound"
+	Name="identify"
 	SccProjectName=""
 	SccLocalPath="">
 	<Platforms>
@@ -11,49 +11,45 @@
 	</Platforms>
 	<Configurations>
 		<Configuration
-			Name="Debug|Win32"
+			Name="Release|Win32"
 			OutputDirectory="."
 			IntermediateDirectory="."
-			ConfigurationType="2"
+			ConfigurationType="1"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\libogg\include\,..\..\include\,..\,.\"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBFISHSOUND_EXPORTS"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
-				PrecompiledHeaderFile="./libfishsound.pch"
+				Optimization="2"
+				InlineFunctionExpansion="1"
+				AdditionalIncludeDirectories="..\include\,.\"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				StringPooling="TRUE"
+				RuntimeLibrary="4"
+				EnableFunctionLevelLinking="TRUE"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderFile="./identify.pch"
 				AssemblerListingLocation="./"
 				ObjectFile="./"
 				ProgramDataBaseFileName="./"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
-				DebugInformationFormat="4"
 				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ogg.lib vorbis.lib libspeex.lib odbc32.lib odbccp32.lib"
-				OutputFile=".\libfishsound.dll"
+				AdditionalDependencies="libspeex.lib odbc32.lib odbccp32.lib ogg.lib vorbis.lib libfishsound.lib liboggz.lib"
+				OutputFile="./identify.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\..\liboggz\lib\"
-				ModuleDefinitionFile=".\libfishsound\libfishsound.def"
-				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="./libfishsound.pdb"
-				ImportLibrary="./libfishsound.lib"
+				AdditionalLibraryDirectories=".\"
+				ProgramDatabaseFile="./identify.pdb"
+				SubSystem="1"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"
-				PreprocessorDefinitions="_DEBUG"
-				MkTypLibCompatible="TRUE"
-				SuppressStartupBanner="TRUE"
-				TargetEnvironment="1"
-				TypeLibraryName="./libfishsound.tlb"
+				TypeLibraryName="./identify.tlb"
 				HeaderFileName=""/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
@@ -63,7 +59,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG"
+				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
@@ -77,49 +73,45 @@
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
-			Name="Release|Win32"
+			Name="Debug|Win32"
 			OutputDirectory="."
 			IntermediateDirectory="."
-			ConfigurationType="2"
+			ConfigurationType="1"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
-				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\libogg\include\,..\..\include\,..\,.\"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBFISHSOUND_EXPORTS"
-				StringPooling="TRUE"
-				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="TRUE"
-				PrecompiledHeaderFile="./libfishsound.pch"
+				Optimization="0"
+				AdditionalIncludeDirectories="..\include\,.\"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="5"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderFile="./identify.pch"
 				AssemblerListingLocation="./"
 				ObjectFile="./"
 				ProgramDataBaseFileName="./"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
+				DebugInformationFormat="4"
 				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib ogg.lib vorbis.lib libspeex.lib"
-				OutputFile=".\libfishsound.dll"
+				AdditionalDependencies="odbc32.lib odbccp32.lib ogg.lib vorbis.lib libspeex.lib libfishsound.lib liboggz.lib"
+				OutputFile="./identify.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\..\liboggz\lib\"
-				ModuleDefinitionFile=".\libfishsound\libfishsound.def"
-				ProgramDatabaseFile="./libfishsound.pdb"
-				ImportLibrary="./libfishsound.lib"
+				AdditionalLibraryDirectories=".\"
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="./identify.pdb"
+				SubSystem="1"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"
-				PreprocessorDefinitions="NDEBUG"
-				MkTypLibCompatible="TRUE"
-				SuppressStartupBanner="TRUE"
-				TargetEnvironment="1"
-				TypeLibraryName="./libfishsound.tlb"
+				TypeLibraryName="./identify.tlb"
 				HeaderFileName=""/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
@@ -129,7 +121,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
+				PreprocessorDefinitions="_DEBUG"
 				Culture="1033"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
@@ -150,16 +142,7 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
 			<File
-				RelativePath="..\..\src\libfishsound\fishsound.c">
-			</File>
-			<File
-				RelativePath=".\libfishsound.def">
-			</File>
-			<File
-				RelativePath="..\..\src\libfishsound\speex.c">
-			</File>
-			<File
-				RelativePath="..\..\src\libfishsound\vorbis.c">
+				RelativePath="..\..\src\examples\identify.c">
 			</File>
 		</Filter>
 		<Filter
@@ -167,18 +150,6 @@
 			Filter="h;hpp;hxx;hm;inl">
 			<File
 				RelativePath="..\config.h">
-			</File>
-			<File
-				RelativePath="..\..\include\fishsound\constants.h">
-			</File>
-			<File
-				RelativePath="..\..\include\fishsound\fishsound.h">
-			</File>
-			<File
-				RelativePath="..\..\src\libfishsound\fs_compat.h">
-			</File>
-			<File
-				RelativePath="..\..\src\libfishsound\private.h">
 			</File>
 		</Filter>
 		<Filter
