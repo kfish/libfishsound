@@ -77,11 +77,11 @@
 
 /* We have speex_free() */
 
-#define HAVE_SPEEX_FREE
+#define HAVE_SPEEX_FREE 1
 
 /* We have speex_lib_get_mode() */
 
-#define HAVE_SPEEX_LIB_GET_MODE
+#define HAVE_SPEEX_LIB_GET_MODE 1
 
 /* We do not have libvorbisenc */
 
