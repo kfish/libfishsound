@@ -1,0 +1,91 @@
+\begin{theindex}
+
+  \item {Building against libfishsound}, 14
+
+  \indexspace
+
+  \item {Configuration}, 9
+  \item {constants.h}, 17
+    \subitem {FISH\_\-SOUND\_\-COMMAND\_\-NOP}, 17
+    \subitem {FISH\_\-SOUND\_\-DECODE}, 18
+    \subitem {FISH\_\-SOUND\_\-ENCODE}, 18
+    \subitem {FISH\_\-SOUND\_\-GET\_\-DECODE\_\-INTERLEAVE}, 17
+    \subitem {FISH\_\-SOUND\_\-GET\_\-INFO}, 17
+    \subitem {FISH\_\-SOUND\_\-SET\_\-DECODE\_\-INTERLEAVE}, 17
+    \subitem {FISH\_\-SOUND\_\-SPEEX}, 18
+    \subitem {FISH\_\-SOUND\_\-UNKNOWN}, 18
+    \subitem {FISH\_\-SOUND\_\-VORBIS}, 18
+    \subitem {FishSoundCommand}, 17
+    \subitem {FishSoundFormat}, 17
+    \subitem {FishSoundMode}, 18
+
+  \indexspace
+
+  \item {fish\_\-sound\_\-command}
+    \subitem {fishsound.h}, 21
+  \item {FISH\_\-SOUND\_\-COMMAND\_\-NOP}
+    \subitem {constants.h}, 17
+  \item {FISH\_\-SOUND\_\-DECODE}
+    \subitem {constants.h}, 18
+  \item {fish\_\-sound\_\-decode}
+    \subitem {fishsound.h}, 21
+  \item {fish\_\-sound\_\-delete}
+    \subitem {fishsound.h}, 21
+  \item {FISH\_\-SOUND\_\-ENCODE}
+    \subitem {constants.h}, 18
+  \item {fish\_\-sound\_\-encode\_\-i}
+    \subitem {fishsound.h}, 22
+  \item {fish\_\-sound\_\-encode\_\-n}
+    \subitem {fishsound.h}, 22
+  \item {FISH\_\-SOUND\_\-GET\_\-DECODE\_\-INTERLEAVE}
+    \subitem {constants.h}, 17
+  \item {FISH\_\-SOUND\_\-GET\_\-INFO}
+    \subitem {constants.h}, 17
+  \item {fish\_\-sound\_\-identify}
+    \subitem {fishsound.h}, 22
+  \item {fish\_\-sound\_\-new}
+    \subitem {fishsound.h}, 22
+  \item {fish\_\-sound\_\-reset}
+    \subitem {fishsound.h}, 23
+  \item {FISH\_\-SOUND\_\-SET\_\-DECODE\_\-INTERLEAVE}
+    \subitem {constants.h}, 17
+  \item {fish\_\-sound\_\-set\_\-decoded\_\-callback}
+    \subitem {fishsound.h}, 23
+  \item {fish\_\-sound\_\-set\_\-encoded\_\-callback}
+    \subitem {fishsound.h}, 23
+  \item {FISH\_\-SOUND\_\-SPEEX}
+    \subitem {constants.h}, 18
+  \item {FISH\_\-SOUND\_\-UNKNOWN}
+    \subitem {constants.h}, 18
+  \item {FISH\_\-SOUND\_\-VORBIS}
+    \subitem {constants.h}, 18
+  \item {fishsound.h}, 19
+    \subitem {fish\_\-sound\_\-command}, 21
+    \subitem {fish\_\-sound\_\-decode}, 21
+    \subitem {fish\_\-sound\_\-delete}, 21
+    \subitem {fish\_\-sound\_\-encode\_\-i}, 22
+    \subitem {fish\_\-sound\_\-encode\_\-n}, 22
+    \subitem {fish\_\-sound\_\-identify}, 22
+    \subitem {fish\_\-sound\_\-new}, 22
+    \subitem {fish\_\-sound\_\-reset}, 23
+    \subitem {fish\_\-sound\_\-set\_\-decoded\_\-callback}, 23
+    \subitem {fish\_\-sound\_\-set\_\-encoded\_\-callback}, 23
+    \subitem {FishSoundDecoded}, 20
+    \subitem {FishSoundEncoded}, 21
+  \item {FishSoundCommand}
+    \subitem {constants.h}, 17
+  \item {FishSoundDecoded}
+    \subitem {fishsound.h}, 20
+  \item {FishSoundEncoded}
+    \subitem {fishsound.h}, 21
+  \item {FishSoundFormat}, 15
+    \subitem {constants.h}, 17
+  \item {FishSoundInfo}, 16
+  \item {FishSoundMode}
+    \subitem {constants.h}, 18
+
+  \indexspace
+
+  \item {Installation}, 11
+
+\end{theindex}

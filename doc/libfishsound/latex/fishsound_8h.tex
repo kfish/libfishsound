@@ -1,0 +1,232 @@
+\section{fishsound.h File Reference}
+\label{fishsound_8h}\index{fishsound.h@{fishsound.h}}
+
+
+\subsection{Detailed Description}
+The libfishsound C API. 
+
+\subsection{General usage}\label{general}
+All access is managed via a Fish\-Sound$\ast$ handle. This is instantiated using {\bf fish\_\-sound\_\-new()}{\rm (p.\,\pageref{fishsound_8h_a4})} and should be deleted with {\bf fish\_\-sound\_\-delete()}{\rm (p.\,\pageref{fishsound_8h_a10})} when no longer required. If there is a discontinuity in the input data (eg. after seeking in an input file), call {\bf fish\_\-sound\_\-reset()}{\rm (p.\,\pageref{fishsound_8h_a9})} to reset the internal codec state.\subsection{Decoding}\label{decoding}
+To decode audio data using libfishsound, first create a Fish\-Sound$\ast$ object with mode FISH\_\-SOUND\_\-DECODE. {\bf fish\_\-sound\_\-new()}{\rm (p.\,\pageref{fishsound_8h_a4})} will return a new Fish\-Sound$\ast$ object, initialised for decoding, and the {\bf Fish\-Sound\-Info}{\rm (p.\,\pageref{structFishSoundInfo})} structure will be cleared.\subsection{Encoding}\label{encoding}
+To encode audio data using libfishsound, first create a Fish\-Sound$\ast$ object with mode FISH\_\-SOUND\_\-ENCODE, and with a {\bf Fish\-Sound\-Info}{\rm (p.\,\pageref{structFishSoundInfo})} structure filled in with the required encoding parameters. {\bf fish\_\-sound\_\-new()}{\rm (p.\,\pageref{fishsound_8h_a4})} will return a new Fish\-Sound$\ast$ object initialised for encoding.
+
+{\tt \#include $<$fishsound/constants.h$>$}\par
+\subsection*{Data Structures}
+\begin{CompactItemize}
+\item 
+struct {\bf Fish\-Sound\-Format}
+\begin{CompactList}\small\item\em Info about a particular sound format. \item\end{CompactList}\item 
+struct {\bf Fish\-Sound\-Info}
+\begin{CompactList}\small\item\em Info about a particular encoder/decoder instance. \item\end{CompactList}\end{CompactItemize}
+\subsection*{Typedefs}
+\begin{CompactItemize}
+\item 
+typedef void $\ast$ {\bf Fish\-Sound}
+\begin{CompactList}\small\item\em An opaque handle to a Fish\-Sound. \item\end{CompactList}\item 
+typedef int($\ast$ {\bf Fish\-Sound\-Decoded} )({\bf Fish\-Sound} $\ast$fsound, float $\ast$$\ast$pcm, long frames, void $\ast$user\_\-data)
+\begin{CompactList}\small\item\em Signature of a callback for libfishsound to call when it has decoded audio PCM data. \item\end{CompactList}\item 
+typedef int($\ast$ {\bf Fish\-Sound\-Encoded} )({\bf Fish\-Sound} $\ast$fsound, unsigned char $\ast$buf, long bytes, void $\ast$user\_\-data)
+\begin{CompactList}\small\item\em Signature of a callback for libfishsound to call when it has encoded data. \item\end{CompactList}\end{CompactItemize}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+int {\bf fish\_\-sound\_\-identify} (unsigned char $\ast$buf, long bytes)
+\begin{CompactList}\small\item\em Identify a codec based on the first few bytes of data. \item\end{CompactList}\item 
+{\bf Fish\-Sound} $\ast$ {\bf fish\_\-sound\_\-new} (int mode, {\bf Fish\-Sound\-Info} $\ast$fsinfo)
+\begin{CompactList}\small\item\em Instantiate a new Fish\-Sound$\ast$ handle. \item\end{CompactList}\item 
+int {\bf fish\_\-sound\_\-set\_\-decoded\_\-callback} ({\bf Fish\-Sound} $\ast$fsound, {\bf Fish\-Sound\-Decoded} decoded, void $\ast$user\_\-data)
+\begin{CompactList}\small\item\em Set the callback for libfishsound to call when it has a block of decoded audio ready. \item\end{CompactList}\item 
+int {\bf fish\_\-sound\_\-set\_\-encoded\_\-callback} ({\bf Fish\-Sound} $\ast$fsound, {\bf Fish\-Sound\-Encoded} encoded, void $\ast$user\_\-data)
+\begin{CompactList}\small\item\em Set the callback for libfishsound to call when it has a block of encoded data ready. \item\end{CompactList}\item 
+long {\bf fish\_\-sound\_\-decode} ({\bf Fish\-Sound} $\ast$fsound, unsigned char $\ast$buf, long bytes)
+\begin{CompactList}\small\item\em Decode a block of data. \item\end{CompactList}\item 
+long {\bf fish\_\-sound\_\-encode} ({\bf Fish\-Sound} $\ast$fsound, float $\ast$$\ast$pcm, long frames)
+\begin{CompactList}\small\item\em Encode a block of audio. \item\end{CompactList}\item 
+int {\bf fish\_\-sound\_\-reset} ({\bf Fish\-Sound} $\ast$fsound)
+\begin{CompactList}\small\item\em Reset the codec state of a Fish\-Sound object. \item\end{CompactList}\item 
+int {\bf fish\_\-sound\_\-delete} ({\bf Fish\-Sound} $\ast$fsound)
+\begin{CompactList}\small\item\em Delete a Fish\-Sound object. \item\end{CompactList}\item 
+int {\bf fish\_\-sound\_\-command} ({\bf Fish\-Sound} $\ast$fsound, int command, void $\ast$data, int datasize)
+\begin{CompactList}\small\item\em Command interface. \item\end{CompactList}\end{CompactItemize}
+
+
+\subsection{Typedef Documentation}
+\index{fishsound.h@{fishsound.h}!FishSound@{FishSound}}
+\index{FishSound@{FishSound}!fishsound.h@{fishsound.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}typedef void$\ast$ {\bf Fish\-Sound}}\label{fishsound_8h_a0}
+
+
+An opaque handle to a Fish\-Sound. 
+
+This is returned by fishsound\_\-new() and is passed to all other fish\_\-sound\_\-$\ast$() functions. \index{fishsound.h@{fishsound.h}!FishSoundDecoded@{FishSoundDecoded}}
+\index{FishSoundDecoded@{FishSoundDecoded}!fishsound.h@{fishsound.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}typedef int($\ast$ {\bf Fish\-Sound\-Decoded})({\bf Fish\-Sound} $\ast$ fsound, float $\ast$$\ast$ pcm, long frames, void $\ast$ user\_\-data)}\label{fishsound_8h_a1}
+
+
+Signature of a callback for libfishsound to call when it has decoded audio PCM data. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em fsound}]The Fish\-Sound$\ast$ handle \item[{\em pcm}]The decoded audio \item[{\em frames}]The count of frames decoded \item[{\em user\_\-data}]Arbitrary user data \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Return values:]
+\begin{description}
+\item[{\em 0}]to continue \item[{\em non-zero}]to stop decoding immediately and return control to the {\bf fish\_\-sound\_\-decode()}{\rm (p.\,\pageref{fishsound_8h_a7})} caller \end{description}
+\end{Desc}
+\index{fishsound.h@{fishsound.h}!FishSoundEncoded@{FishSoundEncoded}}
+\index{FishSoundEncoded@{FishSoundEncoded}!fishsound.h@{fishsound.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}typedef int($\ast$ {\bf Fish\-Sound\-Encoded})({\bf Fish\-Sound} $\ast$ fsound, unsigned char $\ast$ buf, long bytes, void $\ast$ user\_\-data)}\label{fishsound_8h_a2}
+
+
+Signature of a callback for libfishsound to call when it has encoded data. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em fsound}]The Fish\-Sound$\ast$ handle \item[{\em buf}]The encoded data \item[{\em bytes}]The count of bytes encoded \item[{\em user\_\-data}]Arbitrary user data \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Return values:]
+\begin{description}
+\item[{\em 0}]to continue \item[{\em non-zero}]to stop encoding immediately and return control to the {\bf fish\_\-sound\_\-encode()}{\rm (p.\,\pageref{fishsound_8h_a8})} caller \end{description}
+\end{Desc}
+
+
+\subsection{Function Documentation}
+\index{fishsound.h@{fishsound.h}!fish_sound_command@{fish\_\-sound\_\-command}}
+\index{fish_sound_command@{fish\_\-sound\_\-command}!fishsound.h@{fishsound.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int fish\_\-sound\_\-command ({\bf Fish\-Sound} $\ast$ {\em fsound}, int {\em command}, void $\ast$ {\em data}, int {\em datasize})}\label{fishsound_8h_a11}
+
+
+Command interface. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em fsound}]A Fish\-Sound$\ast$ handle \item[{\em command}]The command action \item[{\em data}]Command data \item[{\em datasize}]Size of the data in bytes \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]0 on success, -1 on failure \end{Desc}
+\index{fishsound.h@{fishsound.h}!fish_sound_decode@{fish\_\-sound\_\-decode}}
+\index{fish_sound_decode@{fish\_\-sound\_\-decode}!fishsound.h@{fishsound.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}long fish\_\-sound\_\-decode ({\bf Fish\-Sound} $\ast$ {\em fsound}, unsigned char $\ast$ {\em buf}, long {\em bytes})}\label{fishsound_8h_a7}
+
+
+Decode a block of data. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em fsound}]A Fish\-Sound$\ast$ handle (created with mode FISH\_\-SOUND\_\-DECODE) \item[{\em buf}]A buffer of data \item[{\em bytes}]A count of bytes to decode (ie. the length of buf) \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]The number of bytes consumed \end{Desc}
+\index{fishsound.h@{fishsound.h}!fish_sound_delete@{fish\_\-sound\_\-delete}}
+\index{fish_sound_delete@{fish\_\-sound\_\-delete}!fishsound.h@{fishsound.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int fish\_\-sound\_\-delete ({\bf Fish\-Sound} $\ast$ {\em fsound})}\label{fishsound_8h_a10}
+
+
+Delete a Fish\-Sound object. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em fsound}]A Fish\-Sound$\ast$ handle \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]0 on success, -1 on failure \end{Desc}
+\index{fishsound.h@{fishsound.h}!fish_sound_encode@{fish\_\-sound\_\-encode}}
+\index{fish_sound_encode@{fish\_\-sound\_\-encode}!fishsound.h@{fishsound.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}long fish\_\-sound\_\-encode ({\bf Fish\-Sound} $\ast$ {\em fsound}, float $\ast$$\ast$ {\em pcm}, long {\em frames})}\label{fishsound_8h_a8}
+
+
+Encode a block of audio. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em fsound}]A Fish\-Sound$\ast$ handle (created with mode FISH\_\-SOUND\_\-ENCODE) \item[{\em pcm}]The audio data to encode \item[{\em frames}]A count of frames to encode \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]The number of frames encoded \end{Desc}
+\begin{Desc}
+\item[Note:]For multichannel audio, the audio data is interpreted according to the current PCM style \end{Desc}
+\index{fishsound.h@{fishsound.h}!fish_sound_identify@{fish\_\-sound\_\-identify}}
+\index{fish_sound_identify@{fish\_\-sound\_\-identify}!fishsound.h@{fishsound.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int fish\_\-sound\_\-identify (unsigned char $\ast$ {\em buf}, long {\em bytes})}\label{fishsound_8h_a3}
+
+
+Identify a codec based on the first few bytes of data. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em buf}]A pointer to the first few bytes of the data \item[{\em bytes}]The count of bytes available at buf \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Return values:]
+\begin{description}
+\item[{\em FISH\_\-SOUND\_\-xxxxxx}]FISH\_\-SOUND\_\-VORBIS, FISH\_\-SOUND\_\-SPEEX if {\em buf\/} was identified as the initial bytes of a supported codec \item[{\em FISH\_\-SOUND\_\-UNKNOWN}]if the codec could not be identified \item[{\em FISH\_\-SOUND\_\-ERR\_\-SHORT\_\-IDENTIFY}]if {\em bytes\/} is less than 8 \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Note:]If {\em bytes\/} is exactly 8, then only a weak check is performed, which is fast but may return a false positive. 
+
+If {\em bytes\/} is greater than 8, then a stronger check is performed in which an attempt is made to decode {\em buf\/} as the initial header of each supported codec. This is unlikely to return a false positive but is only useful if {\em buf\/} is the entire payload of a packet derived from a lower layer such as Ogg framing or UDP datagrams. \end{Desc}
+\index{fishsound.h@{fishsound.h}!fish_sound_new@{fish\_\-sound\_\-new}}
+\index{fish_sound_new@{fish\_\-sound\_\-new}!fishsound.h@{fishsound.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}{\bf Fish\-Sound}$\ast$ fish\_\-sound\_\-new (int {\em mode}, {\bf Fish\-Sound\-Info} $\ast$ {\em fsinfo})}\label{fishsound_8h_a4}
+
+
+Instantiate a new Fish\-Sound$\ast$ handle. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em mode}]FISH\_\-SOUND\_\-DECODE or FISH\_\-SOUND\_\-ENCODE \item[{\em fsinfo}]\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A new Fish\-Sound$\ast$ handle, or NULL on error \end{Desc}
+\index{fishsound.h@{fishsound.h}!fish_sound_reset@{fish\_\-sound\_\-reset}}
+\index{fish_sound_reset@{fish\_\-sound\_\-reset}!fishsound.h@{fishsound.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int fish\_\-sound\_\-reset ({\bf Fish\-Sound} $\ast$ {\em fsound})}\label{fishsound_8h_a9}
+
+
+Reset the codec state of a Fish\-Sound object. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em fsound}]A Fish\-Sound$\ast$ handle \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]0 on success, -1 on failure \end{Desc}
+\index{fishsound.h@{fishsound.h}!fish_sound_set_decoded_callback@{fish\_\-sound\_\-set\_\-decoded\_\-callback}}
+\index{fish_sound_set_decoded_callback@{fish\_\-sound\_\-set\_\-decoded\_\-callback}!fishsound.h@{fishsound.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int fish\_\-sound\_\-set\_\-decoded\_\-callback ({\bf Fish\-Sound} $\ast$ {\em fsound}, {\bf Fish\-Sound\-Decoded} {\em decoded}, void $\ast$ {\em user\_\-data})}\label{fishsound_8h_a5}
+
+
+Set the callback for libfishsound to call when it has a block of decoded audio ready. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em fsound}]A Fish\-Sound$\ast$ handle (created with mode FISH\_\-SOUND\_\-DECODE) \item[{\em decoded}]The callback to call \item[{\em user\_\-data}]Arbitrary user data to pass to the callback \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]0 on success, -1 on failure \end{Desc}
+\index{fishsound.h@{fishsound.h}!fish_sound_set_encoded_callback@{fish\_\-sound\_\-set\_\-encoded\_\-callback}}
+\index{fish_sound_set_encoded_callback@{fish\_\-sound\_\-set\_\-encoded\_\-callback}!fishsound.h@{fishsound.h}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int fish\_\-sound\_\-set\_\-encoded\_\-callback ({\bf Fish\-Sound} $\ast$ {\em fsound}, {\bf Fish\-Sound\-Encoded} {\em encoded}, void $\ast$ {\em user\_\-data})}\label{fishsound_8h_a6}
+
+
+Set the callback for libfishsound to call when it has a block of encoded data ready. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em fsound}]A Fish\-Sound$\ast$ handle (created with mode FISH\_\-SOUND\_\-ENCODE) \item[{\em encoded}]The callback to call \item[{\em user\_\-data}]Arbitrary user data to pass to the callback \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]0 on success, -1 on failure \end{Desc}

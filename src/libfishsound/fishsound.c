@@ -1,0 +1,260 @@
+/*
+   Copyright (c) 2002, 2003, Xiph.org Foundation
+
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions
+   are met:
+
+   - Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+
+   - Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+
+   - Neither the name of the Xiph.org Foundation nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+   ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+   A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR
+   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+#include "config.h"
+
+#include <stdio.h>
+#include <string.h>
+
+#include "private.h"
+
+int
+fish_sound_identify (unsigned char * buf, long bytes)
+{
+  if (bytes < 8) return FISH_SOUND_ERR_SHORT_IDENTIFY;
+
+  if (HAVE_VORBIS &&
+      fish_sound_vorbis.identify (buf, bytes) != FISH_SOUND_UNKNOWN)
+    return FISH_SOUND_VORBIS;
+
+  if (HAVE_SPEEX &&
+      fish_sound_speex.identify (buf, bytes) != FISH_SOUND_UNKNOWN)
+    return FISH_SOUND_SPEEX;
+
+  return FISH_SOUND_UNKNOWN;
+}
+
+static int
+fish_sound_set_format (FishSound * fsound, int format)
+{
+  if (format == FISH_SOUND_VORBIS) {
+    fsound->codec = &fish_sound_vorbis;
+  } else if (format == FISH_SOUND_SPEEX) {
+    fsound->codec = &fish_sound_speex;
+  } else {
+    return -1;
+  }
+
+  if (fsound->codec->init)
+    fsound->codec->init (fsound);
+
+  fsound->info.format = format;
+
+  return format;
+}
+
+FishSound *
+fish_sound_new (int mode, FishSoundInfo * fsinfo)
+{
+  FishSound * fsound;
+
+  if (!FS_DECODE && mode == FISH_SOUND_DECODE) return NULL;
+
+  if (!FS_ENCODE && mode == FISH_SOUND_ENCODE) return NULL;
+
+  if (mode == FISH_SOUND_ENCODE) {
+    if (fsinfo == NULL) {
+      return NULL;
+    } else {
+      if (!(HAVE_VORBIS && HAVE_VORBISENC)) {
+	if (fsinfo->format == FISH_SOUND_VORBIS) return NULL;
+      }
+      if (!HAVE_SPEEX) {
+	if (fsinfo->format == FISH_SOUND_SPEEX) return NULL;
+      }
+    }
+  }
+
+  fsound = malloc (sizeof (FishSound));
+
+  fsound->mode = mode;
+  fsound->interleave = 0;
+
+  fsound->codec_data = NULL;
+  fsound->callback = NULL;
+  fsound->user_data = NULL;
+
+  if (mode == FISH_SOUND_DECODE) {
+    fsound->info.samplerate = 0;
+    fsound->info.channels = 0;
+    fsound->info.format = FISH_SOUND_UNKNOWN;
+  } else if (mode == FISH_SOUND_ENCODE) {
+    fsound->info.samplerate = fsinfo->samplerate;
+    fsound->info.channels = fsinfo->channels;
+    fsound->info.format = fsinfo->format;
+
+    fish_sound_set_format (fsound, fsinfo->format);
+  } else {
+    /* XXX: error */
+  } 
+
+  return fsound;
+}
+
+int
+fish_sound_set_decoded_callback (FishSound * fsound,
+				 FishSoundDecoded decoded,
+				 void * user_data)
+{
+  if (fsound == NULL) return -1;
+
+#ifdef FS_DECODE
+  fsound->callback = (void *)decoded;
+  fsound->user_data = user_data;
+#else
+  return FISH_SOUND_ERR_DISABLED;
+#endif
+
+  return 0;
+}
+
+int
+fish_sound_set_encoded_callback (FishSound * fsound,
+				 FishSoundEncoded encoded,
+				 void * user_data)
+{
+  if (fsound == NULL) return -1;
+
+#ifdef FS_ENCODE
+  fsound->callback = (void *)encoded;
+  fsound->user_data = user_data;
+#else
+  return FISH_SOUND_ERR_DISABLED;
+#endif
+
+  return 0;
+}
+
+long
+fish_sound_decode (FishSound * fsound, unsigned char * buf, long bytes)
+{
+  int format;
+
+  if (fsound == NULL) return -1;
+
+#ifdef FS_DECODE
+  if (fsound->info.format == FISH_SOUND_UNKNOWN) {
+    format = fish_sound_identify (buf, bytes);
+    if (format == FISH_SOUND_UNKNOWN) return -1;
+
+    fish_sound_set_format (fsound, format);
+  }
+
+  /*printf ("format: %s\n", fsound->codec->format->name);*/
+
+  if (fsound->codec && fsound->codec->decode)
+    return fsound->codec->decode (fsound, buf, bytes);
+#else
+  return FISH_SOUND_ERR_DISABLED;
+#endif
+
+  return 0;
+}
+
+long
+fish_sound_encode (FishSound * fsound, float ** pcm, long frames)
+{
+  if (fsound == NULL) return -1;
+
+#ifdef FS_ENCODE
+  if (fsound->interleave) {
+    if (fsound->codec && fsound->codec->encode_i)
+      return fsound->codec->encode_i (fsound, pcm, frames);
+  } else {
+    if (fsound->codec && fsound->codec->encode_n)
+      return fsound->codec->encode_n (fsound, pcm, frames);
+  }
+#else
+  return FISH_SOUND_ERR_DISABLED;
+#endif
+
+  return 0;
+}
+
+long
+fish_sound_flush (FishSound * fsound)
+{
+  if (fsound == NULL) return -1;
+
+  if (fsound->codec && fsound->codec->flush)
+    return fsound->codec->flush (fsound);
+
+  return 0;
+}
+
+int
+fish_sound_reset (FishSound * fsound)
+{
+  if (fsound == NULL) return -1;
+
+  if (fsound->codec && fsound->codec->reset)
+    return fsound->codec->reset (fsound);
+
+  return 0;
+}
+
+FishSound *
+fish_sound_delete (FishSound * fsound)
+{
+  if (fsound == NULL) return NULL;
+
+  if (fsound->codec && fsound->codec->delete)
+    fsound->codec->delete (fsound);
+
+  free (fsound);
+
+  return NULL;
+}
+
+int
+fish_sound_command (FishSound * fsound, int command, void * data, int datasize)
+{
+  FishSoundInfo * fsinfo = (FishSoundInfo *)data;
+  int * pi = (int *)data;
+
+  switch (command) {
+  case FISH_SOUND_GET_INFO:
+    memcpy (fsinfo, &fsound->info, sizeof (FishSoundInfo));
+    break;
+  case FISH_SOUND_GET_INTERLEAVE:
+    *pi = fsound->interleave;
+    break;
+  case FISH_SOUND_SET_INTERLEAVE:
+    fsound->interleave = (*pi ? 1 : 0);
+    break;
+  default:
+    if (fsound->codec && fsound->codec->command)
+      return fsound->codec->command (fsound, command, data, datasize);
+    break;
+  }
+
+  return 0;
+}

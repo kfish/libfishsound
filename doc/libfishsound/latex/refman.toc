@@ -1,0 +1,57 @@
+\contentsline {chapter}{\numberline {1}libfishsound Main Page}{1}
+\contentsline {section}{\numberline {1.1}Fish\discretionary {-}{}{}Sound, the sound of fish!}{1}
+\contentsline {subsection}{\numberline {1.1.1}API specification}{1}
+\contentsline {subsection}{\numberline {1.1.2}Library customization}{1}
+\contentsline {subsection}{\numberline {1.1.3}Building against libfishsound}{1}
+\contentsline {section}{\numberline {1.2}Licensing}{1}
+\contentsline {section}{\numberline {1.3}History and Motivation}{2}
+\contentsline {chapter}{\numberline {2}libfishsound Module Index}{3}
+\contentsline {section}{\numberline {2.1}libfishsound Modules}{3}
+\contentsline {chapter}{\numberline {3}libfishsound Data Structure Index}{5}
+\contentsline {section}{\numberline {3.1}libfishsound Data Structures}{5}
+\contentsline {chapter}{\numberline {4}libfishsound File Index}{7}
+\contentsline {section}{\numberline {4.1}libfishsound File List}{7}
+\contentsline {chapter}{\numberline {5}libfishsound Module Documentation}{9}
+\contentsline {section}{\numberline {5.1}Configuration}{9}
+\contentsline {subsection}{\numberline {5.1.1}./configure}{9}
+\contentsline {subsubsection}{\numberline {5.1.1.1}Removing encoding support}{9}
+\contentsline {subsubsection}{\numberline {5.1.1.2}Removing decoding support}{9}
+\contentsline {subsubsection}{\numberline {5.1.1.3}Removing Vorbis support}{10}
+\contentsline {subsubsection}{\numberline {5.1.1.4}Removing Speex support}{10}
+\contentsline {subsubsection}{\numberline {5.1.1.5}Configuration summary}{10}
+\contentsline {section}{\numberline {5.2}Installation}{11}
+\contentsline {subsection}{\numberline {5.2.1}INSTALL}{11}
+\contentsline {section}{\numberline {5.3}Building against libfishsound}{14}
+\contentsline {subsection}{\numberline {5.3.1}Using GNU autoconf}{14}
+\contentsline {subsection}{\numberline {5.3.2}Determining compiler options with pkg-config}{14}
+\contentsline {chapter}{\numberline {6}libfishsound Data Structure Documentation}{15}
+\contentsline {section}{\numberline {6.1}Fish\discretionary {-}{}{}Sound\discretionary {-}{}{}Format Struct Reference}{15}
+\contentsline {subsection}{\numberline {6.1.1}Detailed Description}{15}
+\contentsline {section}{\numberline {6.2}Fish\discretionary {-}{}{}Sound\discretionary {-}{}{}Info Struct Reference}{16}
+\contentsline {subsection}{\numberline {6.2.1}Detailed Description}{16}
+\contentsline {chapter}{\numberline {7}libfishsound File Documentation}{17}
+\contentsline {section}{\numberline {7.1}constants.h File Reference}{17}
+\contentsline {subsection}{\numberline {7.1.1}Detailed Description}{17}
+\contentsline {subsection}{\numberline {7.1.2}Enumeration Type Documentation}{17}
+\contentsline {subsubsection}{\numberline {7.1.2.1}\setlength {\rightskip }{0pt plus 5cm}enum {\bf Fish\discretionary {-}{}{}Sound\discretionary {-}{}{}Command}}{17}
+\contentsline {subsubsection}{\numberline {7.1.2.2}\setlength {\rightskip }{0pt plus 5cm}enum {\bf Fish\discretionary {-}{}{}Sound\discretionary {-}{}{}Format}}{18}
+\contentsline {subsubsection}{\numberline {7.1.2.3}\setlength {\rightskip }{0pt plus 5cm}enum {\bf Fish\discretionary {-}{}{}Sound\discretionary {-}{}{}Mode}}{18}
+\contentsline {section}{\numberline {7.2}fishsound.h File Reference}{19}
+\contentsline {subsection}{\numberline {7.2.1}Detailed Description}{19}
+\contentsline {subsection}{\numberline {7.2.2}General usage}{19}
+\contentsline {subsection}{\numberline {7.2.3}Decoding}{19}
+\contentsline {subsection}{\numberline {7.2.4}Encoding}{19}
+\contentsline {subsection}{\numberline {7.2.5}Typedef Documentation}{20}
+\contentsline {subsubsection}{\numberline {7.2.5.1}\setlength {\rightskip }{0pt plus 5cm}typedef int($\ast $ {\bf Fish\discretionary {-}{}{}Sound\discretionary {-}{}{}Decoded})({\bf Fish\discretionary {-}{}{}Sound} $\ast $ fsound, float $\ast $$\ast $ pcm, long frames, void $\ast $ user\_\discretionary {-}{}{}data)}{20}
+\contentsline {subsubsection}{\numberline {7.2.5.2}\setlength {\rightskip }{0pt plus 5cm}typedef int($\ast $ {\bf Fish\discretionary {-}{}{}Sound\discretionary {-}{}{}Encoded})({\bf Fish\discretionary {-}{}{}Sound} $\ast $ fsound, unsigned char $\ast $ buf, long bytes, void $\ast $ user\_\discretionary {-}{}{}data)}{21}
+\contentsline {subsection}{\numberline {7.2.6}Function Documentation}{21}
+\contentsline {subsubsection}{\numberline {7.2.6.1}\setlength {\rightskip }{0pt plus 5cm}int fish\_\discretionary {-}{}{}sound\_\discretionary {-}{}{}command ({\bf Fish\discretionary {-}{}{}Sound} $\ast $ {\em fsound}, int {\em command}, void $\ast $ {\em data}, int {\em datasize})}{21}
+\contentsline {subsubsection}{\numberline {7.2.6.2}\setlength {\rightskip }{0pt plus 5cm}long fish\_\discretionary {-}{}{}sound\_\discretionary {-}{}{}decode ({\bf Fish\discretionary {-}{}{}Sound} $\ast $ {\em fsound}, unsigned char $\ast $ {\em buf}, long {\em bytes})}{21}
+\contentsline {subsubsection}{\numberline {7.2.6.3}\setlength {\rightskip }{0pt plus 5cm}int fish\_\discretionary {-}{}{}sound\_\discretionary {-}{}{}delete ({\bf Fish\discretionary {-}{}{}Sound} $\ast $ {\em fsound})}{22}
+\contentsline {subsubsection}{\numberline {7.2.6.4}\setlength {\rightskip }{0pt plus 5cm}long fish\_\discretionary {-}{}{}sound\_\discretionary {-}{}{}encode\_\discretionary {-}{}{}i ({\bf Fish\discretionary {-}{}{}Sound} $\ast $ {\em fsound}, float $\ast $$\ast $ {\em pcm}, long {\em frames})}{22}
+\contentsline {subsubsection}{\numberline {7.2.6.5}\setlength {\rightskip }{0pt plus 5cm}long fish\_\discretionary {-}{}{}sound\_\discretionary {-}{}{}encode\_\discretionary {-}{}{}n ({\bf Fish\discretionary {-}{}{}Sound} $\ast $ {\em fsound}, float $\ast $ {\em pcm}[$\,$], long {\em frames})}{22}
+\contentsline {subsubsection}{\numberline {7.2.6.6}\setlength {\rightskip }{0pt plus 5cm}int fish\_\discretionary {-}{}{}sound\_\discretionary {-}{}{}identify (unsigned char $\ast $ {\em buf}, long {\em bytes})}{22}
+\contentsline {subsubsection}{\numberline {7.2.6.7}\setlength {\rightskip }{0pt plus 5cm}{\bf Fish\discretionary {-}{}{}Sound}$\ast $ fish\_\discretionary {-}{}{}sound\_\discretionary {-}{}{}new (int {\em mode}, {\bf Fish\discretionary {-}{}{}Sound\discretionary {-}{}{}Info} $\ast $ {\em fsinfo})}{23}
+\contentsline {subsubsection}{\numberline {7.2.6.8}\setlength {\rightskip }{0pt plus 5cm}int fish\_\discretionary {-}{}{}sound\_\discretionary {-}{}{}reset ({\bf Fish\discretionary {-}{}{}Sound} $\ast $ {\em fsound})}{23}
+\contentsline {subsubsection}{\numberline {7.2.6.9}\setlength {\rightskip }{0pt plus 5cm}int fish\_\discretionary {-}{}{}sound\_\discretionary {-}{}{}set\_\discretionary {-}{}{}decoded\_\discretionary {-}{}{}callback ({\bf Fish\discretionary {-}{}{}Sound} $\ast $ {\em fsound}, {\bf Fish\discretionary {-}{}{}Sound\discretionary {-}{}{}Decoded} {\em decoded}, void $\ast $ {\em user\_\discretionary {-}{}{}data})}{23}
+\contentsline {subsubsection}{\numberline {7.2.6.10}\setlength {\rightskip }{0pt plus 5cm}int fish\_\discretionary {-}{}{}sound\_\discretionary {-}{}{}set\_\discretionary {-}{}{}encoded\_\discretionary {-}{}{}callback ({\bf Fish\discretionary {-}{}{}Sound} $\ast $ {\em fsound}, {\bf Fish\discretionary {-}{}{}Sound\discretionary {-}{}{}Encoded} {\em encoded}, void $\ast $ {\em user\_\discretionary {-}{}{}data})}{23}
