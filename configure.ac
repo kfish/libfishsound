@@ -31,6 +31,8 @@ fi
 dnl Overall configuration success flag
 fishsound_config_ok=yes
 
+fishsound_examples=""
+
 dnl
 dnl  Configuration option for building of experimental code.
 dnl
@@ -79,8 +81,6 @@ dnl  Check decode/encode option sanity
 dnl
 if test "x${ac_enable_decode}" = xno && test "x${ac_enable_encode}" = xno ; then
   AC_MSG_ERROR([
-***
-*** NO FISH ERROR
 ***
 *** You have attempted to explicitly disable both encoding and decoding.
 ***
@@ -179,8 +179,6 @@ dnl  Check codec disabling sanity
 dnl
 if test "x${ac_enable_vorbis}" = xno && test "x${ac_enable_speex}" = xno ; then
   AC_MSG_ERROR([
-***
-*** NO FISH ERROR
 ***
 *** You have attempted to explicitly disable both Vorbis and Speex support.
 ***
@@ -319,6 +317,23 @@ else
 AC_SUBST(SHLIB_VERSION_ARG)
 AC_SUBST(SHARED_VERSION_INFO)
 
+if test "x$HAVE_OGGZ" = xyes ; then
+  fishsound_examples="identify"
+
+  if test "x$HAVE_LIBSNDFILE1" = xyes ; then
+    if test "x${ac_enable_decode}" = xyes ; then
+      fishsound_examples="$fishsound_examples decode"
+    fi
+    if test "x${ac_enable_encode}" = xyes ; then
+      fishsound_examples="$fishsound_examples encode"
+    fi
+  else
+    fishsound_examples="$fishsound_examples (decode and encode require libsndfile)"
+  fi
+else
+  fishsound_examples="(none; liboggz and libsndfile required)"
+fi
+
 AC_OUTPUT([
 Makefile
 doc/Makefile
@@ -350,8 +365,7 @@ AC_MSG_RESULT([
 
   Example programs (./src/examples):
 
-    Ogg: liboggz example: ........ $HAVE_OGGZ
-    PCM: libsndfile1 example: .... $HAVE_LIBSNDFILE1
+    $fishsound_examples
 
   Installation paths:
 
