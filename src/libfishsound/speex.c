@@ -1339,8 +1339,14 @@ fs_speex_flush (FishSound * fsound)
 
 #else /* !FS_ENCODE */
 
+#define fs_speex_encode_s NULL
+#define fs_speex_encode_s_ilv NULL
+#define fs_speex_encode_i NULL
+#define fs_speex_encode_i_ilv NULL
 #define fs_speex_encode_f NULL
 #define fs_speex_encode_f_ilv NULL
+#define fs_speex_encode_d NULL
+#define fs_speex_encode_d_ilv NULL
 #define fs_speex_flush NULL
 
 #endif
