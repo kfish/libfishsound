@@ -299,7 +299,11 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
       vorbis_block_init (&fsv->vd, &fsv->vb);
     }
   } else {
+#if FS_FLOAT
     if (vorbis_synthesis (&fsv->vb, &op) == 0)
+#else
+    if (vorbis_synthesis (&fsv->vb, &op, 1) == 0)
+#endif
       vorbis_synthesis_blockin (&fsv->vd, &fsv->vb);
 
     while ((samples = vorbis_synthesis_pcmout (&fsv->vd, &pcm)) > 0) {
