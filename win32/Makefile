@@ -40,16 +40,16 @@ LINK32_OBJS= \
 "libfishsound.dll" : $(LINK32_OBJS) ".\libfishsound\libfishsound.def"
     $(LINK32) $(LINK32_FLAGS) /def:".\libfishsound\libfishsound.def" $(LINK32_OBJS)
 
-"identify.exe" : "..\src\tools\identify.c"
-	$(CPP) $(CFLAGS) /Fo".\identify.obj" /c "..\src\tools\identify.c"
+"identify.exe" : "..\src\examples\identify.c"
+	$(CPP) $(CFLAGS) /Fo".\identify.obj" /c "..\src\examples\identify.c"
 	$(LINK32) $(PROG_LINK_FLAGS) /out:"identify.exe" ".\identify.obj" liboggz.lib libfishsound.lib
 
-"encode.exe" : "..\src\tools\encode.c"
-	$(CPP) $(CFLAGS) /Fo".\encode.obj" /c "..\src\tools\encode.c"
+"encode.exe" : "..\src\examples\encode.c"
+	$(CPP) $(CFLAGS) /Fo".\encode.obj" /c "..\src\examples\encode.c"
 	$(LINK32) $(PROG_LINK_FLAGS) /out:"encode.exe" ".\encode.obj" liboggz.lib libfishsound.lib libspeex.lib libsndfile.lib
 
-"decode.exe" : "..\src\tools\decode.c"
-	$(CPP) $(CFLAGS) /Fo".\decode.obj" /c "..\src\tools\decode.c"
+"decode.exe" : "..\src\examples\decode.c"
+	$(CPP) $(CFLAGS) /Fo".\decode.obj" /c "..\src\examples\decode.c"
 	$(LINK32) $(PROG_LINK_FLAGS) /out:"decode.exe" ".\decode.obj" liboggz.lib libfishsound.lib libspeex.lib vorbis.lib libsndfile.lib
 
 
