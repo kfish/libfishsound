@@ -353,6 +353,29 @@ fi
 AM_CONDITIONAL(HAVE_LIBSNDFILE1, [test "x$HAVE_LIBSNDFILE1" = "xyes"])
 
 
+# Checks for typedefs, structures, and compiler characteristics.
+
+dnl Use -Wall if we have gcc.
+dnl changequote(,)dnl
+if test "x$ac_cv_prog_gcc" = xyes ; then
+  CFLAGS="$CFLAGS -Wall -g"
+fi
+dnl changequote([,])dnl
+
+case "$target_os" in
+  darwin* | rhapsody*)
+    dnl Disable -Wall and -pedantic for Apple Darwin/Rhapsody.
+    dnl System headers on these systems are broken.
+    temp_CFLAGS=`echo $CFLAGS | sed "s/-Wall -pedantic//"`
+    CFLAGS=$temp_CFLAGS
+    ;;
+  linux* | solaris*)
+    SHLIB_VERSION_ARG="-Wl,--version-script=Version_script"
+    ;;
+  *)
+    ;;
+esac
+
 dnl
 dnl  Configuration tests complete -- provide summary of results.
 dnl

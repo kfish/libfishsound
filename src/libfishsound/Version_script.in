@@ -24,6 +24,24 @@
 		fish_sound_set_frameno;
 		fish_sound_prepare_truncation;
 
+		fish_sound_set_decoded_short;
+		fish_sound_set_decoded_short_ilv;
+		fish_sound_set_decoded_int;
+		fish_sound_set_decoded_int_ilv;
+		fish_sound_set_decoded_float;
+		fish_sound_set_decoded_float_ilv;
+		fish_sound_set_decoded_double;
+		fish_sound_set_decoded_double_ilv;
+
+		fish_sound_encode_short;
+		fish_sound_encode_short_ilv;
+		fish_sound_encode_int;
+		fish_sound_encode_int_ilv;
+		fish_sound_encode_float;
+		fish_sound_encode_float_ilv;
+		fish_sound_encode_double;
+		fish_sound_encode_double_ilv;
+
 		fish_sound_comment_get_vendor;
 		fish_sound_comment_first;
 		fish_sound_comment_first_byname;
