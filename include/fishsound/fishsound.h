@@ -128,7 +128,7 @@
  * libraries, it may not be possible to implement some low-level techniques
  * that these libraries enable, such as parallelization of Vorbis sub-block
  * decoding. Nevertheless it is expected that libfishsound is a useful
- * API for most software requiring Vorbis or Speex support, including all
+ * API for most software requiring Vorbis or Speex support, including most
  * applications the author has encountered.
  *
  * \section acknowledgements Acknowledgements
