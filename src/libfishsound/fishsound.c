@@ -97,7 +97,7 @@ fish_sound_new (int mode, FishSoundInfo * fsinfo)
 
   fsound->mode = mode;
   fsound->interleave = 0;
-
+  fsound->codec = NULL;
   fsound->codec_data = NULL;
   fsound->callback = NULL;
   fsound->user_data = NULL;
