@@ -328,7 +328,6 @@ include/fishsound/Makefile
 src/Makefile
 src/libfishsound/Version_script
 src/libfishsound/Makefile
-src/tools/Makefile
 src/tests/Makefile
 src/examples/Makefile
 fishsound.pc
