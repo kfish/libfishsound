@@ -1,4 +1,4 @@
-/*
+/**
    Copyright (c) 2002, 2003, Xiph.org Foundation
 
    Redistribution and use in source and binary forms, with or without
@@ -37,25 +37,17 @@
 
 #include <oggz/oggz.h>
 #include <fishsound/fishsound.h>
-
 #include <sndfile.h>
-
-#define DEBUG
 
 static char * infilename, * outfilename;
 static int begun = 0;
 static FishSoundInfo fsinfo;
 static SNDFILE * sndfile;
 
-static long total_frames = 0;
-
 static int
 open_output (int samplerate, int channels)
 {
   SF_INFO sfinfo;
-
-  printf ("opening output %s, %d Hz\n", channels == 1 ? "MONO" : "STEREO",
-	  samplerate);
 
   sfinfo.samplerate = samplerate;
   sfinfo.channels = channels;
@@ -76,11 +68,6 @@ decoded (FishSound * fsound, float ** pcm, long frames, void * user_data)
     begun = 1;
   }
 
-#if 0
-  total_frames += frames;
-  printf ("writing %ld frames, total %ld\n", frames, total_frames);
-#endif
-
   sf_writef_float (sndfile, (float *)pcm, frames);
 
   return 0;
@@ -92,11 +79,6 @@ read_packet (OGGZ * oggz, ogg_packet * op, long serialno, void * user_data)
   FishSound * fsound = (FishSound *)user_data;
 
   fish_sound_decode (fsound, op->packet, op->bytes);
-
-  if (op->e_o_s) {
-    printf ("*** eos ***\n");
-    return 1;
-  }
 
   return 0;
 }
@@ -111,7 +93,8 @@ main (int argc, char ** argv)
 
   if (argc < 3) {
     printf ("usage: %s infilename outfilename\n", argv[0]);
-    printf ("Opens a speex or vorbis input file and decodes it to pcm.\n");
+    printf ("*** FishSound example program. ***\n");
+    printf ("Decodes an Ogg Speex or Ogg Vorbis file producing a PCM wav file.\n");
     exit (1);
   }
 

@@ -277,10 +277,11 @@
  *
  * \section decoding Decoding
  *
- * To decode audio data using libfishsound, first create a FishSound*
- * object with mode FISH_SOUND_DECODE. fish_sound_new() will return a
- * new FishSound* object, initialised for decoding, and the FishSoundInfo
- * structure will be cleared.
+ * libfishsound provides callback based decoding: you feed it encoded audio
+ * data, and it will call your callback with decoded PCM. A more detailed
+ * explanation and a full example of decoding Ogg Vorbis and Speex files is
+ * provided in the
+ * \link decode Decoding audio data \endlink section.
  *
  * \section encoding Encoding
  *
@@ -288,6 +289,38 @@
  * object with mode FISH_SOUND_ENCODE, and with a FishSoundInfo structure
  * filled in with the required encoding parameters. fish_sound_new()
  * will return a new FishSound* object initialised for encoding.
+ */
+
+/** \defgroup decode Decoding audio data
+
+ * To decode audio data using libfishsound:
+ *
+ * - create a FishSound* object with mode FISH_SOUND_DECODE. fish_sound_new()
+ * will return a new FishSound* object, initialised for decoding, and the
+ * FishSoundInfo structure will be cleared.
+ * - provide a FishSoundDecoded callback for libfishsound to call when it has
+ * decoded audio.
+ * - (optionally) specify whether you want to receive interleaved or
+ * per-channel PCM data, using a fish_sound_command(). The default is for
+ * per-channel (non-interleaved) PCM.
+ * - feed encoded audio data to libfishsound via fish_sound_decode().
+ * libfishsound will decode the audio for you, calling the FishSoundDecode
+ * callback you provided earlier each time it has a block of audio ready.
+ * - when finished, call fish_sound_delete().
+ *
+ * This procedure is illustrated in src/examples/decode.c. Note that this
+ * example additionally:
+ * - uses <a href="http://www.annodex.net/software/liboggz/">liboggz</a> to
+ * demultiplex audio data from an Ogg encapsulated Vorbis or Speex stream.
+ * Hence, the step of feeding encoded data to libfishsound is done within
+ * the OggzReadPacket callback.
+ * - uses <a href="http://www.mega-nerd.com/libsndfile/">libsndfile</a> to
+ * write the decoded audio to a WAV file.
+ *
+ * Hence this example code demonstrates all that is needed to decode both
+ * Ogg Vorbis and Ogg Speex files:
+ *
+ * \include decode.c
  */
 
 /**
