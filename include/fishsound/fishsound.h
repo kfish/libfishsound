@@ -149,6 +149,16 @@
  */
 
 /** \defgroup configuration Configuration
+ *
+ * \section platforms Platform-specific configuration
+ *
+ * FishSound can be configured on most platforms using the GNU autoconf
+ * ./configure system described below.
+ *
+ * For Win32, see the \link win32 README.win32 \endlink section. You will
+ * need to edit <tt>win32/config.h</tt> by hand to achieve the customizations
+ * described below.
+ *
  * \section ./configure ./configure
  *
  * It is possible to customize the functionality of libfishsound
@@ -217,8 +227,7 @@
 
   Example programs (./src/examples):
 
-    Ogg: liboggz example: ........ yes
-    PCM: libsndfile1 example: .... yes
+    identify decode encode
 
   Installation paths:
 
@@ -235,6 +244,12 @@
  * \section install INSTALL
  *
  * \include INSTALL
+ */
+
+/** \defgroup win32 Building on Win32
+ * \section win32 README.Win32
+ *
+ * \include README.win32
  */
 
 /** \defgroup building Building against libfishsound
