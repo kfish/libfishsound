@@ -79,6 +79,11 @@ typedef short FS_SpeexPCM;
 typedef float FS_SpeexPCM;
 #endif
 
+/* How to free memory allocated by libspeex */
+#if !HAVE_SPEEX_FREE
+#define speex_free fs_free
+#endif
+
 typedef struct _FishSoundSpeexEnc {
   int frame_offset; /* number of speex frames done in this packet */
   int pcm_offset;
@@ -135,7 +140,7 @@ fish_sound_speex_identify (unsigned char * buf, long bytes)
     /* otherwise, assume the buffer is an entire initial header and
      * feed it to speex_packet_to_header() */
     if ((header = speex_packet_to_header ((char *)buf, (int)bytes)) != NULL) {
-      fs_free(header);
+      speex_free(header);
       return FISH_SOUND_SPEEX;
     }
   }
@@ -274,7 +279,7 @@ process_header(unsigned char * buf, long bytes, int enh_enabled,
 
   *extra_headers = header->extra_headers;
 
-  fs_free(header);
+  speex_free(header);
 
   return st;
 }

@@ -237,6 +237,17 @@ if test "x${ac_enable_speex}" = xyes ; then
       SPEEX_SUPPORT="yes (1.0.x)"
     fi
 
+    dnl Test for speex_free() in libspeex
+    AC_CHECK_LIB(speex, speex_free, HAVE_SPEEX_FREE="yes",
+      HAVE_SPEEX_FREE="no", [$SPEEX_LIBS])
+    if test "x$HAVE_SPEEX_FREE" = xyes ; then
+      AC_DEFINE(HAVE_SPEEX_FREE, [1],
+       [Define to 1 if speex_free() exists in libspeex])
+    else
+      AC_DEFINE(HAVE_SPEEX_FREE, [0],
+       [Define to 1 if speex_free() exists in libspeex])
+    fi
+
     dnl Test for libspeex SPEEX_DISABLE_GLOBAL_POINTERS API
     dnl If so, we need to use a different API to access available modes,
     dnl and free them after use.
