@@ -178,7 +178,7 @@ fs_vorbis_command (FishSound * fsound, int command, void * data,
   return 0;
 }
 
-#ifdef FS_DECODE
+#if FS_DECODE
 static long
 fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
 {
