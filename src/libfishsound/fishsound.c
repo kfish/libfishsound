@@ -100,7 +100,7 @@ fish_sound_new (int mode, FishSoundInfo * fsinfo)
 
   fsound->mode = mode;
   fsound->interleave = 0;
-  fsound->pcm_type = FISH_SOUND_PCM_FLOAT;
+  fsound->pcm_type = FISH_SOUND_PCM_INT;
   fsound->frameno = 0;
   fsound->next_granulepos = -1;
   fsound->next_eos = 0;

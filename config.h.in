@@ -9,6 +9,9 @@
 /* Define to build experimental code */
 #undef FS_EXPERIMENTAL
 
+/* Do not build code that requires floating point */
+#undef FS_FLOAT
+
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 

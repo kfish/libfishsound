@@ -297,6 +297,7 @@ fs_speex_decode_short_dlv (FishSound * fsound)
 }
 #endif /* HAVE_SPEEX_1_1 */
 
+#if FS_FLOAT
 static inline void
 fs_speex_float_dispatch (FishSound * fsound)
 {
@@ -359,12 +360,14 @@ fs_speex_decode_float_dlv (FishSound * fsound)
 
   return 0;
 }
+#endif /* FS_FLOAT */
 
-static void
+static int
 fs_speex_update (FishSound * fsound, int interleave, FishSoundPCM pcm_type)
 {
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
   size_t pcm_size;
+  short * tmp;
 
   if (HAVE_SPEEX_1_1 && (pcm_type == FISH_SOUND_PCM_SHORT ||
 			 pcm_type == FISH_SOUND_PCM_INT)) {
@@ -373,28 +376,43 @@ fs_speex_update (FishSound * fsound, int interleave, FishSoundPCM pcm_type)
     pcm_size = sizeof (float);
   }
 
-  fss->ipcm.f = (float *)
-    fs_realloc (fss->ipcm.f,
+  tmp = (short *)
+    fs_realloc (fss->ipcm.s,
 		pcm_size * fss->frame_size * fsound->info.channels);
+  if (tmp == NULL) {
+    return FISH_SOUND_ERR_OUT_OF_MEMORY;
+  } else {
+    fss->ipcm.s = tmp;
+  }
 
   if (interleave) {
     /* if transitioning from non-interleave to interleave,
        free non-ilv buffers */
     if (!fsound->interleave && fsound->info.channels == 2) {
-      if (fss->pcm.f[0]) fs_free (fss->pcm.f[0]);
-      if (fss->pcm.f[1]) fs_free (fss->pcm.f[1]);
-      fss->pcm.f[0] = NULL;
-      fss->pcm.f[1] = NULL;
+      if (fss->pcm.s[0]) fs_free (fss->pcm.s[0]);
+      if (fss->pcm.s[1]) fs_free (fss->pcm.s[1]);
+      fss->pcm.s[0] = NULL;
+      fss->pcm.s[1] = NULL;
     }
   } else {
     if (fsound->info.channels == 1) {
-      fss->pcm.f[0] = (float *) fss->ipcm.f;
+      fss->pcm.s[0] = (short *) fss->ipcm.s;
     } else if (fsound->info.channels == 2) {
-      fss->pcm.f[0] = fs_realloc (fss->pcm.f[0], pcm_size * fss->frame_size);
-      fss->pcm.f[1] = fs_realloc (fss->pcm.f[1], pcm_size * fss->frame_size);
+      tmp = fs_realloc (fss->pcm.s[0], pcm_size * fss->frame_size);
+      if (tmp == NULL)
+	return FISH_SOUND_ERR_OUT_OF_MEMORY;
+      else
+	fss->pcm.s[0] = tmp;
+
+      tmp = fs_realloc (fss->pcm.s[1], pcm_size * fss->frame_size);
+      if (tmp == NULL)
+	return FISH_SOUND_ERR_OUT_OF_MEMORY;
+      else
+	fss->pcm.s[1] = tmp;
     }
   }
 
+  return 0;
 }
 
 static long
@@ -405,6 +423,13 @@ fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
   int rate = 0;
   int channels = -1;
   int forceMode = -1;
+
+#if !FS_FLOAT
+  if (fsound->pcm_type == FISH_SOUND_PCM_FLOAT ||
+      fsound->pcm_type == FISH_SOUND_PCM_DOUBLE) {
+    return FISH_SOUND_ERR_DISABLED; /* paranoid, notreached */
+  }
+#endif
 
   if (fss->packetno == 0) {
     fss->st = process_header (buf, bytes, enh_enabled,
@@ -424,21 +449,7 @@ fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
     fsound->info.samplerate = rate;
     fsound->info.channels = channels;
 
-#if 1
-    fss->ipcm.f = NULL;
-    fss->pcm.f[0] = NULL;
-    fss->pcm.f[1] = NULL;
     fs_speex_update (fsound, fsound->interleave, fsound->pcm_type);
-#else
-    fss->ipcm.f = fs_malloc (sizeof (float) * fss->frame_size * channels);
-
-    if (channels == 1) {
-      fss->pcm.f[0] = fss->ipcm.f;
-    } else if (channels == 2) {
-      fss->pcm.f[0] = fs_malloc (sizeof (float) * fss->frame_size);
-      fss->pcm.f[1] = fs_malloc (sizeof (float) * fss->frame_size);
-    }
-#endif
 
     if (fss->nframes == 0) fss->nframes = 1;
 
@@ -460,12 +471,16 @@ fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
       }
     } else /* fall through to float decode */
 #endif
-      
+
+#if FS_FLOAT      
       if (fsound->info.channels == 2 && !fsound->interleave) {
 	fs_speex_decode_float_dlv (fsound);
       } else {
 	fs_speex_decode_float (fsound);
       }
+#else
+    return FISH_SOUND_ERR_DISABLED; /* notreached */
+#endif
   }
 
   fss->packetno++;
@@ -731,9 +746,9 @@ fs_speex_init (FishSound * fsound)
   fss->frame_size = 0;
   fss->nframes = 1;
   fss->pcm_len = 0;
-  fss->ipcm.f = NULL;
-  fss->pcm.f[0] = NULL;
-  fss->pcm.f[1] = NULL;
+  fss->ipcm.s = NULL;
+  fss->pcm.s[0] = NULL;
+  fss->pcm.s[1] = NULL;
 
   memcpy (&fss->stereo, &stereo_init, sizeof (SpeexStereoState));
 

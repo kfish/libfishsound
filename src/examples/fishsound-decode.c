@@ -59,6 +59,7 @@ open_output (int samplerate, int channels)
   return 0;
 }
 
+#if FS_FLOAT
 static int
 decoded_float (FishSound * fsound, float ** pcm, long frames, void * user_data)
 {
@@ -73,7 +74,7 @@ decoded_float (FishSound * fsound, float ** pcm, long frames, void * user_data)
 
   return 0;
 }
-
+#else
 static int
 decoded_short (FishSound * fsound, short ** pcm, long frames, void * user_data)
 {
@@ -88,6 +89,7 @@ decoded_short (FishSound * fsound, short ** pcm, long frames, void * user_data)
 
   return 0;
 }
+#endif
 
 static int
 read_packet (OGGZ * oggz, ogg_packet * op, long serialno, void * user_data)
@@ -121,10 +123,10 @@ main (int argc, char ** argv)
 
   fish_sound_set_interleave (fsound, 1);
 
-#if HAVE_SPEEX_1_1
-  fish_sound_set_decoded_short_ilv (fsound, decoded_short, NULL);
-#else
+#if FS_FLOAT
   fish_sound_set_decoded_float_ilv (fsound, decoded_float, NULL);
+#else
+  fish_sound_set_decoded_short_ilv (fsound, decoded_short, NULL);
 #endif
 
   if ((oggz = oggz_open ((char *) infilename, OGGZ_READ)) == NULL) {

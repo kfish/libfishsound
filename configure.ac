@@ -47,6 +47,22 @@ if test "x${ac_enable_experimental}" = xyes ; then
 fi
 
 dnl
+dnl  Configuration option for floating point support.
+dnl
+
+ac_enable_float=yes
+AC_ARG_ENABLE(float,
+     [  --disable-float         disable building of floating point code ],
+     [ ac_enable_float=no ], [ ac_enable_float=yes] )
+
+if test "x${ac_enable_float}" = xyes ; then
+    AC_DEFINE(FS_FLOAT, [1], [Build code that requires floating point])
+else
+    AC_DEFINE(FS_FLOAT, [0], [Do not build code that requires floating point])
+fi
+AM_CONDITIONAL(FS_FLOAT, [test "x${ac_enable_float}" = "xyes"])
+
+dnl
 dnl  Configuration option for building of decoding support.
 dnl
   
@@ -70,6 +86,12 @@ ac_enable_encode=yes
 AC_ARG_ENABLE(encode,
      [  --disable-encode        disable building of encoding support ],
      [ ac_enable_encode=no ], [ ac_enable_encode=yes] )
+
+if test "x${ac_enable_float}" = xno ; then
+  AC_MSG_WARN([Encoding support disabled:
+*** This version of libfishsound does not support integer-only encoding ])
+  ac_enable_encode=no
+fi
 
 if test "x${ac_enable_encode}" = xyes ; then
     AC_DEFINE(FS_ENCODE, [1], [Build encoding support])
@@ -107,6 +129,12 @@ ac_enable_vorbis=yes
 AC_ARG_ENABLE(vorbis,
      [  --disable-vorbis        enable building of Vorbis codec support ],
      [ ac_enable_vorbis=no ], [ ac_enable_vorbis=yes] )
+
+if test "x${ac_enable_float}" = xno ; then
+  AC_MSG_WARN([Vorbis support disabled:
+*** This version of libfishsound does not support integer-only Vorbis ])
+  ac_enable_vorbis=no
+fi
 
 if test "x${ac_enable_vorbis}" = xyes ; then
   AC_CHECK_LIB(vorbis, vorbis_info_init, HAVE_VORBIS="maybe", , [-lm -logg])
@@ -373,9 +401,10 @@ AC_MSG_RESULT([
 ------------------------------------------------------------------------
   $PACKAGE $VERSION:  Automatic configuration OK.
 
-  General configuration:
+  General build configuration:
 
     Experimental code: ........... ${ac_enable_experimental}
+    Floating point code: ......... ${ac_enable_float}
     Decoding support: ............ ${ac_enable_decode}
     Encoding support: ............ ${ac_enable_encode}
 
