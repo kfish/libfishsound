@@ -255,3 +255,15 @@ fish_sound_decode (FishSound * fsound, unsigned char * buf, long bytes)
   return 0;
 }
 
+
+/* DEPRECATED */
+int fish_sound_set_decoded_callback (FishSound * fsound,
+				     FishSoundDecoded_Float decoded,
+				     void * user_data)
+{
+  if (fsound == NULL) return -1;
+
+  return fsound->interleave ?
+    fish_sound_set_decoded_float_ilv (fsound, decoded, user_data) :
+    fish_sound_set_decoded_float (fsound, decoded, user_data);
+}

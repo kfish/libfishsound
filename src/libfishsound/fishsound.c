@@ -238,6 +238,7 @@ fish_sound_get_interleave (FishSound * fsound)
   return fsound->interleave;
 }
 
+/* DEPRECATED */
 int
 fish_sound_set_interleave (FishSound * fsound, int interleave)
 {

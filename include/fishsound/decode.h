@@ -250,10 +250,4 @@ int fish_sound_set_decoded_double_ilv (FishSound * fsound,
  */
 long fish_sound_decode (FishSound * fsound, unsigned char * buf, long bytes);
 
-/* The following defines provide source compatability for applications
- * written for libfishsound < 0.7. These interface names are deprecated.
- */
-#define FishSoundDecoded FishSoundDecoded_Float
-#define fish_sound_set_decoded_callback fish_sound_set_decoded_float
-
 #endif /* __FISH_SOUND_DECODE_H__ */
