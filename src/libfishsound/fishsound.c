@@ -92,6 +92,8 @@ fish_sound_new (int mode, FishSoundInfo * fsinfo)
 	if (fsinfo->format == FISH_SOUND_SPEEX) return NULL;
       }
     }
+  } else if (mode != FISH_SOUND_DECODE) {
+    return NULL;
   }
 
   fsound = malloc (sizeof (FishSound));
@@ -113,9 +115,10 @@ fish_sound_new (int mode, FishSoundInfo * fsinfo)
     fsound->info.channels = fsinfo->channels;
     fsound->info.format = fsinfo->format;
 
-    fish_sound_set_format (fsound, fsinfo->format);
-  } else {
-    /* XXX: error */
+    if (fish_sound_set_format (fsound, fsinfo->format) == -1) {
+      free (fsound);
+      return NULL;
+    }
   } 
 
   return fsound;
