@@ -45,13 +45,22 @@
 
 #if HAVE_SPEEX
 
+#if HAVE_SPEEX_1_1
+#include <speex/speex.h>
+#include <speex/speex_header.h>
+#include <speex/speex_stereo.h>
+#include <speex/speex_callbacks.h>
+
+#ifdef SPEEX_DISABLE_GLOBAL_POINTERS
+#include <speex/speex_noglobals.h>
+#endif
+
+#else /* Speex 1.0 */
+
 #include <speex.h>
 #include <speex_header.h>
 #include <speex_stereo.h>
 #include <speex_callbacks.h>
-
-#ifdef SPEEX_DISABLE_GLOBAL_POINTERS
-#include <speex_noglobals.h>
 #endif
 
 /* Format for the vendor string: "Encoded with Speex VERSION", where VERSION
@@ -73,7 +82,6 @@ typedef struct _FishSoundSpeexEnc {
 typedef struct _FishSoundSpeexInfo {
 #ifdef SPEEX_DISABLE_GLOBAL_POINTERS
   SpeexMode * mode;
-  int modeID;
 #endif
   int packetno;
   void * st;
@@ -168,9 +176,8 @@ process_header(unsigned char * buf, long bytes, int enh_enabled,
     modeID = forceMode;
 
 #ifdef SPEEX_DISABLE_GLOBAL_POINTERS
-  mode = (SpeexMode *)speex_mode_new_byID (modeID);
+  mode = (SpeexMode *)speex_mode_new (modeID);
   fss->mode = mode;
-  fss->modeID = modeID;
 #else
   /* speex_mode_list[] is declared const in speex 1.1.x, hence the cast */
   mode = (SpeexMode *)speex_mode_list[modeID];
@@ -582,6 +589,9 @@ fs_speex_update (FishSound * fsound, int interleave, FishSoundPCM pcm_type)
       fss->pcm.s[1] = NULL;
     }
   } else {
+    /* first remove any previous shortcut pointers, don't free etc. */
+    if (fss->pcm.s[0] == fss->ipcm.s) fss->pcm.s[0] = NULL;
+
     /* if transitioning from interleave to non-interleave,
        free ilv buffers */
     if (fsound->interleave) {
@@ -590,15 +600,35 @@ fs_speex_update (FishSound * fsound, int interleave, FishSoundPCM pcm_type)
     }
 
     if (fsound->info.channels == 1) {
-      fss->pcm.s[0] = (short *) fss->ipcm.s;
+      if (HAVE_SPEEX_1_1 && pcm_type == FISH_SOUND_PCM_SHORT) {
+	/* if pcm.s[0] was previously malloc'd, free it */
+	if (fss->pcm.s[0]) fs_free (fss->pcm.s[0]);
+
+	/* set a shortcut pointer */
+	fss->pcm.s[0] = (short *) fss->ipcm.s;
+      } else if (!HAVE_SPEEX_1_1 && pcm_type == FISH_SOUND_PCM_FLOAT) {
+	/* if pcm.s[0] was previously malloc'd, free it */
+	if (fss->pcm.f[0]) fs_free (fss->pcm.f[0]);
+
+	/* set a shortcut pointer */
+	fss->pcm.f[0] = (float *) fss->ipcm.f;
+      } else {
+	/* realloc an existing, or malloc if NULL, pcm buffer */
+	tmp = fs_realloc (fss->pcm.s[0], pcm_out_size * fss->frame_size);
+	if (tmp == NULL)
+	  return FISH_SOUND_ERR_OUT_OF_MEMORY;
+	else
+	  fss->pcm.s[0] = tmp;
+      }
     } else if (fsound->info.channels == 2) {
-      tmp = fs_realloc (fss->pcm.s[0], pcm_size * fss->frame_size);
+      /* realloc existing, or malloc if NULL, pcm buffers */
+      tmp = fs_realloc (fss->pcm.s[0], pcm_out_size * fss->frame_size);
       if (tmp == NULL)
 	return FISH_SOUND_ERR_OUT_OF_MEMORY;
       else
 	fss->pcm.s[0] = tmp;
-
-      tmp = fs_realloc (fss->pcm.s[1], pcm_size * fss->frame_size);
+      
+      tmp = fs_realloc (fss->pcm.s[1], pcm_out_size * fss->frame_size);
       if (tmp == NULL)
 	return FISH_SOUND_ERR_OUT_OF_MEMORY;
       else
@@ -698,9 +728,8 @@ fs_speex_enc_headers (FishSound * fsound)
   modeID = 1;
 
 #ifdef SPEEX_DISABLE_GLOBAL_POINTERS
-  mode = (SpeexMode *)speex_mode_new_byID (modeID);
+  mode = (SpeexMode *)speex_mode_new (modeID);
   fss->mode = mode;
-  fss->modeID = modeID;
 #else
   /* speex_mode_list[] is declared const in speex 1.1.x, hence the cast */
   mode = (SpeexMode *)speex_mode_list[modeID];
@@ -967,7 +996,7 @@ fs_speex_delete (FishSound * fsound)
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
 
 #ifdef SPEEX_DISABLE_GLOBAL_POINTERS
-  speex_mode_free_byID (fss->mode, fss->modeID);
+  speex_mode_destroy (fss->mode);
 #endif
 
   if (fsound->mode == FISH_SOUND_DECODE) {
