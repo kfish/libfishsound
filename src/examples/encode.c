@@ -40,8 +40,6 @@
 #include <fishsound/fishsound.h>
 #include <sndfile.h>
 
-#define DEBUG
-
 long serialno;
 int b_o_s = 1;
 
@@ -51,8 +49,6 @@ encoded (FishSound * fsound, unsigned char * buf, long bytes, void * user_data)
   OGGZ * oggz = (OGGZ *)user_data;
   ogg_packet op;
   int err;
-
-  /*printf ("encoded %ld bytes\n", bytes);*/
 
   op.packet = buf;
   op.bytes = bytes;
@@ -79,6 +75,8 @@ main (int argc, char ** argv)
   SF_INFO sfinfo;
 
   char * infilename, * outfilename;
+  char * ext = NULL;
+  int format = FISH_SOUND_VORBIS;
 
   float pcm[2048];
   int i;
@@ -86,7 +84,7 @@ main (int argc, char ** argv)
 
   if (argc < 3) {
     printf ("usage: %s infile outfile\n", argv[0]);
-    printf ("Opens a pcm audio file and encodes it to a speex file.\n");
+    printf ("Opens a pcm audio file and encodes it to an Ogg Vorbis or Speex file.\n");
     exit (1);
   }
 
@@ -102,9 +100,17 @@ main (int argc, char ** argv)
 
   serialno = oggz_serialno_new (oggz);
 
+  /* If the given output filename ends in ".spx", encode as Speex,
+   * otherwise use Vorbis */
+  ext = strrchr (outfilename, '.');
+  if (ext && !strncasecmp (ext, ".spx", 4))
+    format = FISH_SOUND_SPEEX;
+  else
+    format = FISH_SOUND_VORBIS;
+
   fsinfo.channels = sfinfo.channels;
   fsinfo.samplerate = sfinfo.samplerate;
-  fsinfo.format = FISH_SOUND_VORBIS;
+  fsinfo.format = format;
 
   fsound = fish_sound_new (FISH_SOUND_ENCODE, &fsinfo);
   fish_sound_set_encoded_callback (fsound, encoded, oggz);

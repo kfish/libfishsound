@@ -280,19 +280,18 @@
  * libfishsound provides callback based decoding: you feed it encoded audio
  * data, and it will call your callback with decoded PCM. A more detailed
  * explanation and a full example of decoding Ogg Vorbis and Speex files is
- * provided in the
- * \link decode Decoding audio data \endlink section.
+ * provided in the \link decode Decoding audio data \endlink section.
  *
  * \section encoding Encoding
  *
- * To encode audio data using libfishsound, first create a FishSound*
- * object with mode FISH_SOUND_ENCODE, and with a FishSoundInfo structure
- * filled in with the required encoding parameters. fish_sound_new()
- * will return a new FishSound* object initialised for encoding.
+ * libfishsound provides callback based encoding: you feed it PCM audio,
+ * and it will call your callback with encoded audio data. A more detailed
+ * explanation and a full example of encoding Ogg Vorbis and Speex files is
+ * provided in the \link encode Encoding audio data \endlink section.
  */
 
 /** \defgroup decode Decoding audio data
-
+ *
  * To decode audio data using libfishsound:
  *
  * - create a FishSound* object with mode FISH_SOUND_DECODE. fish_sound_new()
@@ -304,7 +303,7 @@
  * per-channel PCM data, using a fish_sound_command(). The default is for
  * per-channel (non-interleaved) PCM.
  * - feed encoded audio data to libfishsound via fish_sound_decode().
- * libfishsound will decode the audio for you, calling the FishSoundDecode
+ * libfishsound will decode the audio for you, calling the FishSoundDecoded
  * callback you provided earlier each time it has a block of audio ready.
  * - when finished, call fish_sound_delete().
  *
@@ -321,6 +320,38 @@
  * Ogg Vorbis and Ogg Speex files:
  *
  * \include decode.c
+ */
+
+/** \defgroup encode Encoding audio data
+ *
+ * To encode audio data using libfishsound:
+ *
+ * - create a FishSound* object with mode FISH_SOUND_ENCODE, and with a
+ * FishSoundInfo structure filled in with the required encoding parameters.
+ * fish_sound_new()  will return a new FishSound* object initialised for
+ * encoding.
+ * - provide a FishSoundEncoded callback for libfishsound to call when it
+ * has a block of encoded audio
+ * - (optionally) specify whether you will be providing interleaved or
+ * per-channel PCM data, using a fish_sound_command(). The default is for
+ * per-channel (non-interleaved) PCM.
+ * - feed raw PCM audio data to libfishsound via fish_sound_encode().
+ * libfishsound will encode the audio for you, calling the FishSoundEncoded
+ * callback you provided earlier each time it has a block of encoded audio
+ * ready.
+ * - when finished, call fish_sound_delete().
+ *
+ * This procedure is illustrated in src/examples/encode.c. Note that this
+ * example additionally:
+ * - uses <a href="http://www.mega-nerd.com/libsndfile/">libsndfile</a> to
+ * read input from a PCM audio file (WAV, AIFF, etc.)
+ * - uses <a href="http://www.annodex.net/software/liboggz/">liboggz</a> to
+ * encapsulate the encoded Vorbis or Speex data in an Ogg stream.
+ *
+ * Hence this example code demonstrates all that is needed to encode
+ * Ogg Vorbis and Ogg Speex files:
+ *
+ * \include encode.c
  */
 
 /**
