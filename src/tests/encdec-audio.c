@@ -58,6 +58,33 @@ usage (char * progname)
   exit (1);
 }
 
+/** PCM type */
+typedef enum {
+  /** Undefined/Error */
+  FISH_SOUND_PCM_UNDEF = 0x00,
+
+  /** short */
+  FISH_SOUND_PCM_SHORT = 0x01,
+
+  /** int */
+  FISH_SOUND_PCM_INT = 0x02,
+
+  /** float */
+  FISH_SOUND_PCM_FLOAT = 0x03,
+
+  /** double */
+  FISH_SOUND_PCM_DOUBLE = 0x04
+
+} FishSoundPCM;
+
+static char * pcm_name[] = {
+  "UNDEF",
+  "short",
+  "int",
+  "float",
+  "double"
+};
+
 /* For one-time tests, configure these by commandline args */
 static int * test_blocksizes, * test_samplerates, * test_channels;
 static int iter = DEFAULT_ITER;
@@ -88,6 +115,48 @@ typedef struct {
 } FS_EncDec;
 
 static int
+decoded_short (FishSound * fsound, short ** pcm, long frames, void * user_data)
+{
+  FS_EncDec * ed = (FS_EncDec *) user_data;
+
+  ed->frames_out += frames;
+
+  return 0;
+}
+
+static int
+decoded_short_ilv (FishSound * fsound, short * pcm[], long frames,
+		   void * user_data)
+{
+  FS_EncDec * ed = (FS_EncDec *) user_data;
+
+  ed->frames_out += frames;
+
+  return 0;
+}
+
+static int
+decoded_int (FishSound * fsound, int ** pcm, long frames, void * user_data)
+{
+  FS_EncDec * ed = (FS_EncDec *) user_data;
+
+  ed->frames_out += frames;
+
+  return 0;
+}
+
+static int
+decoded_int_ilv (FishSound * fsound, int * pcm[], long frames,
+		   void * user_data)
+{
+  FS_EncDec * ed = (FS_EncDec *) user_data;
+
+  ed->frames_out += frames;
+
+  return 0;
+}
+
+static int
 decoded_float (FishSound * fsound, float ** pcm, long frames, void * user_data)
 {
   FS_EncDec * ed = (FS_EncDec *) user_data;
@@ -109,6 +178,28 @@ decoded_float_ilv (FishSound * fsound, float * pcm[], long frames,
 }
 
 static int
+decoded_double (FishSound * fsound, double ** pcm, long frames,
+		void * user_data)
+{
+  FS_EncDec * ed = (FS_EncDec *) user_data;
+
+  ed->frames_out += frames;
+
+  return 0;
+}
+
+static int
+decoded_double_ilv (FishSound * fsound, double * pcm[], long frames,
+		   void * user_data)
+{
+  FS_EncDec * ed = (FS_EncDec *) user_data;
+
+  ed->frames_out += frames;
+
+  return 0;
+}
+
+static int
 encoded (FishSound * fsound, unsigned char * buf, long bytes, void * user_data)
 {
   FS_EncDec * ed = (FS_EncDec *) user_data;
@@ -118,7 +209,35 @@ encoded (FishSound * fsound, unsigned char * buf, long bytes, void * user_data)
 
 /* Fill a PCM buffer with a squarish wave */
 static void
-fs_fill_square (float * pcm, int length)
+fs_fill_square_short (short * pcm, int length)
+{
+  short value = 15000;
+  int i;
+
+  for (i = 0; i < length; i++) {
+    pcm[i] = value;
+    if ((i % 100) == 0) {
+      value = -value;
+    }
+  }
+}
+
+static void
+fs_fill_square_int (int * pcm, int length)
+{
+  int value = 1000000000;
+  int i;
+
+  for (i = 0; i < length; i++) {
+    pcm[i] = value;
+    if ((i % 100) == 0) {
+      value = -value;
+    }
+  }
+}
+
+static void
+fs_fill_square_float (float * pcm, int length)
 {
   float value = 0.5;
   int i;
@@ -131,9 +250,23 @@ fs_fill_square (float * pcm, int length)
   }
 }
 
+static void
+fs_fill_square_double (double * pcm, int length)
+{
+  double value = 0.5;
+  int i;
+
+  for (i = 0; i < length; i++) {
+    pcm[i] = value;
+    if ((i % 100) == 0) {
+      value = -value;
+    }
+  }
+}
+
 static FS_EncDec *
-fs_encdec_new (int samplerate, int channels, int format, int interleave,
-	       int blocksize)
+fs_encdec_new (FishSoundPCM pcm_type, int samplerate, int channels,
+	       int format, int interleave, int blocksize)
 {
   FS_EncDec * ed;
   FishSoundInfo fsinfo;
@@ -156,17 +289,66 @@ fs_encdec_new (int samplerate, int channels, int format, int interleave,
   ed->interleave = interleave;
   ed->channels = channels;
 
-  if (interleave) {
-    fish_sound_set_decoded_float_ilv (ed->decoder, decoded_float_ilv, ed);
-    ed->pcm.f = (float **) malloc (sizeof (float) * channels * blocksize);
-    fs_fill_square ((float *)ed->pcm.f, channels * blocksize);
-  } else {
-    fish_sound_set_decoded_float (ed->decoder, decoded_float, ed);
-    ed->pcm.f = (float **) malloc (sizeof (float *) * channels);
-    for (i = 0; i < channels; i++) {
-      ed->pcm.f[i] = (float *) malloc (sizeof (float) * blocksize);
-      fs_fill_square (ed->pcm.f[i], blocksize);
+  switch (pcm_type) {
+  case FISH_SOUND_PCM_SHORT:
+    if (interleave) {
+      fish_sound_set_decoded_short_ilv (ed->decoder, decoded_short_ilv, ed);
+      ed->pcm.s = (short **) malloc (sizeof (short) * channels * blocksize);
+      fs_fill_square_short ((short *)ed->pcm.s, channels * blocksize);
+    } else {
+      fish_sound_set_decoded_short (ed->decoder, decoded_short, ed);
+      ed->pcm.s = (short **) malloc (sizeof (short *) * channels);
+      for (i = 0; i < channels; i++) {
+	ed->pcm.s[i] = (short *) malloc (sizeof (short) * blocksize);
+	fs_fill_square_short (ed->pcm.s[i], blocksize);
+      }
     }
+
+    break;
+  case FISH_SOUND_PCM_INT:
+    if (interleave) {
+      fish_sound_set_decoded_int_ilv (ed->decoder, decoded_int_ilv, ed);
+      ed->pcm.i = (int **) malloc (sizeof (int) * channels * blocksize);
+      fs_fill_square_int ((int *)ed->pcm.i, channels * blocksize);
+    } else {
+      fish_sound_set_decoded_int (ed->decoder, decoded_int, ed);
+      ed->pcm.i = (int **) malloc (sizeof (int *) * channels);
+      for (i = 0; i < channels; i++) {
+	ed->pcm.i[i] = (int *) malloc (sizeof (int) * blocksize);
+	fs_fill_square_int (ed->pcm.i[i], blocksize);
+      }
+    }
+    break;
+  case FISH_SOUND_PCM_FLOAT:
+    if (interleave) {
+      fish_sound_set_decoded_float_ilv (ed->decoder, decoded_float_ilv, ed);
+      ed->pcm.f = (float **) malloc (sizeof (float) * channels * blocksize);
+      fs_fill_square_float ((float *)ed->pcm.f, channels * blocksize);
+    } else {
+      fish_sound_set_decoded_float (ed->decoder, decoded_float, ed);
+      ed->pcm.f = (float **) malloc (sizeof (float *) * channels);
+      for (i = 0; i < channels; i++) {
+	ed->pcm.f[i] = (float *) malloc (sizeof (float) * blocksize);
+	fs_fill_square_float (ed->pcm.f[i], blocksize);
+      }
+    }
+    break;
+  case FISH_SOUND_PCM_DOUBLE:
+    if (interleave) {
+      fish_sound_set_decoded_double_ilv (ed->decoder, decoded_double_ilv, ed);
+      ed->pcm.d = (double **) malloc (sizeof (double) * channels * blocksize);
+      fs_fill_square_double ((double *)ed->pcm.d, channels * blocksize);
+    } else {
+      fish_sound_set_decoded_double (ed->decoder, decoded_double, ed);
+      ed->pcm.d = (double **) malloc (sizeof (double *) * channels);
+      for (i = 0; i < channels; i++) {
+	ed->pcm.d[i] = (double *) malloc (sizeof (double) * blocksize);
+	fs_fill_square_double (ed->pcm.d[i], blocksize);
+      }
+    }
+    break;
+  default:
+    break;
   }
 
   ed->frames_in = 0;
@@ -197,22 +379,23 @@ fs_encdec_delete (FS_EncDec * ed)
 }
 
 static int
-fs_encdec_test (int samplerate, int channels, int format, int interleave,
-		int blocksize)
+fs_encdec_test (FishSoundPCM pcm_type, int samplerate, int channels,
+		int format, int interleave, int blocksize)
 {
   FS_EncDec * ed;
   char msg[128];
   int i;
 
   snprintf (msg, 128,
-	    "+ %2d channel %6d Hz %s, %d frame buffer (%s)",
+	    "+ %2d channel %6d Hz %s %d frame %-6s (%s)",
 	    channels, samplerate,
-	    format == FISH_SOUND_VORBIS ? "Vorbis" : "Speex",
-	    blocksize,
+	    format == FISH_SOUND_VORBIS ? "Vorbis," : "Speex, ",
+	    blocksize, pcm_name[pcm_type],
 	    interleave ? "interleave" : "non-interleave");
   INFO (msg);
   
-  ed = fs_encdec_new (samplerate, channels, format, interleave, blocksize);
+  ed = fs_encdec_new (pcm_type, samplerate, channels, format,
+		      interleave, blocksize);
 
   for (i = 0; i < iter; i++) {
     ed->frames_in += blocksize;
@@ -277,6 +460,7 @@ parse_args (int argc, char * argv[])
 int
 main (int argc, char * argv[])
 {
+  FishSoundPCM pcm_type;
   int b, s, c;
 
   test_blocksizes = default_blocksizes;
@@ -288,42 +472,42 @@ main (int argc, char * argv[])
   for (b = 0; test_blocksizes[b]; b++) {
     for (s = 0; test_samplerates[s]; s++) {
       for (c = 0; test_channels[c]; c++) {
+	for (pcm_type = 0x01; pcm_type <= 0x04; pcm_type++) {
 
-	if (test_non_interleave) {
-	  /* Test VORBIS */
-	  if (test_vorbis) {
-	    fs_encdec_test (test_samplerates[s], test_channels[c],
-			    FISH_SOUND_VORBIS, 0, test_blocksizes[b]);
-	  }
+	  if (test_non_interleave) {
+	    /* Test VORBIS */
+	    if (test_vorbis) {
+	      fs_encdec_test (pcm_type, test_samplerates[s], test_channels[c],
+			      FISH_SOUND_VORBIS, 0, test_blocksizes[b]);
+	    }
 	  
-	  /* Test SPEEX */
-	  if (test_speex) {
-	    if (test_channels[c] <= 2) {
-	      fs_encdec_test (test_samplerates[s], test_channels[c],
-			      FISH_SOUND_SPEEX, 0, test_blocksizes[b]);
+	    /* Test SPEEX */
+	    if (test_speex) {
+	      if (test_channels[c] <= 2) {
+		fs_encdec_test (pcm_type, test_samplerates[s], test_channels[c],
+				FISH_SOUND_SPEEX, 0, test_blocksizes[b]);
 	      
+	      }
+	    }
+	  }
+
+	  if (test_interleave) {
+	    /* Test VORBIS */
+	    if (test_vorbis) {
+	      fs_encdec_test (pcm_type, test_samplerates[s], test_channels[c],
+			      FISH_SOUND_VORBIS, 1, test_blocksizes[b]);
+	    }
+	  
+	    /* Test SPEEX */
+	    if (test_speex) {
+	      if (test_channels[c] <= 2) {
+		fs_encdec_test (pcm_type, test_samplerates[s], test_channels[c],
+				FISH_SOUND_SPEEX, 1, test_blocksizes[b]);
+	      
+	      }
 	    }
 	  }
 	}
-
-	if (test_interleave) {
-	  /* Test VORBIS */
-	  if (test_vorbis) {
-	    fs_encdec_test (test_samplerates[s], test_channels[c],
-			    FISH_SOUND_VORBIS, 1, test_blocksizes[b]);
-	  }
-	  
-	  /* Test SPEEX */
-	  if (test_speex) {
-	    if (test_channels[c] <= 2) {
-	      fs_encdec_test (test_samplerates[s], test_channels[c],
-			      FISH_SOUND_SPEEX, 1, test_blocksizes[b]);
-	      
-	    }
-	  }
-	}
-
-
       }
     }
   }
