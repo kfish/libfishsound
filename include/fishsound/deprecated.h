@@ -33,6 +33,10 @@
 #ifndef __FISH_SOUND_DEPRECATED_H__
 #define __FISH_SOUND_DEPRECATED_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * DEPRECATED FUNCTION.
  * Set the PCM format used by a FishSound object. The default value is
@@ -80,4 +84,8 @@ int fish_sound_set_decoded_callback (FishSound * fsound,
 				     FishSoundDecoded decoded,
 				     void * user_data);
 
-#endif /* __FISH_SOUND_DECODE_H__ */
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __FISH_SOUND_DEPRECATED_H__ */
