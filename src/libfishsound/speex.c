@@ -44,8 +44,6 @@
 
 #if HAVE_SPEEX
 
-#define DISABLE_GLOBAL_DATA
-
 #include <speex.h>
 #include <speex_header.h>
 #include <speex_stereo.h>
@@ -68,7 +66,7 @@ typedef struct _FishSoundSpeexEnc {
 } FishSoundSpeexEnc;
 
 typedef struct _FishSoundSpeexInfo {
-#ifdef DISABLE_GLOBAL_DATA
+#ifdef SPEEX_DISABLE_GLOBAL_POINTERS
   SpeexMode * mode;
   int modeID;
 #endif
@@ -154,7 +152,7 @@ process_header(unsigned char * buf, long bytes, int enh_enabled,
   if (forceMode!=-1)
     modeID = forceMode;
 
-#ifdef DISABLE_GLOBAL_DATA
+#ifdef SPEEX_DISABLE_GLOBAL_POINTERS
   mode = (SpeexMode *)speex_mode_new_byID (modeID);
   fss->mode = mode;
   fss->modeID = modeID;
@@ -782,7 +780,7 @@ fs_speex_delete (FishSound * fsound)
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
 
   if (fsound->mode == FISH_SOUND_DECODE) {
-#ifdef DISABLE_GLOBAL_DATA
+#ifdef SPEEX_DISABLE_GLOBAL_POINTERS
     speex_mode_free_byID (fss->mode, fss->modeID);
 #endif
     if (fss->st) speex_decoder_destroy (fss->st);

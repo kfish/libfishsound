@@ -78,6 +78,9 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* Define if libspeex uses SPEEX_DISABLE_GLOBAL_POINTERS API */
+#undef SPEEX_DISABLE_GLOBAL_POINTERS
+
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 

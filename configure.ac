@@ -211,6 +211,18 @@ if test "x${ac_enable_speex}" = xyes ; then
       SPEEX_SUPPORT="yes (1.0.x)"
     fi
 
+    dnl Test for libspeex SPEEX_DISABLE_GLOBAL_POINTERS API
+    dnl If so, we need to define SPEEX_DISABLE_GLOBAL_POINTERS before
+    dnl including speex.h, and use a different API to access available modes,
+    dnl and free them.
+    AC_CHECK_LIB(speex, speex_mode_new_byID, DISABLE_GLOBAL_POINTERS="yes",
+      DISABLE_GLOBAL_POINTERS="no")
+    if test "x$DISABLE_GLOBAL_POINTERS" = xyes ; then
+      AC_DEFINE(SPEEX_DISABLE_GLOBAL_POINTERS, ,
+       [Define if libspeex uses SPEEX_DISABLE_GLOBAL_POINTERS API])
+      SPEEX_SUPPORT="$SPEEX_SUPPORT (SPEEX_DISABLE_GLOBAL_POINTERS)"
+    fi
+
     AC_DEFINE(HAVE_SPEEX, [1], [Define to 1 if you have libspeex])
     SPEEX_LIBS="-lspeex -lm"
     AC_SUBST(SPEEX_LIBS)
