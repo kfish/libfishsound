@@ -1095,10 +1095,6 @@ fs_speex_delete (FishSound * fsound)
 {
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
 
-#ifdef SPEEX_DISABLE_GLOBAL_POINTERS
-  if (fss->mode) speex_mode_destroy (fss->mode);
-#endif
-
   fs_speex_free_buffers (fsound);
 
   if (fsound->mode == FISH_SOUND_DECODE) {
@@ -1107,6 +1103,10 @@ fs_speex_delete (FishSound * fsound)
     if (fss->st) speex_encoder_destroy (fss->st);
   }
   speex_bits_destroy (&fss->bits);
+
+#ifdef SPEEX_DISABLE_GLOBAL_POINTERS
+  if (fss->mode) speex_mode_destroy (fss->mode);
+#endif
 
   fs_free (fss);
   fsound->codec_data = NULL;
