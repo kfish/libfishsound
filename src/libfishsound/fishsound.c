@@ -238,6 +238,8 @@ fish_sound_delete (FishSound * fsound)
   if (fsound->codec && fsound->codec->del)
     fsound->codec->del (fsound);
 
+  fish_sound_comments_free (fsound);
+
   free (fsound);
 
   return NULL;

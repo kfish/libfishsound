@@ -407,6 +407,20 @@ fish_sound_comments_init (FishSound * fsound)
 }
 
 int
+fish_sound_comments_free (FishSound * fsound)
+{
+  fs_vector_foreach (fsound->comments, (FishSoundFunc)fs_comment_free);
+  fs_vector_delete (fsound->comments);
+  fsound->comments = NULL;
+
+  if (fsound->vendor)
+    free (fsound->vendor);
+  fsound->vendor = NULL;
+
+  return 0;
+}
+
+int
 fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
 			    long length)
 {

@@ -155,6 +155,7 @@ FishSoundCodec * fish_sound_speex_codec (void);
 
 /* comments */
 int fish_sound_comments_init (FishSound * fsound);
+int fish_sound_comments_free (FishSound * fsound);
 int fish_sound_comments_decode (FishSound * fsound, unsigned char * buf,
 				long bytes);
 long fish_sound_comments_encode (FishSound * fsound, unsigned char * buf,
