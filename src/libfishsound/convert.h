@@ -230,22 +230,22 @@ _fs_convert_s_d (short * src, double * dest, long samples, double mult)
 }
 
 static inline void
-_fs_convert_f_s (float * src, short * dest, long samples)
+_fs_convert_f_s (float * src, short * dest, long samples, float mult)
 {
   int i;
 
   for (i = 0; i < samples; i++) {
-    dest[i] = (short) src[i];
+    dest[i] = (short) src[i] * mult;
   }
 }
 
 static inline void
-_fs_convert_f_i (float * src, int * dest, long samples)
+_fs_convert_f_i (float * src, int * dest, long samples, float mult)
 {
   int i;
 
   for (i = 0; i < samples; i++) {
-    dest[i] = (int) src[i];
+    dest[i] = (int) src[i] * mult;
   }
 }
 

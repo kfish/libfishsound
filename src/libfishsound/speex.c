@@ -474,12 +474,12 @@ fs_speex_decode_float (FishSound * fsound)
     switch (fsound->pcm_type) {
     case FISH_SOUND_PCM_SHORT:
       _fs_convert_f_s (fss->ipcm.f, fss->ipcm_out.s,
-		       fss->frame_size * fsound->info.channels);
+		       fss->frame_size * fsound->info.channels, 1.0);
       fs_speex_short_dispatch (fsound);
       break;
     case FISH_SOUND_PCM_INT:
       _fs_convert_f_i (fss->ipcm.f, fss->ipcm_out.i,
-		       fss->frame_size * fsound->info.channels);
+		       fss->frame_size * fsound->info.channels, 32767.0);
       fs_speex_int_dispatch (fsound);
       break;
     case FISH_SOUND_PCM_FLOAT:
@@ -946,10 +946,15 @@ fs_speex_encode_block (FishSound * fsound)
   FishSoundSpeexEnc * fse = (FishSoundSpeexEnc *)fss->enc;
   long nencoded = 0;
 
+#if HAVE_SPEEX_1_1
+  if (fsound->info.channels == 2)
+    speex_encode_stereo_int (fss->ipcm.s, fse->pcm_offset, &fss->bits);
+  speex_encode_int (fss->st, fss->ipcm.s, &fss->bits);
+#elif FS_FLOAT
   if (fsound->info.channels == 2)
     speex_encode_stereo (fss->ipcm.f, fse->pcm_offset, &fss->bits);
-
   speex_encode (fss->st, fss->ipcm.f, &fss->bits);
+#endif
 
   fse->frame_offset++;
   if (fse->frame_offset == fss->nframes) {
@@ -969,26 +974,31 @@ fs_speex_encode_f (FishSound * fsound, float * pcm[], long frames)
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
   FishSoundSpeexEnc * fse = (FishSoundSpeexEnc *)fss->enc;
   long remaining = frames, len, n = 0, nencoded = 0;
-  int j, start;
+  int start, channels;
 
   if (fss->packetno == 0)
     fs_speex_enc_headers (fsound);
+
+  channels = fsound->info.channels;
 
   while (remaining > 0) {
     len = MIN (remaining, fss->frame_size - fse->pcm_offset);
 
     start = fse->pcm_offset;
+
     fss->pcm_out.f[0] = &pcm[0][n];
 
-    if (fsound->info.channels == 2) {
+    if (channels == 2) {
       fss->pcm_out.f[1] = &pcm[1][n];
-      _fs_interleave_f_f (fss->pcm_out.f, (float **)&fss->ipcm.f[start*2],
-			  len, 2, 32767.0);
-    } else {
-      for (j = 0; j < len; j++) {
-	fss->ipcm.f[start + j] = fss->pcm_out.f[0][j] * (float)32767.0;
-      }
     }
+
+#if HAVE_SPEEX_1_1
+    _fs_interleave_f_s (fss->pcm_out.f, (short **)&fss->ipcm.s[start*channels],
+			len, channels, 32767.0);
+#elif FS_FLOAT
+    _fs_interleave_f_f (fss->pcm_out.f, (float **)&fss->ipcm.f[start*channels],
+			len, channels, 32767.0);
+#endif
 
     fse->pcm_offset += len;
 
@@ -1009,9 +1019,8 @@ fs_speex_encode_f_ilv (FishSound * fsound, float ** pcm, long frames)
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
   FishSoundSpeexEnc * fse = (FishSoundSpeexEnc *)fss->enc;
   long remaining = frames, len, nencoded = 0;
-  int j, start, end;
+  int start, end;
   int channels = fsound->info.channels;
-  float * p = (float *)pcm;
 
   if (fss->packetno == 0)
     fs_speex_enc_headers (fsound);
@@ -1021,9 +1030,14 @@ fs_speex_encode_f_ilv (FishSound * fsound, float ** pcm, long frames)
 
     start = fse->pcm_offset * channels;
     end = (len + fse->pcm_offset) * channels;
-    for (j = start; j < end; j++) {
-      fss->ipcm.f[j] = *p++ * (float)32767.0;
-    }
+
+#if HAVE_SPEEX_1_1
+    _fs_convert_f_s ((float *)&pcm[start], &fss->ipcm.s[start], len*channels,
+		     (float)32767.0);
+#elif FS_FLOAT
+    _fs_convert_f_f ((float *)&pcm[start], &fss->ipcm.f[start], len*channels,
+		     (float)32767.0);
+#endif
 
     fse->pcm_offset += len;
 
