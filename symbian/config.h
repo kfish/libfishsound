@@ -34,21 +34,49 @@
 #define CONFIG_H
 
 /* Build decoding support */
+
 #define FS_DECODE 1
 
 /* Do not build encoding support */
+
 #define FS_ENCODE 0
 
+#ifdef __WINS__
+
+/* We have libvorbis */
+
+#define HAVE_VORBIS 1
+
+/* Use floating point arithmetic when decoding on the emulator */
+
+#define FS_FLOAT 1
+
+#else /* ! __WINS__ */
+
+/* We do not have libvorbis */
+
+#define HAVE_VORBIS 0
+
+/* Use fixed point arithmetic when decoding on the device */
+
+#define FS_FLOAT 1
+
+#endif /* __WINS__ */
+
 /* We have liboggz */
+
 #define HAVE_OGGZ 1
 
 /* We have libspeex */
-#define HAVE_SPEEX 0
 
-/* We have libvorbis */
-#define HAVE_VORBIS 0
+#define HAVE_SPEEX 1
+
+/* We have libspeex 1.1 */
+
+#define HAVE_SPEEX_1_1 1
 
 /* We do not have libvorbisenc */
+
 #define HAVE_VORBISENC 0
 
 #endif /* ! CONFIG_H */
