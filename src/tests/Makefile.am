@@ -17,7 +17,7 @@ endif
 
 if FS_DECODE
 if FS_ENCODE
-encdec_tests = encdec-comments encdec-audio
+encdec_tests = noop encdec-comments encdec-audio
 endif
 endif
 
@@ -25,6 +25,9 @@ TESTS = $(encode_tests) $(decode_tests) $(encdec_tests)
 
 noinst_PROGRAMS = $(TESTS)
 noinst_HEADERS = fs_tests.h
+
+noop_SOURCES = noop.c
+noop_LDADD = $(FISHSOUND_LIBS)
 
 comment_test_SOURCES = comment-test.c
 comment_test_LDADD = $(FISHSOUND_LIBS)
