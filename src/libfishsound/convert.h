@@ -36,23 +36,8 @@
 /* inline functions */
 
 static inline void
-_fs_deinterleave (float ** src, float * dest[],
-		  long frames, int channels, float mult_factor)
-{
-  int i, j;
-  float * d, * s = (float *)src;
-
-  for (i = 0; i < frames; i++) {
-    for (j = 0; j < channels; j++) {
-      d = dest[j];
-      d[i] = s[i*channels + j] * mult_factor;
-    }
-  }
-}
-
-static inline void
-_fs_deinterleave_short (short ** src, short * dest[],
-                        long frames, int channels)
+_fs_deinterleave_s_s (short ** src, short * dest[],
+		      long frames, int channels)
 {
   int i, j;
   short * d, * s = (short *)src;
@@ -81,8 +66,71 @@ _fs_deinterleave_s_i (short ** src, int * dest[], long frames, int channels)
 }
 
 static inline void
-_fs_interleave (float * src[], float ** dest,
-		long frames, int channels, float mult_factor)
+_fs_deinterleave_f_s (float ** src, short * dest[],
+		      long frames, int channels, float mult)
+{
+  int i, j;
+  float * s = (float *)src;
+  short * d;
+
+  for (i = 0; i < frames; i++) {
+    for (j = 0; j < channels; j++) {
+      d = dest[j];
+      d[i] = (short) (s[i*channels + j] * mult);
+    }
+  }
+}
+
+static inline void
+_fs_deinterleave_f_i (float ** src, int * dest[],
+		      long frames, int channels, float mult)
+{
+  int i, j;
+  float * s = (float *)src;
+  int * d;
+
+  for (i = 0; i < frames; i++) {
+    for (j = 0; j < channels; j++) {
+      d = dest[j];
+      d[i] = (int) (s[i*channels + j] * mult);
+    }
+  }
+}
+
+static inline void
+_fs_deinterleave_f_f (float ** src, float * dest[],
+		      long frames, int channels, float mult)
+{
+  int i, j;
+  float * s = (float *)src, * d;
+
+  for (i = 0; i < frames; i++) {
+    for (j = 0; j < channels; j++) {
+      d = dest[j];
+      d[i] = s[i*channels + j] * mult;
+    }
+  }
+}
+
+static inline void
+_fs_deinterleave_f_d (float ** src, double * dest[],
+		      long frames, int channels, float mult)
+{
+  int i, j;
+  float * s = (float *)src;
+  double * d;
+
+  for (i = 0; i < frames; i++) {
+    for (j = 0; j < channels; j++) {
+      d = dest[j];
+      d[i] = (double) s[i*channels + j] * mult;
+    }
+  }
+}
+
+static inline void
+_fs_interleave_f_f (float * src[], float ** dest,
+		    long frames, int channels, float mult)
 {
   int i, j;
   float * s, * d = (float *)dest;
@@ -90,7 +138,7 @@ _fs_interleave (float * src[], float ** dest,
   for (i = 0; i < frames; i++) {
     for (j = 0; j < channels; j++) {
       s = src[j];
-      d[i*channels + j] = s[i] * mult_factor;
+      d[i*channels + j] = s[i] * mult;
     }
   }
 }
@@ -104,6 +152,54 @@ _fs_convert_s_i (short ** src, int ** dest, long samples)
 
   for (i = 0; i < samples; i++) {
     d[i] = (int) s[i];
+  }
+}
+
+static inline void
+_fs_convert_f_s (float ** src, short ** dest, long samples)
+{
+  int i;
+  float * s = (float *)src;
+  short * d = (short *)dest;
+
+  for (i = 0; i < samples; i++) {
+    d[i] = (short) s[i];
+  }
+}
+
+static inline void
+_fs_convert_f_i (float ** src, int ** dest, long samples)
+{
+  int i;
+  float * s = (float *)src;
+  int * d = (int *)dest;
+
+  for (i = 0; i < samples; i++) {
+    d[i] = (int) s[i];
+  }
+}
+
+static inline void
+_fs_convert_f_f (float ** src, float ** dest, long samples, float mult)
+{
+  int i;
+  float * s = (float *)src;
+  float * d = (float *)dest;
+
+  for (i = 0; i < samples; i++) {
+    d[i] = ((float) s[i]) * mult;
+  }
+}
+
+static inline void
+_fs_convert_f_d (float ** src, double ** dest, long samples, float mult)
+{
+  int i;
+  float * s = (float *)src;
+  double * d = (double *)dest;
+
+  for (i = 0; i < samples; i++) {
+    d[i] = ((double) s[i]) * mult;
   }
 }
 

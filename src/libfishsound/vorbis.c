@@ -232,8 +232,8 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
 			       fsound->info.channels);
 	  fsv->max_pcm = samples;
 	}
-	_fs_interleave (pcm, (float **)fsv->ipcm, samples,
-			fsound->info.channels, 1.0);
+	_fs_interleave_f_f (pcm, (float **)fsv->ipcm, samples,
+			    fsound->info.channels, 1.0);
 	retpcm = (float **)fsv->ipcm;
       } else {
 	retpcm = pcm;
@@ -367,7 +367,7 @@ fs_vorbis_encode_i (FishSound * fsound, float ** pcm, long frames)
     /* expose the buffer to submit data */
     vpcm = vorbis_analysis_buffer (&fsv->vd, 1024);
 
-    _fs_deinterleave ((float **)d, vpcm, len, fsound->info.channels, 1.0);
+    _fs_deinterleave_f_f ((float **)d, vpcm, len, fsound->info.channels, 1.0);
 
     d += (len * fsound->info.channels);
 
