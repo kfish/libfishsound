@@ -111,6 +111,8 @@ main (int argc, char ** argv)
 
   if (argc < 3) {
     printf ("usage: %s infilename outfilename\n", argv[0]);
+    printf ("Opens a speex or vorbis input file and decodes it to pcm.\n");
+    exit (1);
   }
 
   infilename = argv[1];
@@ -123,8 +125,8 @@ main (int argc, char ** argv)
 
   fish_sound_set_decoded_callback (fsound, decoded, NULL);
 
-  if ((oggz = oggz_open ((char *)argv[1], OGGZ_READ)) == NULL) {
-    printf ("unable to open file %s\n", argv[1]);
+  if ((oggz = oggz_open ((char *) infilename, OGGZ_READ)) == NULL) {
+    printf ("unable to open file %s\n", infilename);
     exit (1);
   }
 

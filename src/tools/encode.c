@@ -86,6 +86,8 @@ main (int argc, char ** argv)
 
   if (argc < 3) {
     printf ("usage: %s infile outfile\n", argv[0]);
+    printf ("Opens a pcm audio file and encodes it to a speex file.\n");
+    exit (1);
   }
 
   infilename = argv[1];
@@ -94,7 +96,7 @@ main (int argc, char ** argv)
   sndfile = sf_open (infilename, SFM_READ, &sfinfo);
 
   if ((oggz = oggz_open (outfilename, OGGZ_WRITE)) == NULL) {
-    printf ("unable to open file %s\n", argv[1]);
+    printf ("unable to open file %s\n", outfilename);
     exit (1);
   }
 
@@ -102,7 +104,7 @@ main (int argc, char ** argv)
 
   fsinfo.channels = sfinfo.channels;
   fsinfo.samplerate = sfinfo.samplerate;
-  fsinfo.format = FISH_SOUND_SPEEX;
+  fsinfo.format = FISH_SOUND_VORBIS;
 
   fsound = fish_sound_new (FISH_SOUND_ENCODE, &fsinfo);
   fish_sound_set_encoded_callback (fsound, encoded, oggz);

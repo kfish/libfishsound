@@ -13,7 +13,8 @@ libfishsound_la_SOURCES = \
 	fishsound.c \
 	private.h \
 	speex.c \
-	vorbis.c
+	vorbis.c \
+	fs_compat.h
 
 libfishsound_la_LDFLAGS = -version-info @SHARED_VERSION_INFO@ @SHLIB_VERSION_ARG@
 libfishsound_la_LIBADD = $(VORBIS_LIBS) $(SPEEX_LIBS)

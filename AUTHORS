@@ -1,7 +1,13 @@
 Conrad Parker <conrad@metadecks.org>
+        - Design, implementation.
+  
+Silvia Pfeiffer <Silvia.Pfeiffer@CSIRO.AU>
+        - MS Windows porting, general packaging.
+  
 
 Zentaro Kavanagh <zen@illiminable.com>
 	- Windows porting and packaging.
+
 
 based on code from:
 

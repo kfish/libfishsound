@@ -1,63 +1,15 @@
-Wed Sep 10 16:52:47 EST 2003 Conrad Parker <Conrad.Parker@csiro.au>
+Sun Mar 07 17:30:00 EST 2004 Silvia Pfeiffer <Silvia.Pfeiffer@csiro.au>
+	* Version 0.5.41
+	* fixed up windows port and release preparation with
+	  REAME files etc.
+	
 
-	* added patch from Philip XXXXXXXXX correcting CMML checking
+Some time in the year 2003...
 
-Wed Feb 19 06:51:51 EST 2003 Conrad Parker <Conrad.Parker@CSIRO.AU>
+	* A new fish was born...
 
-        * tools: added seek_offset flag to anx_writer_import calls
-        * anxed: added seek-offset argument
+	* ... by Conrad Parker <Conrad.Parker@csiro.au>
 
-Thu Feb 13 12:22:25 EST 2003 Andre Pang <Andre.Pang@csiro.au>
+	* ... and it had a long unlogged journey...
 
-	* fix_dl.[ch]: fixes to compile on Mac OS X
-
-Thu Feb  6 06:36:35 EST 2003 Conrad Parker <Conrad.Parker@csiro.au>
-
-	* fix_dl.[ch]: new files, dl/libtdl fixing wrappers
-	* Version_script.in: updated
-
-Fri Jan 10 20:47:13 EST 2003 Conrad Parker <Conrad.Parker@csiro.au>
-
-	* anx_read.c: fixed leak in parsing stream tag
-        * anxsndfile: added wav header to output
-        # anxsndfile: changed output mime-type to audio/x-wav
-
-Thu Jan  9 22:48:45 EST 2003 Conrad Parker <Conrad.Parker@csiro.au>
-
-	* anx_write.c: fixed bug in writing anchors at time 0
-
-Thu Jan  9 09:04:51 EST 2003 Conrad Parker <Conrad.Parker@csiro.au>
-
-	* implemented anx_seek_id()
-	* anx_read.c, anx_snprint.c: changed "mime-type" attribute to
-	"mimetype"
-	* deleted "fragdesc" attribute everywhere
-
-Tue Dec 24 12:01:47 EST 2002 Conrad Parker <Conrad.Parker@csiro.au>
-
-	* ANX_SEEK_NEXT, ANX_SEEK_PREV, ANX_SEEK_HEAD done for read
-	* mime.c: new file -- /etc/mime.types parsing by extension
-
-Thu Dec 19 16:32:41 EST 2002 Conrad Parker <Conrad.Parker@csiro.au>
-
-	* implemented seeking for read
-	* OS X dylib crack fixes from Andre Pang
-
-Fri Nov 22 23:48:02 EST 2002 Conrad Parker <Conrad.Parker@csiro.au>
-
-	* removed AnxTime and AnxFramerate [AnxPacketrate] types
-
-Mon Nov  4 09:08:39 EST 2002 Conrad Parker <Conrad.Parker@csiro.au>
-
-	* rewrote API ...
-	* added anx_read functionality, merged xtag into core
-	* version 0.2.0
-
-Wed Sep 25 09:46:56 EST 2002 Conrad Parker <Conrad.Parker@csiro.au>
-
-	* added xtag.[ch] and test prog
-
-Thu Sep 19 23:42:48 EST 2002 Conrad Parker <Conrad.Parker@csiro.au>
-
-	* added libsndfile1 media backend
-	* started ChangeLog ...
+	* before arriving at 0.5.40 . :)

@@ -34,6 +34,8 @@
 
 #include <stdlib.h>
 
+#include "fs_compat.h"
+
 #include <fishsound/constants.h>
 
 #undef MIN

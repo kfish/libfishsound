@@ -6,7 +6,7 @@ AC_PREREQ(2.53)
 
 AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE(libfishsound, 0.5.40)
+AM_INIT_AUTOMAKE(libfishsound, 0.5.41)
 AM_CONFIG_HEADER(config.h)
 
 SHARED_VERSION_INFO="0:5:0"
@@ -80,13 +80,13 @@ dnl
 if test "x${ac_enable_decode}" = xno && test "x${ac_enable_encode}" = xno ; then
   AC_MSG_ERROR([
 ***
-*** ZEN FISH ERROR
+*** NO FISH ERROR
 ***
 *** You have attempted to explicitly disable both encoding and decoding.
 ***
 *** If you want a fish that does nothing, try kfishd:
 ***
-***   http://www.verge.net.au/~horms/junk/index.html#kfishd
+***   http://www.verge.net.au/~horms/junk/
 ***
 *** or buy a dead one from your local pet store.
 ***
@@ -180,13 +180,13 @@ dnl
 if test "x${ac_enable_vorbis}" = xno && test "x${ac_enable_speex}" = xno ; then
   AC_MSG_ERROR([
 ***
-*** ZEN FISH ERROR
+*** NO FISH ERROR
 ***
 *** You have attempted to explicitly disable both Vorbis and Speex support.
 ***
 *** If you want a fish that does nothing, try kfishd:
 ***
-***   http://www.verge.net.au/~horms/junk/index.html#kfishd
+***   http://www.verge.net.au/~horms/junk/
 ***
 *** or buy a live one and let it watch television.
 ***

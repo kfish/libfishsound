@@ -84,13 +84,14 @@ main (int argc, char ** argv)
 
   if (argc < 2) {
     printf ("usage: %s filename\n", argv[0]);
+    printf ("Checks whether a file is a speex or a vorbis file.\n");
     exit (1);
   }
 
   infilename = argv[1];
 
-  if ((oggz = oggz_open ((char *)argv[1], OGGZ_READ)) == NULL) {
-    printf ("unable to open file %s\n", argv[1]);
+  if ((oggz = oggz_open ((char *) infilename, OGGZ_READ)) == NULL) {
+    printf ("unable to open file %s\n", infilename);
     exit (1);
   }
 
