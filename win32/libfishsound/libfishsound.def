@@ -1,0 +1,11 @@
+LIBRARY	libfishsound.dll
+EXPORTS
+		fish_sound_identify
+		fish_sound_new
+		fish_sound_set_decoded_callback
+		fish_sound_set_encoded_callback
+		fish_sound_decode
+		fish_sound_encode
+		fish_sound_reset
+		fish_sound_delete 
+		fish_sound_command
