@@ -34,6 +34,7 @@
 #define __FISH_SOUND_CONVERT_H__
 
 #include <string.h>
+#include <ogg/ogg.h>
 
 /* inline functions */
 
