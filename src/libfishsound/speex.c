@@ -116,14 +116,14 @@ typedef struct _FishSoundSpeexInfo {
     int * i;
     float * f;
     double * d;
-  } ipcm_out; /* interleaved pcm, output */
+  } ipcm_out; /* interleaved pcm, output (decode only) */
 
   union {
     short * s[2];
     int * i[2];
     float * f[2];
     double * d[2];
-  } pcm_out; /* Speex does max 2 channels */
+  } pcm_out; /* non-interleaved pcm, output; Speex does max 2 channels */
 
   FishSoundSpeexEnc * enc;
 } FishSoundSpeexInfo;
