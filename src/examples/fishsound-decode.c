@@ -60,7 +60,7 @@ open_output (int samplerate, int channels)
 }
 
 static int
-decoded (FishSound * fsound, float ** pcm, long frames, void * user_data)
+decoded_float (FishSound * fsound, float ** pcm, long frames, void * user_data)
 {
   if (!begun) {
     fish_sound_command (fsound, FISH_SOUND_GET_INFO, &fsinfo,
@@ -70,6 +70,21 @@ decoded (FishSound * fsound, float ** pcm, long frames, void * user_data)
   }
 
   sf_writef_float (sndfile, (float *)pcm, frames);
+
+  return 0;
+}
+
+static int
+decoded_short (FishSound * fsound, short ** pcm, long frames, void * user_data)
+{
+  if (!begun) {
+    fish_sound_command (fsound, FISH_SOUND_GET_INFO, &fsinfo,
+			sizeof (FishSoundInfo));
+    open_output (fsinfo.samplerate, fsinfo.channels);
+    begun = 1;
+  }
+
+  sf_writef_short (sndfile, (short *)pcm, frames);
 
   return 0;
 }
@@ -106,7 +121,11 @@ main (int argc, char ** argv)
 
   fish_sound_set_interleave (fsound, 1);
 
-  fish_sound_set_decoded_callback (fsound, decoded, NULL);
+#if HAVE_SPEEX_1_1
+  fish_sound_set_decoded_short_ilv (fsound, decoded_short, NULL);
+#else
+  fish_sound_set_decoded_float_ilv (fsound, decoded_float, NULL);
+#endif
 
   if ((oggz = oggz_open ((char *) infilename, OGGZ_READ)) == NULL) {
     printf ("unable to open file %s\n", infilename);

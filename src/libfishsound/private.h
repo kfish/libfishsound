@@ -43,6 +43,25 @@
 #undef MIN
 #define MIN(a,b) (((a)<(b))?(a):(b))
 
+/** PCM type */
+typedef enum {
+  /** Undefined/Error */
+  FISH_SOUND_PCM_UNDEF = 0x00,
+
+  /** short */
+  FISH_SOUND_PCM_SHORT = 0x01,
+
+  /** int */
+  FISH_SOUND_PCM_INT = 0x02,
+
+  /** float */
+  FISH_SOUND_PCM_FLOAT = 0x03,
+
+  /** double */
+  FISH_SOUND_PCM_DOUBLE = 0x04
+
+} FishSoundPCM;
+
 typedef struct _FishSound FishSound;
 typedef struct _FishSoundInfo FishSoundInfo;
 typedef struct _FishSoundCodec FishSoundCodec;
@@ -53,6 +72,8 @@ typedef int         (*FSCodecIdentify) (unsigned char * buf, long bytes);
 typedef FishSound * (*FSCodecInit) (FishSound * fsound);
 typedef FishSound * (*FSCodecDelete) (FishSound * fsound);
 typedef int         (*FSCodecReset) (FishSound * fsound);
+typedef int         (*FSCodecUpdate) (FishSound * fsound, int interleave,
+				      FishSoundPCM pcm_type);
 typedef int         (*FSCodecCommand) (FishSound * fsound, int command,
 				       void * data, int datasize);
 typedef long        (*FSCodecDecode) (FishSound * fsound, unsigned char * buf,
@@ -62,6 +83,8 @@ typedef long        (*FSCodecEncodeI) (FishSound * fsound, float ** pcm,
 typedef long        (*FSCodecEncodeN) (FishSound * fsound, float ** pcm,
 				       long frames);
 typedef long        (*FSCodecFlush) (FishSound * fsound);
+
+#include <fishsound/decode.h>
 
 struct _FishSoundFormat {
   int format;
@@ -74,6 +97,7 @@ struct _FishSoundCodec {
   FSCodecInit init;
   FSCodecDelete del;
   FSCodecReset reset;
+  FSCodecUpdate update;
   FSCodecCommand command;
   FSCodecDecode decode;
   FSCodecEncodeI encode_i;
@@ -92,6 +116,18 @@ struct _FishSoundComment {
   char * value;
 };
 
+union FishSoundCallback {
+  FishSoundDecoded_Short decoded_short;
+  FishSoundDecoded_ShortIlv decoded_short_ilv;
+  FishSoundDecoded_Int decoded_int;
+  FishSoundDecoded_IntIlv decoded_int_ilv;
+  FishSoundDecoded_Float decoded_float;
+  FishSoundDecoded_FloatIlv decoded_float_ilv;
+  FishSoundDecoded_Double decoded_double;
+  FishSoundDecoded_DoubleIlv decoded_double_ilv;
+  void * encoded;
+};
+
 struct _FishSound {
   /** FISH_SOUND_DECODE or FISH_SOUND_ENCODE */
   FishSoundMode mode;
@@ -101,6 +137,9 @@ struct _FishSound {
 
   /** Interleave boolean */
   int interleave;
+
+  /** Decoded PCM type */
+  FishSoundPCM pcm_type;
 
   /**
    * Current frameno.
@@ -129,7 +168,7 @@ struct _FishSound {
   void * codec_data;
 
   /* encode or decode callback */
-  void * callback;
+  union FishSoundCallback callback;
 
   /** user data for encode/decode callback */
   void * user_data; 
@@ -139,11 +178,11 @@ struct _FishSound {
   FishSoundVector * comments;
 };
 
-typedef int (*FishSoundDecoded) (FishSound * fsound, float ** pcm,
-				 long frames, void * user_data);
-
 typedef int (*FishSoundEncoded) (FishSound * fsound, unsigned char * buf,
 				 long bytes, void * user_data);
+
+int fish_sound_identify (unsigned char * buf, long bytes);
+int fish_sound_set_format (FishSound * fsound, int format);
 
 /* Format specific interfaces */
 int fish_sound_vorbis_identify (unsigned char * buf, long bytes);
@@ -188,6 +227,21 @@ _fs_deinterleave (float ** src, float * dest[],
     for (j = 0; j < channels; j++) {
       d = dest[j];
       d[i] = s[i*channels + j] * mult_factor;
+    }
+  }
+}
+
+static inline void
+_fs_deinterleave_short (short ** src, short * dest[],
+                        long frames, int channels)
+{
+  int i, j;
+  short * d, * s = (short *)src;
+
+  for (i = 0; i < frames; i++) {
+    for (j = 0; j < channels; j++) {
+      d = dest[j];
+      d[i] = s[i*channels + j];
     }
   }
 }

@@ -74,8 +74,16 @@ typedef struct _FishSoundSpeexInfo {
   int extra_headers;
   SpeexStereoState stereo;
   int pcm_len; /* nr frames in pcm */
-  float * ipcm; /* interleaved pcm */
-  float * pcm[2]; /* Speex does max 2 channels */
+
+  union {
+    short * s;
+    float * f;
+  } ipcm; /* interleaved pcm */
+  union {
+    short * s[2];
+    float * f[2];
+  } pcm; /* Speex does max 2 channels */
+
   FishSoundSpeexEnc * enc;
 } FishSoundSpeexInfo;
 
@@ -228,6 +236,166 @@ process_header(unsigned char * buf, long bytes, int enh_enabled,
   return st;
 }
 
+#if HAVE_SPEEX_1_1
+static inline void
+fs_speex_short_dispatch (FishSound * fsound)
+{
+  FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
+  FishSoundDecoded_ShortIlv ds;
+  FishSoundDecoded_Short dsi;
+
+  if (fsound->interleave) {
+    dsi = (FishSoundDecoded_ShortIlv)fsound->callback.decoded_short_ilv;
+    dsi (fsound, (short **)fss->ipcm.s, fss->frame_size, fsound->user_data);
+  } else {
+    ds = (FishSoundDecoded_Short)fsound->callback.decoded_short;
+    ds (fsound, fss->pcm.s, fss->frame_size, fsound->user_data);
+  }
+}
+
+static long
+fs_speex_decode_short (FishSound * fsound)
+{
+  FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
+  int i;
+
+  for (i = 0; i < fss->nframes; i++) {
+    /* Decode frame */
+    speex_decode_int (fss->st, &fss->bits, fss->ipcm.s);
+
+    if (fsound->info.channels == 2)
+      speex_decode_stereo_int (fss->ipcm.s, fss->frame_size, &fss->stereo);
+
+    fsound->frameno += fss->frame_size;
+
+    fs_speex_short_dispatch (fsound);
+  }
+
+  return 0;
+}
+
+static long
+fs_speex_decode_short_dlv (FishSound * fsound)
+{
+  FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
+  int i;
+
+  for (i = 0; i < fss->nframes; i++) {
+    /* Decode frame */
+    speex_decode_int (fss->st, &fss->bits, fss->ipcm.s);
+
+    speex_decode_stereo_int (fss->ipcm.s, fss->frame_size, &fss->stereo);
+    _fs_deinterleave_short ((short **)fss->ipcm.s, fss->pcm.s,
+			    fss->frame_size, 2);
+
+    fsound->frameno += fss->frame_size;
+
+    fs_speex_short_dispatch (fsound);
+  }
+
+  return 0;
+}
+#endif /* HAVE_SPEEX_1_1 */
+
+static inline void
+fs_speex_float_dispatch (FishSound * fsound)
+{
+  FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
+  FishSoundDecoded_FloatIlv df;
+  FishSoundDecoded_Float dfi;
+
+  if (fsound->interleave) {
+    dfi = (FishSoundDecoded_FloatIlv)fsound->callback.decoded_float_ilv;
+    dfi (fsound, (float **)fss->ipcm.f, fss->frame_size, fsound->user_data);
+  } else {
+    df = (FishSoundDecoded_Float)fsound->callback.decoded_float;
+    df (fsound, fss->pcm.f, fss->frame_size, fsound->user_data);
+  }
+}
+
+static long
+fs_speex_decode_float (FishSound * fsound)
+{
+  FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
+  int i, j;
+
+  for (i = 0; i < fss->nframes; i++) {
+    /* Decode frame */
+    speex_decode (fss->st, &fss->bits, fss->ipcm.f);
+
+    if (fsound->info.channels == 2)
+      speex_decode_stereo (fss->ipcm.f, fss->frame_size, &fss->stereo);
+
+    for (j = 0; j < fss->frame_size * fsound->info.channels; j++) {
+      fss->ipcm.f[j] /= 32767.0;
+    }
+
+    fsound->frameno += fss->frame_size;
+
+    fs_speex_float_dispatch (fsound);
+  }
+
+  return 0;
+}
+
+static long
+fs_speex_decode_float_dlv (FishSound * fsound)
+{
+  FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
+  int i;
+
+  for (i = 0; i < fss->nframes; i++) {
+    /* Decode frame */
+    speex_decode (fss->st, &fss->bits, fss->ipcm.f);
+
+    speex_decode_stereo (fss->ipcm.f, fss->frame_size, &fss->stereo);
+    _fs_deinterleave ((float **)fss->ipcm.f, fss->pcm.f,
+		      fss->frame_size, 2, (float)(1/32767.0));
+
+    fsound->frameno += fss->frame_size;
+
+    fs_speex_float_dispatch (fsound);
+  }
+
+  return 0;
+}
+
+static void
+fs_speex_update (FishSound * fsound, int interleave, FishSoundPCM pcm_type)
+{
+  FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
+  size_t pcm_size;
+
+  if (HAVE_SPEEX_1_1 && (pcm_type == FISH_SOUND_PCM_SHORT ||
+			 pcm_type == FISH_SOUND_PCM_INT)) {
+    pcm_size = sizeof (short);
+  } else {
+    pcm_size = sizeof (float);
+  }
+
+  fss->ipcm.f = (float *)
+    fs_realloc (fss->ipcm.f,
+		pcm_size * fss->frame_size * fsound->info.channels);
+
+  if (interleave) {
+    /* if transitioning from non-interleave to interleave,
+       free non-ilv buffers */
+    if (!fsound->interleave && fsound->info.channels == 2) {
+      if (fss->pcm.f[0]) fs_free (fss->pcm.f[0]);
+      if (fss->pcm.f[1]) fs_free (fss->pcm.f[1]);
+      fss->pcm.f[0] = NULL;
+      fss->pcm.f[1] = NULL;
+    }
+  } else {
+    if (fsound->info.channels == 1) {
+      fss->pcm.f[0] = (float *) fss->ipcm.f;
+    } else if (fsound->info.channels == 2) {
+      fss->pcm.f[0] = fs_realloc (fss->pcm.f[0], pcm_size * fss->frame_size);
+      fss->pcm.f[1] = fs_realloc (fss->pcm.f[1], pcm_size * fss->frame_size);
+    }
+  }
+
+}
 
 static long
 fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
@@ -237,8 +405,6 @@ fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
   int rate = 0;
   int channels = -1;
   int forceMode = -1;
-  int i, j;
-  float ** retpcm;
 
   if (fss->packetno == 0) {
     fss->st = process_header (buf, bytes, enh_enabled,
@@ -258,14 +424,21 @@ fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
     fsound->info.samplerate = rate;
     fsound->info.channels = channels;
 
-    fss->ipcm = fs_malloc (sizeof (float) * fss->frame_size * channels);
+#if 1
+    fss->ipcm.f = NULL;
+    fss->pcm.f[0] = NULL;
+    fss->pcm.f[1] = NULL;
+    fs_speex_update (fsound, fsound->interleave, fsound->pcm_type);
+#else
+    fss->ipcm.f = fs_malloc (sizeof (float) * fss->frame_size * channels);
 
     if (channels == 1) {
-      fss->pcm[0] = fss->ipcm;
+      fss->pcm.f[0] = fss->ipcm.f;
     } else if (channels == 2) {
-      fss->pcm[0] = fs_malloc (sizeof (float) * fss->frame_size);
-      fss->pcm[1] = fs_malloc (sizeof (float) * fss->frame_size);
+      fss->pcm.f[0] = fs_malloc (sizeof (float) * fss->frame_size);
+      fss->pcm.f[1] = fs_malloc (sizeof (float) * fss->frame_size);
     }
+#endif
 
     if (fss->nframes == 0) fss->nframes = 1;
 
@@ -277,41 +450,22 @@ fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
   } else {
     speex_bits_read_from (&fss->bits, (char *)buf, (int)bytes);
 
-    for (i = 0; i < fss->nframes; i++) {
-      /* Decode frame */
-      speex_decode (fss->st, &fss->bits, fss->ipcm);
-
-      if (fsound->info.channels == 2) {
-	speex_decode_stereo (fss->ipcm, fss->frame_size, &fss->stereo);
-	if (fsound->interleave) {
-	  for (j = 0; j < fss->frame_size * fsound->info.channels; j++) {
-	    fss->ipcm[j] /= 32767.0;
-	  }
-	} else {
-	  _fs_deinterleave ((float **)fss->ipcm, fss->pcm,
-			    fss->frame_size, 2, (float)(1/32767.0));
-	}
+#if HAVE_SPEEX_1_1
+    if (fsound->pcm_type == FISH_SOUND_PCM_SHORT ||
+	fsound->pcm_type == FISH_SOUND_PCM_INT) {
+      if (fsound->info.channels == 2 && !fsound->interleave) {
+	fs_speex_decode_short_dlv (fsound);
       } else {
-	for (j = 0; j < fss->frame_size; j++) {
-	  fss->ipcm[j] /= 32767.0;
-	}
+	fs_speex_decode_short (fsound);
       }
-
-      if (fsound->interleave) {
-	retpcm = (float **)fss->ipcm;
+    } else /* fall through to float decode */
+#endif
+      
+      if (fsound->info.channels == 2 && !fsound->interleave) {
+	fs_speex_decode_float_dlv (fsound);
       } else {
-	retpcm = (float **)fss->pcm;
+	fs_speex_decode_float (fsound);
       }
-
-      fsound->frameno += fss->frame_size;
-
-      /* fss->pcm is ready to go! */
-      if (fsound->callback) {
-	((FishSoundDecoded)fsound->callback) (fsound, retpcm,
-					      fss->frame_size,
-					      fsound->user_data);
-      }
-    }
   }
 
   fss->packetno++;
@@ -346,8 +500,8 @@ fs_speex_enc_headers (FishSound * fsound)
 
   fss->st = speex_encoder_init (mode);
 
-  if (fsound->callback) {
-    FishSoundEncoded encoded = (FishSoundEncoded)fsound->callback;
+  if (fsound->callback.encoded) {
+    FishSoundEncoded encoded = (FishSoundEncoded)fsound->callback.encoded;
     char vendor_string[128];
 
     /* header */
@@ -378,9 +532,9 @@ fs_speex_enc_headers (FishSound * fsound)
 
   /* XXX: blah blah blah ... set VBR etc. */
 
-  fss->ipcm = fs_malloc (fss->frame_size * fsound->info.channels
-			 * sizeof (float));
-
+  fss->ipcm.f =
+    fs_malloc (fss->frame_size * fsound->info.channels * sizeof (float));
+  
   return fsound;
 }
 
@@ -394,8 +548,8 @@ fs_speex_encode_write (FishSound * fsound)
   bytes = speex_bits_write (&fss->bits, fse->cbits, MAX_FRAME_BYTES);
   speex_bits_reset (&fss->bits);
 
-  if (fsound->callback) {
-    FishSoundEncoded encoded = (FishSoundEncoded)fsound->callback;
+  if (fsound->callback.encoded) {
+    FishSoundEncoded encoded = (FishSoundEncoded)fsound->callback.encoded;
 
     encoded (fsound, (unsigned char *)fse->cbits, (long)bytes,
 	     fsound->user_data);
@@ -412,9 +566,9 @@ fs_speex_encode_block (FishSound * fsound)
   long nencoded = 0;
 
   if (fsound->info.channels == 2)
-    speex_encode_stereo (fss->ipcm, fse->pcm_offset, &fss->bits);
+    speex_encode_stereo ((float *)fss->ipcm.f, fse->pcm_offset, &fss->bits);
 
-  speex_encode (fss->st, fss->ipcm, &fss->bits);
+  speex_encode (fss->st, fss->ipcm.f, &fss->bits);
 
   fse->frame_offset++;
   if (fse->frame_offset == fss->nframes) {
@@ -447,7 +601,7 @@ fs_speex_encode_i (FishSound * fsound, float ** pcm, long frames)
     start = fse->pcm_offset * channels;
     end = (len + fse->pcm_offset) * channels;
     for (j = start; j < end; j++) {
-      fss->ipcm[j] = *p++ * (float)32767.0;
+      fss->ipcm.f[j] = *p++ * (float)32767.0;
     }
 
     fse->pcm_offset += len;
@@ -477,15 +631,15 @@ fs_speex_encode_n (FishSound * fsound, float * pcm[], long frames)
     len = MIN (remaining, fss->frame_size - fse->pcm_offset);
 
     start = fse->pcm_offset;
-    fss->pcm[0] = &pcm[0][n];
+    fss->pcm.f[0] = &pcm[0][n];
 
     if (fsound->info.channels == 2) {
-      fss->pcm[1] = &pcm[1][n];
-      _fs_interleave (fss->pcm, (float **)&fss->ipcm[start*2],
+      fss->pcm.f[1] = &pcm[1][n];
+      _fs_interleave (fss->pcm.f, (float **)&fss->ipcm.f[start*2],
 		      len, 2, 32767.0);
     } else {
       for (j = 0; j < len; j++) {
-	fss->ipcm[start + j] = fss->pcm[0][j] * (float)32767.0;
+	fss->ipcm.f[start + j] = fss->pcm.f[0][j] * (float)32767.0;
       }
     }
 
@@ -577,9 +731,9 @@ fs_speex_init (FishSound * fsound)
   fss->frame_size = 0;
   fss->nframes = 1;
   fss->pcm_len = 0;
-  fss->ipcm = NULL;
-  fss->pcm[0] = NULL;
-  fss->pcm[1] = NULL;
+  fss->ipcm.f = NULL;
+  fss->pcm.f[0] = NULL;
+  fss->pcm.f[1] = NULL;
 
   memcpy (&fss->stereo, &stereo_init, sizeof (SpeexStereoState));
 
@@ -625,6 +779,7 @@ fish_sound_speex_codec (void)
   codec->init = fs_speex_init;
   codec->del = fs_speex_delete;
   codec->reset = fs_speex_reset;
+  codec->update = fs_speex_update;
   codec->command = fs_speex_command;
   codec->decode = fs_speex_decode;
   codec->encode_i = fs_speex_encode_i;

@@ -77,13 +77,18 @@ typedef struct {
   FishSound * decoder;
   int interleave;
   int channels;
-  float ** pcm;
+  union {
+    short ** s;
+    int ** i;
+    float ** f;
+    double ** d;
+  } pcm;
   long frames_in;
   long frames_out;
 } FS_EncDec;
 
 static int
-decoded (FishSound * fsound, float ** pcm, long frames, void * user_data)
+decoded_float (FishSound * fsound, float ** pcm, long frames, void * user_data)
 {
   FS_EncDec * ed = (FS_EncDec *) user_data;
 
@@ -136,19 +141,19 @@ fs_encdec_new (int samplerate, int channels, int format, int interleave,
   fish_sound_set_interleave (ed->decoder, interleave);
 
   fish_sound_set_encoded_callback (ed->encoder, encoded, ed);
-  fish_sound_set_decoded_callback (ed->decoder, decoded, ed);
+  fish_sound_set_decoded_float (ed->decoder, decoded_float, ed);
 
   ed->interleave = interleave;
   ed->channels = channels;
 
   if (interleave) {
-    ed->pcm = (float **) malloc (sizeof (float) * channels * blocksize);
-    fs_fill_square ((float *)ed->pcm, channels * blocksize);
+    ed->pcm.f = (float **) malloc (sizeof (float) * channels * blocksize);
+    fs_fill_square ((float *)ed->pcm.f, channels * blocksize);
   } else {
-    ed->pcm = (float **) malloc (sizeof (float *) * channels);
+    ed->pcm.f = (float **) malloc (sizeof (float *) * channels);
     for (i = 0; i < channels; i++) {
-      ed->pcm[i] = (float *) malloc (sizeof (float) * blocksize);
-      fs_fill_square (ed->pcm[i], blocksize);
+      ed->pcm.f[i] = (float *) malloc (sizeof (float) * blocksize);
+      fs_fill_square (ed->pcm.f[i], blocksize);
     }
   }
 
@@ -170,9 +175,9 @@ fs_encdec_delete (FS_EncDec * ed)
 
   if (!ed->interleave) {
     for (i = 0; i < ed->channels; i++)
-      free (ed->pcm[i]);
+      free (ed->pcm.f[i]);
   }
-  free (ed->pcm);
+  free (ed->pcm.f);
   
   free (ed);
 
@@ -201,7 +206,7 @@ fs_encdec_test (int samplerate, int channels, int format, int interleave,
     ed->frames_in += blocksize;
     fish_sound_prepare_truncation (ed->encoder, ed->frames_in,
 				   (i == (iter - 1)));
-    fish_sound_encode (ed->encoder, ed->pcm, blocksize);
+    fish_sound_encode (ed->encoder, ed->pcm.f, blocksize);
   }
 
   fish_sound_flush (ed->encoder);
