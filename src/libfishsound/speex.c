@@ -357,6 +357,8 @@ fs_speex_decode_short (FishSound * fsound)
 
     switch (fsound->pcm_type) {
     case FISH_SOUND_PCM_SHORT:
+      _fs_convert_s_s (fss->ipcm.s, fss->ipcm_out.s,
+		       fss->frame_size * fsound->info.channels);
       fs_speex_short_dispatch (fsound);
       break;
     case FISH_SOUND_PCM_INT:

@@ -33,6 +33,8 @@
 #ifndef __FISH_SOUND_CONVERT_H__
 #define __FISH_SOUND_CONVERT_H__
 
+#include <string.h>
+
 /* inline functions */
 
 static inline void
@@ -173,6 +175,12 @@ _fs_interleave_f_f (float * src[], float ** dest,
       d[i*channels + j] = s[i] * mult;
     }
   }
+}
+
+static inline void
+_fs_convert_s_s (short * src, short * dest, long samples)
+{
+  memcpy (dest, src, samples * sizeof (short));
 }
 
 static inline void
