@@ -49,6 +49,10 @@
 #include <speex_stereo.h>
 #include <speex_callbacks.h>
 
+#ifdef SPEEX_DISABLE_GLOBAL_POINTERS
+#include <speex_noglobals.h>
+#endif
+
 /* Format for the vendor string: "Encoded with Speex VERSION", where VERSION
  * is the libspeex version as read from a newly-generated Speex header.
  */
