@@ -208,6 +208,7 @@ if test "x${ac_enable_speex}" = xyes ; then
       AC_DEFINE(HAVE_SPEEX_1_1, [1], [Define to 1 if you have libspeex 1.1.x])
       SPEEX_SUPPORT="yes (1.1.x)"
     else
+      AC_DEFINE(HAVE_SPEEX_1_1, [0], [Define to 1 if you have libspeex 1.1.x])
       SPEEX_SUPPORT="yes (1.0.x)"
     fi
 
