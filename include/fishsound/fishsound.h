@@ -183,7 +183,7 @@
  * - All internal encoding related functions will not be built
  * - Any attempt to call fish_sound_new() with \a mode == FISH_SOUND_ENCODE
  *   will fail, returning NULL
- * - Any attempt to call fish_sound_encode() will return
+ * - Any attempt to call fish_sound_encode_*() will return
  *   FISH_SOUND_ERR_DISABLED
  * - The resulting library will not be linked against libvorbisenc
  *
@@ -360,7 +360,7 @@
  * - (optionally) specify whether you will be providing interleaved or
  * per-channel PCM data, using a fish_sound_set_interleave().
  * The default is for per-channel (non-interleaved) PCM.
- * - feed raw PCM audio data to libfishsound via fish_sound_encode().
+ * - feed raw PCM audio data to libfishsound via fish_sound_encode_*().
  * libfishsound will encode the audio for you, calling the FishSoundEncoded
  * callback you provided earlier each time it has a block of encoded audio
  * ready.
@@ -537,7 +537,7 @@ int fish_sound_set_frameno (FishSound * fsound, long frameno);
  * When encoding into Ogg, you should call this function with the \a granulepos
  * and \a eos that will be used for the \a ogg_packet structure. This call
  * should be made before passing the block of audio data to
- * fish_sound_encode(). Failure to do so may result in minor encoding errors
+ * fish_sound_encode_*(). Failure to do so may result in minor encoding errors
  * on the first and/or last packet of the stream.
  *
  * \param fsound A FishSound* handle

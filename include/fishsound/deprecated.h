@@ -85,6 +85,7 @@ int fish_sound_set_decoded_callback (FishSound * fsound,
 				     void * user_data);
 
 /**
+ * DEPRECATED FUNCTION.
  * Encode a block of audio
  * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
  * \param pcm The audio data to encode
