@@ -44,6 +44,8 @@
 
 #if HAVE_SPEEX
 
+#define DISABLE_GLOBAL_DATA
+
 #include <speex.h>
 #include <speex_header.h>
 #include <speex_stereo.h>
@@ -66,6 +68,10 @@ typedef struct _FishSoundSpeexEnc {
 } FishSoundSpeexEnc;
 
 typedef struct _FishSoundSpeexInfo {
+#ifdef DISABLE_GLOBAL_DATA
+  SpeexMode * mode;
+  int modeID;
+#endif
   int packetno;
   void * st;
   SpeexBits bits;
@@ -120,7 +126,8 @@ static void *
 process_header(unsigned char * buf, long bytes, int enh_enabled,
 	       int * frame_size, int * rate,
 	       int * nframes, int forceMode, int * channels,
-	       SpeexStereoState * stereo, int * extra_headers)
+	       SpeexStereoState * stereo, int * extra_headers,
+	       FishSoundSpeexInfo * fss)
 {
   void *st;
   SpeexMode *mode;
@@ -146,8 +153,15 @@ process_header(unsigned char * buf, long bytes, int enh_enabled,
   modeID = header->mode;
   if (forceMode!=-1)
     modeID = forceMode;
+
+#ifdef DISABLE_GLOBAL_DATA
+  mode = (SpeexMode *)speex_mode_new_byID (modeID);
+  fss->mode = mode;
+  fss->modeID = modeID;
+#else
   /* speex_mode_list[] is declared const in speex 1.1.x, hence the cast */
   mode = (SpeexMode *)speex_mode_list[modeID];
+#endif
 
   if (header->speex_version_id > 1) {
     /*
@@ -436,7 +450,7 @@ fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
 			      &fss->frame_size, &rate,
 			      &fss->nframes, forceMode, &channels,
 			      &fss->stereo,
-			      &fss->extra_headers);
+			      &fss->extra_headers, fss);
 
     if (fss->st == NULL) {
       /* XXX: error */
@@ -768,6 +782,9 @@ fs_speex_delete (FishSound * fsound)
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
 
   if (fsound->mode == FISH_SOUND_DECODE) {
+#ifdef DISABLE_GLOBAL_DATA
+    speex_mode_free_byID (fss->mode, fss->modeID);
+#endif
     if (fss->st) speex_decoder_destroy (fss->st);
   } else if (fsound->mode == FISH_SOUND_ENCODE) {
     if (fss->st) speex_encoder_destroy (fss->st);
