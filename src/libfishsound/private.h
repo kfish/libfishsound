@@ -197,6 +197,12 @@ struct _FishSound {
   /** The comments */
   char * vendor;
   FishSoundVector * comments;
+
+  /** Whether or not it is allowed to set up parameters */
+  int finalized;
+
+  /** Encoding quality */
+  float encode_quality;
 };
 
 int fish_sound_identify (unsigned char * buf, long bytes);

@@ -94,6 +94,12 @@ typedef enum _FishSoundError {
   /** Out of memory */
   FISH_SOUND_ERR_OUT_OF_MEMORY          = -4,
 
+  /** Parameters have been finalized */
+  FISH_SOUND_ERR_FINALIZED              = -5,
+
+  /** Parameter passed to _set() function is out of range */
+  FISH_SOUND_ERR_OUT_OF_RANGE           = -6,
+
   /** Functionality disabled at build time */
   FISH_SOUND_ERR_DISABLED               = -10,
 

@@ -52,6 +52,8 @@
 #include <ivorbisfile.h>
 #endif
 
+#define FS_VORBIS_DEFAULT_QUALITY 0.3
+
 typedef struct _FishSoundVorbisInfo {
   int packetno;
   struct vorbis_info vi;
@@ -345,6 +347,35 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
 
 #if FS_ENCODE && HAVE_VORBISENC
 
+static void
+fs_vorbis_enc_finalize (FishSound * fsound)
+{
+  FishSoundVorbisInfo * fsv = (FishSoundVorbisInfo *)fsound->codec_data;
+
+#ifdef DEBUG
+  printf ("fs_vorbis_enc_finalize: finalized %s, quality %f\n",
+	  fsound->finalized ? "YES" : "NO", fsound->encode_quality);
+#endif
+
+  if (!fsound->finalized) {
+
+    vorbis_encode_init_vbr (&fsv->vi, fsound->info.channels,
+			    fsound->info.samplerate,
+			    fsound->encode_quality);
+
+    /* set up the analysis state and auxiliary encoding storage */
+    vorbis_analysis_init (&fsv->vd, &fsv->vi);
+    vorbis_block_init (&fsv->vd, &fsv->vb);
+
+#ifdef DEBUG
+  printf ("fs_vorbis_enc_finalize: %d channels, %d Hz\n",
+	  fsound->info.channels, fsound->info.samplerate);
+#endif
+  }
+
+  fsound->finalized = 1;
+}
+
 static FishSound *
 fs_vorbis_enc_headers (FishSound * fsound)
 {
@@ -428,6 +459,8 @@ fs_vorbis_encode_f (FishSound * fsound, float * pcm[], long frames)
   int i;
   float ** ppcm = alloca (sizeof (float *) * fsound->info.channels);
 
+  fs_vorbis_enc_finalize (fsound);
+
   if (fsv->packetno == 0) {
     fs_vorbis_enc_headers (fsound);
   }
@@ -473,6 +506,8 @@ fs_vorbis_encode_f_ilv (FishSound * fsound, float ** pcm, long frames)
   long len, remaining = frames;
   float * d = (float *)pcm;
 
+  fs_vorbis_enc_finalize (fsound);
+
   if (fsv->packetno == 0) {
     fs_vorbis_enc_headers (fsound);
   }
@@ -505,20 +540,8 @@ fs_vorbis_encode_f_ilv (FishSound * fsound, float ** pcm, long frames)
 static FishSound *
 fs_vorbis_enc_init (FishSound * fsound)
 {
-  FishSoundVorbisInfo * fsv = (FishSoundVorbisInfo *)fsound->codec_data;
-
-#ifdef DEBUG
-  printf ("Vorbis enc init: %d channels, %d Hz\n", fsound->info.channels,
-	  fsound->info.samplerate);
-#endif
-
-
-  vorbis_encode_init_vbr (&fsv->vi, fsound->info.channels,
-			  fsound->info.samplerate, (float)0.3 /* quality */);
-
-  /* set up the analysis state and auxiliary encoding storage */
-  vorbis_analysis_init (&fsv->vd, &fsv->vi);
-  vorbis_block_init (&fsv->vd, &fsv->vb);
+  fsound->encode_quality = FS_VORBIS_DEFAULT_QUALITY;
+  fsound->finalized = 0;
 
   return fsound;
 }
@@ -557,6 +580,10 @@ fs_vorbis_init (FishSound * fsound)
 
   fsound->codec_data = fsv;
 
+  if (fsound->mode == FISH_SOUND_DECODE) {
+    fsound->finalized = 1;
+  }
+
 #if FS_ENCODE && HAVE_VORBISENC
 
   if (fsound->mode == FISH_SOUND_ENCODE) {
@@ -577,10 +604,12 @@ fs_vorbis_delete (FishSound * fsound)
     fs_free (fsv->pcm_out);
   if (fsv->ipcm) fs_free (fsv->ipcm);
 
-  vorbis_block_clear (&fsv->vb);
-  vorbis_dsp_clear (&fsv->vd);
-  vorbis_comment_clear (&fsv->vc);
-  vorbis_info_clear (&fsv->vi);
+  if (fsound->finalized) {
+    vorbis_block_clear (&fsv->vb);
+    vorbis_dsp_clear (&fsv->vd);
+    vorbis_comment_clear (&fsv->vc);
+    vorbis_info_clear (&fsv->vi);
+  }
 
   fs_free (fsv);
   fsound->codec_data = NULL;

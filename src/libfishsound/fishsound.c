@@ -114,6 +114,7 @@ fish_sound_new (int mode, FishSoundInfo * fsinfo)
   fsound->codec_data = NULL;
   fsound->callback.encoded = NULL;
   fsound->user_data = NULL;
+  fsound->finalized = 0;
 
   fish_sound_comments_init (fsound);
 

@@ -38,6 +38,26 @@
 #include "private.h"
 
 int
+fish_sound_set_encode_quality (FishSound * fsound, float quality)
+{
+  if (fsound == NULL) return -1;
+
+#if FS_ENCODE
+  if (fsound->finalized)
+    return FISH_SOUND_ERR_FINALIZED;
+
+  if (quality < 0.0 || quality > 1.0)
+    return FISH_SOUND_ERR_OUT_OF_RANGE;
+
+  fsound->encode_quality = quality;
+#else
+  return FISH_SOUND_ERR_DISABLED;
+#endif
+
+  return 0;
+}
+
+int
 fish_sound_set_encoded_callback (FishSound * fsound,
 				 FishSoundEncoded encoded,
 				 void * user_data)
