@@ -351,7 +351,7 @@ fs_vorbis_encode_n (FishSound * fsound, float * pcm[], long frames)
   float ** vpcm;
   long len, remaining = frames;
   int i;
-  float ** ppcm = _alloca (sizeof (float *) * fsound->info.channels);
+  float ** ppcm = alloca (sizeof (float *) * fsound->info.channels);
 
   if (fsv->packetno == 0) {
     fs_vorbis_enc_headers (fsound);
