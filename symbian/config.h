@@ -75,6 +75,14 @@
 
 #define HAVE_SPEEX_1_1 1
 
+/* We have speex_free() */
+
+#define HAVE_SPEEX_FREE
+
+/* We have speex_lib_get_mode()
+
+#define HAVE_SPEEX_LIB_GET_MODE
+
 /* We do not have libvorbisenc */
 
 #define HAVE_VORBISENC 0
