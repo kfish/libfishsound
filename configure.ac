@@ -220,6 +220,18 @@ if test "x${ac_enable_speex}" = xyes ; then
     if test "x$HAVE_SPEEX_1_1" = xyes ; then
       AC_DEFINE(HAVE_SPEEX_1_1, [1], [Define to 1 if you have libspeex 1.1.x])
       SPEEX_SUPPORT="yes (1.1.x)"
+
+      dnl Test for speex_lib_get_mode() in libspeex 1.1
+      AC_CHECK_LIB(speex, speex_lib_get_mode, HAVE_SPEEX_LIB_GET_MODE="yes",
+        HAVE_SPEEX_LIB_GET_MODE="no", [$SPEEX_LIBS])
+      if test "x$HAVE_SPEEX_LIB_GET_MODE" = xyes ; then
+        AC_DEFINE(HAVE_SPEEX_LIB_GET_MODE, [1],
+         [Define to 1 if speex_lib_get_mode() exists in libspeex])
+      else
+        AC_DEFINE(HAVE_SPEEX_LIB_GET_MODE, [0],
+         [Define to 1 if speex_lib_get_mode() exists in libspeex])
+      fi
+
     else
       AC_DEFINE(HAVE_SPEEX_1_1, [0], [Define to 1 if you have libspeex 1.1.x])
       SPEEX_SUPPORT="yes (1.0.x)"

@@ -182,7 +182,9 @@ process_header(unsigned char * buf, long bytes, int enh_enabled,
   if (forceMode!=-1)
     modeID = forceMode;
 
-#ifdef SPEEX_DISABLE_GLOBAL_POINTERS
+#if HAVE_SPEEX_LIB_GET_MODE
+  mode = (SpeexMode *) speex_lib_get_mode (modeID);
+#elif defined(SPEEX_DISABLE_GLOBAL_POINTERS)
   mode = (SpeexMode *)speex_mode_new (modeID);
   fss->mode = mode;
 #else
@@ -846,7 +848,9 @@ fs_speex_enc_headers (FishSound * fsound)
   /* XXX: set wb, nb, uwb modes */
   modeID = 1;
 
-#ifdef SPEEX_DISABLE_GLOBAL_POINTERS
+#if HAVE_SPEEX_LIB_GET_MODE
+  mode = (SpeexMode *) speex_lib_get_mode (modeID);
+#elif defined(SPEEX_DISABLE_GLOBAL_POINTERS)
   mode = (SpeexMode *)speex_mode_new (modeID);
   fss->mode = mode;
 #else
