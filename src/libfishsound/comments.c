@@ -221,9 +221,6 @@ fish_sound_comment_set_vendor (FishSound * fsound, const char * vendor_string)
 {
   if (fsound == NULL) return FISH_SOUND_ERR_BAD;
 
-  if (fsound->mode != FISH_SOUND_ENCODE)
-    return FISH_SOUND_ERR_INVALID;
-
   if (fsound->vendor) free (fsound->vendor);
 
   fsound->vendor = fs_strdup (vendor_string);
@@ -429,6 +426,8 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
    if (c+len>end) return -1;
 
    /* Vendor */
+   nvalue = fs_strdup_len (c, len);
+   fish_sound_comment_set_vendor (fsound, nvalue);
 #ifdef DEBUG
    fwrite(c, 1, len, stderr); fputc ('\n', stderr);
 #endif
@@ -454,13 +453,7 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
 	value++;
 
 	n = c+len - value;
-#if 0
-	nvalue = malloc (n+1);
-	strncpy (nvalue, value, n);
-	nvalue[n] = '\0';
-#else
 	nvalue = fs_strdup_len (value, n);
-#endif
 #ifdef DEBUG
 	printf ("fish_sound_comments_decode: %s -> %s (length %d)\n",
 		name, nvalue, n);
