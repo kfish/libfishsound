@@ -437,22 +437,7 @@ fs_speex_encode_i (FishSound * fsound, float ** pcm, long frames)
     fse->pcm_offset += len;
 
     if (fse->pcm_offset == fss->frame_size) {
-#if 0
-      fse->pcm_offset = 0;
-
-      if (fsound->info.channels == 2)
-	speex_encode_stereo (fss->ipcm, fss->frame_size, &fss->bits);
-      
-      speex_encode (fss->st, fss->ipcm, &fss->bits);
-    
-      fse->frame_offset++;
-      if (fse->frame_offset == fss->nframes) {
-	nencoded += fs_speex_encode_write (fsound);
-	fse->frame_offset = 0;
-      }
-#else
       nencoded += fs_speex_encode_block (fsound);
-#endif
     }
 
     remaining -= len;
@@ -512,22 +497,7 @@ fs_speex_flush (FishSound * fsound)
   long nencoded = 0;
 
   if (fse->pcm_offset > 0) {
-#if 0
-    fse->pcm_offset = 0;
-
-    if (fsound->info.channels == 2)
-      speex_encode_stereo (fss->ipcm, fse->pcm_offset, &fss->bits);
-      
-    speex_encode (fss->st, fss->ipcm, &fss->bits);
-    
-    fse->frame_offset++;
-    if (fse->frame_offset == fss->nframes) {
-      nencoded += fs_speex_encode_write (fsound);
-      fse->frame_offset = 0;
-    }
-#else
     nencoded += fs_speex_encode_block (fsound);
-#endif
   }
 
   if (fse->frame_offset == 0) return 0;
