@@ -142,7 +142,7 @@ fish_sound_vorbis_identify (unsigned char * buf, long bytes)
   struct vorbis_info vi;
   struct vorbis_comment vc;
   ogg_packet op;
-  int ret;
+  int ret, id = FISH_SOUND_UNKNOWN;
 
   if (!strncmp ((char *)&buf[1], "vorbis", 6)) {
     /* if only a short buffer was passed, do a weak identify */
@@ -162,15 +162,17 @@ fish_sound_vorbis_identify (unsigned char * buf, long bytes)
     op.packetno = 0;
 
     if ((ret = vorbis_synthesis_headerin (&vi, &vc, &op)) == 0) {
-      if (vi.rate != 0) return FISH_SOUND_VORBIS;
+      if (vi.rate != 0) id = FISH_SOUND_VORBIS;
 #ifdef DEBUG
     } else {
       printf ("vorbis_synthesis_headerin returned %d\n", ret);
 #endif
     }
+
+    vorbis_info_clear (&vi);
   }
 
-  return FISH_SOUND_UNKNOWN;
+  return id;
 }
 
 static int
