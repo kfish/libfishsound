@@ -440,6 +440,10 @@ typedef int (*FishSoundDecoded) (FishSound * fsound, float ** pcm,
 typedef int (*FishSoundEncoded) (FishSound * fsound, unsigned char * buf,
 				 long bytes, void * user_data);
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Identify a codec based on the first few bytes of data.
  * \param buf A pointer to the first few bytes of the data
@@ -600,5 +604,9 @@ long fish_sound_get_frameno (FishSound * fsound);
  * \retval -1 Invalid \a fsound
  */
 int fish_sound_set_frameno (FishSound * fsound, long frameno);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __FISH_SOUND_H__ */
