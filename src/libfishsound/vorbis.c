@@ -41,7 +41,7 @@
 
 /*#define DEBUG*/
 
-#ifdef HAVE_VORBIS
+#if HAVE_VORBIS
 
 #include <vorbis/codec.h>
 #include <vorbis/vorbisenc.h>
