@@ -151,6 +151,8 @@ dnl  Detect speex
 dnl
 
 HAVE_SPEEX=no
+HAVE_SPEEX_1_1=no
+SPEEX_SUPPORT=no
 
 ac_enable_speex=yes
 AC_ARG_ENABLE(speex,
@@ -163,6 +165,20 @@ if test "x${ac_enable_speex}" = xyes ; then
     AC_CHECK_HEADER(speex.h, HAVE_SPEEX="yes", HAVE_SPEEX="no")
   fi
   if test "x$HAVE_SPEEX" = xyes ; then
+
+    dnl Test for libspeex 1.1.x
+    AC_CHECK_LIB(speex, speex_preprocess, HAVE_SPEEX_1_1="maybe", , [-lm])
+    if test "x$HAVE_SPEEX_1_1" = xmaybe; then
+      AC_CHECK_HEADER(speex_preprocess.h, HAVE_SPEEX_1_1="yes",
+        HAVE_SPEEX_1_1="no")
+    fi
+    if test "x$HAVE_SPEEX_1_1" = xyes ; then
+      AC_DEFINE(HAVE_SPEEX_1_1, [1], [Define to 1 if you have libspeex 1.1.x])
+      SPEEX_SUPPORT="yes (1.1.x)"
+    else
+      SPEEX_SUPPORT="yes (1.0.x)"
+    fi
+
     AC_DEFINE(HAVE_SPEEX, [1], [Define to 1 if you have libspeex])
     SPEEX_LIBS="-lspeex -lm"
     AC_SUBST(SPEEX_LIBS)
@@ -170,7 +186,7 @@ if test "x${ac_enable_speex}" = xyes ; then
     AC_DEFINE(HAVE_SPEEX, [0], [Define to 1 if you have libspeex])
   fi
 else
-  HAVE_SPEEX=disabled
+  SPEEX_SUPPORT=disabled
 fi
 AM_CONDITIONAL(HAVE_SPEEX, [test "x$HAVE_SPEEX" = "xyes"])
 
@@ -361,7 +377,7 @@ AC_MSG_RESULT([
   Library configuration (./src/libfishsound):
 
     Vorbis support: .............. $VORBIS_SUPPORT
-    Speex support: ............... $HAVE_SPEEX
+    Speex support: ............... $SPEEX_SUPPORT
 
   Example programs (./src/examples):
 
