@@ -232,7 +232,7 @@ if test "x${ac_enable_speex}" = xyes ; then
       DISABLE_GLOBAL_POINTERS="no", [$SPEEX_LIBS])
     if test "x$DISABLE_GLOBAL_POINTERS" = "xmaybe"; then
       AC_CHECK_HEADER([speex/speex_noglobals.h], DISABLE_GLOBAL_POINTERS="yes",
-        DISABLE_GLOBAL_POINTERS="no")
+        DISABLE_GLOBAL_POINTERS="no", [speex/speex.h])
     fi
     if test "x$DISABLE_GLOBAL_POINTERS" = xyes ; then
       AC_DEFINE(SPEEX_DISABLE_GLOBAL_POINTERS, ,
