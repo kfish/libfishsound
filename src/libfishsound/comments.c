@@ -44,7 +44,7 @@ static char *
 fs_strdup (const char * s)
 {
   char * ret;
-  if (!s) return NULL;
+  if (s == NULL) return NULL;
   ret = fs_malloc (strlen(s) + 1);
   return strcpy (ret, s);
 }
@@ -53,9 +53,10 @@ static char *
 fs_strdup_len (const char * s, int len)
 {
   char * ret;
-  if (!s) return NULL;
+  if (s == NULL) return NULL;
+  if (len == 0) return NULL;
   ret = fs_malloc (len + 1);
-  if (!strncpy (ret, s, len)) {
+  if (strncpy (ret, s, len) == NULL) {
     fs_free (ret);
     return NULL;
   }
@@ -451,6 +452,7 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
    /* Vendor */
    nvalue = fs_strdup_len (c, len);
    fish_sound_comment_set_vendor (fsound, nvalue);
+   if (nvalue) fs_free (nvalue);
 #ifdef DEBUG
    fwrite(c, 1, len, stderr); fputc ('\n', stderr);
 #endif
