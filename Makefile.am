@@ -30,7 +30,17 @@
 
 SUBDIRS = doc include src
 
-EXTRA_DIST = fishsound.pc.in win32 README.win32
+EXTRA_DIST = fishsound.pc.in README.win32 \
+	win32/Makefile \
+	win32/libfishsound/libfishsound.def \
+	win32/config.h \
+	win32/libfishsound.dsw \
+	win32/libfishsound.dsp \
+	win32/identify.dsp \
+	win32/decode.dsp \
+	win32/encode.dsp \
+	win32/libfishsound/libfishsound.sln \
+	win32/libfishsound/libfishsound.vcproj
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = fishsound.pc
