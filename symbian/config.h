@@ -41,27 +41,13 @@
 
 #define FS_ENCODE 0
 
-#ifdef __WINS__
-
 /* We have libvorbis */
 
 #define HAVE_VORBIS 1
 
-/* Use floating point arithmetic when decoding on the emulator */
-
-#define FS_FLOAT 1
-
-#else /* ! __WINS__ */
-
-/* We do not have libvorbis */
-
-#define HAVE_VORBIS 0
-
-/* Use fixed point arithmetic when decoding on the device */
+/* Use only fixed point arithmetic */
 
 #define FS_FLOAT 0
-
-#endif /* __WINS__ */
 
 /* We have liboggz */
 

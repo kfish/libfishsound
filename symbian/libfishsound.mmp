@@ -36,6 +36,6 @@ UID           0
 SOURCEPATH    ..\src\libfishsound
 SOURCE        comments.c decode.c fishsound.c fs_vector.c speex.c vorbis.c
 
-USERINCLUDE   . ..\..\speex\include ..\..\speex\include\speex ..\..\vorbis\include\vorbis
+USERINCLUDE   . ..\..\speex\include ..\..\speex\include\speex ..\..\tremor ..\..\ogg\include\ogg
 SYSTEMINCLUDE \epoc32\include \epoc32\include\libc ..\include ..\..\speex\include
-SYSTEMINCLUDE ..\..\vorbis\include ..\..\ogg\include ..\..\ogg\symbian
+SYSTEMINCLUDE ..\..\tremor ..\..\ogg\include ..\..\ogg\symbian
