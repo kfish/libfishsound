@@ -81,7 +81,7 @@ fs_speex_identify (unsigned char * buf, long bytes)
 
   if (bytes < 8) return FISH_SOUND_UNKNOWN;
 
-  if (!strncmp (buf, "Speex   ", 8)) {
+  if (!strncmp ((char *)buf, "Speex   ", 8)) {
     /* if only a short buffer was passed, do a weak identify */
     if (bytes == 8) return FISH_SOUND_SPEEX;
 
@@ -463,7 +463,6 @@ static long
 fs_speex_encode_n (FishSound * fsound, float * pcm[], long frames)
 {
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
-  FishSoundSpeexEnc * fse = (FishSoundSpeexEnc *)fss->enc;
   long remaining = frames, len;
   int i, j;
 
