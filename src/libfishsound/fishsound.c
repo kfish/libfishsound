@@ -123,7 +123,7 @@ fish_sound_new (int mode, FishSoundInfo * fsinfo)
       free (fsound);
       return NULL;
     }
-  } 
+  }
 
   return fsound;
 }
@@ -135,7 +135,7 @@ fish_sound_set_decoded_callback (FishSound * fsound,
 {
   if (fsound == NULL) return -1;
 
-#ifdef FS_DECODE
+#if FS_DECODE
   fsound->callback = (void *)decoded;
   fsound->user_data = user_data;
 #else
@@ -152,7 +152,7 @@ fish_sound_set_encoded_callback (FishSound * fsound,
 {
   if (fsound == NULL) return -1;
 
-#ifdef FS_ENCODE
+#if FS_ENCODE
   fsound->callback = (void *)encoded;
   fsound->user_data = user_data;
 #else
@@ -169,7 +169,7 @@ fish_sound_decode (FishSound * fsound, unsigned char * buf, long bytes)
 
   if (fsound == NULL) return -1;
 
-#ifdef FS_DECODE
+#if FS_DECODE
   if (fsound->info.format == FISH_SOUND_UNKNOWN) {
     format = fish_sound_identify (buf, bytes);
     if (format == FISH_SOUND_UNKNOWN) return -1;
@@ -193,7 +193,7 @@ fish_sound_encode (FishSound * fsound, float ** pcm, long frames)
 {
   if (fsound == NULL) return -1;
 
-#ifdef FS_ENCODE
+#if FS_ENCODE
   if (fsound->interleave) {
     if (fsound->codec && fsound->codec->encode_i)
       return fsound->codec->encode_i (fsound, pcm, frames);
