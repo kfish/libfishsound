@@ -1,0 +1,27 @@
+libfishsound provides a simple programming interface for decoding and
+encoding audio data using Xiph.Org codecs (Vorbis and Speex).
+
+libfishsound by itself is designed to handle raw codec streams from a
+lower level layer such as UDP datagrams. When these codecs are used in
+files, they are commonly encapsulated in Ogg to produce Ogg Vorbis
+and Speex files.
+
+The src/ directory contains the source code.
+The src/libfishsound/ directory has the library source code.
+The src/tools/ directory has some command line tools showing 
+               how to program with libfishsound.
+ 
+The include/ directory contains the libsishound include files that
+will be installed into the system include directory.
+  
+The doc/ directory contains some documentation for libfishsound. The
+subdirectory libfishsound is autocreated by doxygen from comments
+contained in the source code.
+  
+The win32/ directory contains the files necessary to compile the
+library for MS Windows.
+  
+This library is installed using the standard configure, make, make
+install sequence. Full details in the file INSTALL.
+  
+Read the file README.win32 for installing under MS Windows.
