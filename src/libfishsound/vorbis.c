@@ -504,8 +504,6 @@ fs_vorbis_enc_init (FishSound * fsound)
   vorbis_encode_init_vbr (&fsv->vi, fsound->info.channels,
 			  fsound->info.samplerate, (float)0.3 /* quality */);
 
-  vorbis_encode_setup_init (&fsv->vi);
-
   /* set up the analysis state and auxiliary encoding storage */
   vorbis_analysis_init (&fsv->vd, &fsv->vi);
   vorbis_block_init (&fsv->vd, &fsv->vb);
@@ -562,6 +560,10 @@ static FishSound *
 fs_vorbis_delete (FishSound * fsound)
 {
   FishSoundVorbisInfo * fsv = (FishSoundVorbisInfo *)fsound->codec_data;
+
+  if (fsv->pcm_out && fsv->pcm_out != fsv->ipcm)
+    fs_free (fsv->pcm_out);
+  if (fsv->ipcm) fs_free (fsv->ipcm);
 
   vorbis_block_clear (&fsv->vb);
   vorbis_dsp_clear (&fsv->vd);
