@@ -161,7 +161,9 @@ fs_comment_validate_byname (const char * name, const char * value)
 
   for (c = name; *c; c++) {
     if (*c < 0x20 || *c > 0x7D || *c == 0x3D) {
+#ifdef DEBUG
       printf ("XXX char %c in %s invalid\n", *c, name);
+#endif
       return 0;
     }
   }
