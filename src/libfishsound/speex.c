@@ -133,7 +133,8 @@ process_header(unsigned char * buf, long bytes, int enh_enabled,
   modeID = header->mode;
   if (forceMode!=-1)
     modeID = forceMode;
-  mode = speex_mode_list[modeID];
+  /* speex_mode_list[] is declared const in speex 1.1.x, hence the cast */
+  mode = (SpeexMode *)speex_mode_list[modeID];
 
   if (header->speex_version_id > 1) {
     /*
@@ -327,7 +328,8 @@ fs_speex_enc_headers (FishSound * fsound)
   int bytes;
 
   /* XXX: set wb, nb, uwb modes */
-  mode = &speex_wb_mode;
+  /* These modes are declared const in speex 1.1.x, hence the explicit cast */
+  mode = (SpeexMode *)&speex_wb_mode;
 
   speex_init_header (&header, fsound->info.samplerate, 1, mode);
   header.frames_per_packet = fss->nframes; /* XXX: frames per packet */
