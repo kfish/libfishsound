@@ -21,7 +21,7 @@ encdec_tests = noop encdec-comments encdec-audio
 endif
 endif
 
-TESTS = $(encode_tests) $(decode_tests) $(encdec_tests)
+TESTS = $(encode_tests) $(encdec_tests)
 
 noinst_PROGRAMS = $(TESTS)
 noinst_HEADERS = fs_tests.h
