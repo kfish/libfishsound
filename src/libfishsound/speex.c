@@ -80,7 +80,9 @@ typedef float FS_SpeexPCM;
 #endif
 
 /* How to free memory allocated by libspeex */
-#if !HAVE_SPEEX_FREE
+#if HAVE_SPEEX_FREE
+void speex_free (void *ptr);
+#else
 #define speex_free fs_free
 #endif
 
@@ -853,6 +855,7 @@ fs_speex_enc_headers (FishSound * fsound)
   SpeexHeader header;
   unsigned char * buf;
   int bytes;
+  size_t buflen;
 
   /* XXX: set wb, nb, uwb modes */
   modeID = 1;
@@ -906,8 +909,9 @@ fs_speex_enc_headers (FishSound * fsound)
 
   /* XXX: blah blah blah ... set VBR etc. */
 
-  fss->ipcm.f =
-    fs_malloc (fss->frame_size * fsound->info.channels * sizeof (float));
+  buflen = fss->frame_size * fsound->info.channels * sizeof (float);    
+  fss->ipcm.f = fs_malloc (buflen);
+  memset (fss->ipcm.f, 0, buflen);
   
   return fsound;
 }
@@ -919,6 +923,7 @@ fs_speex_encode_write (FishSound * fsound)
   FishSoundSpeexEnc * fse = (FishSoundSpeexEnc *)fss->enc;
   int bytes;
 
+  speex_bits_insert_terminator (&fss->bits);
   bytes = speex_bits_write (&fss->bits, fse->cbits, MAX_FRAME_BYTES);
   speex_bits_reset (&fss->bits);
 
@@ -940,7 +945,7 @@ fs_speex_encode_block (FishSound * fsound)
   long nencoded = 0;
 
   if (fsound->info.channels == 2)
-    speex_encode_stereo ((float *)fss->ipcm.f, fse->pcm_offset, &fss->bits);
+    speex_encode_stereo (fss->ipcm.f, fse->pcm_offset, &fss->bits);
 
   speex_encode (fss->st, fss->ipcm.f, &fss->bits);
 
@@ -1044,6 +1049,12 @@ fs_speex_flush (FishSound * fsound)
     nencoded += fs_speex_encode_block (fsound);
   }
 
+  /* If, at this point, fse->frame_offset == 0, then either:
+     - all remaining encoded data has just been flushed out via
+     fs_speex_encode_block(), OR
+     - there was no data remaining to flush at the beginning of this
+     function (fse->pcm_offset == 0 && fse->frame_offset == 0)
+  */
   if (fse->frame_offset == 0) return 0;
 
   while (fse->frame_offset < fss->nframes) {
