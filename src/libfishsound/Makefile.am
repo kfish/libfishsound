@@ -2,7 +2,7 @@
 
 AM_CFLAGS = -Wall -pedantic
 
-INCLUDES = $(INCLTDL) -I$(top_srcdir)/include
+INCLUDES = $(INCLTDL) -I$(top_srcdir)/include $(VORBIS_CFLAGS) $(SPEEX_CFLAGS)
 
 EXTRA_DIST = Version_script.in
 
