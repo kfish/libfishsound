@@ -3,7 +3,8 @@ libfishsound under windows and create:
 
 - libfishsound.dll
 - identify.exe
-
+- encode.exe
+- decode.exe
 
 Building with the Makefile
 ==========================
@@ -12,7 +13,9 @@ Here's what you need to do:
 
 1) Install libogg.dll, libvorbis.dll, and libspeex.dll.
    (you can get them from http://www.xiph.org/ogg/vorbis/ 
-    and http://www.speex.org/ ).
+    and http://www.speex.org/ ). encode and decode will
+   additionally require libsndfile to be installed (see
+   http://www.mega-nerd.com/libsndfile/).
 
 2) cd win32 subdirectory
 

@@ -15,7 +15,9 @@
 		fish_sound_decode;
 		fish_sound_encode;
 		fish_sound_reset;
+		fish_sound_flush;
 		fish_sound_delete;
+		fish_sound_command;
         local:
                 *;
 };

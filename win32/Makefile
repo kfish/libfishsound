@@ -21,7 +21,7 @@ CFLAGS=/nologo /MD /W1 /GX /O2 /I"." /I"..\src\libfishsound" /I"..\include" /I"$
 #====================================================================
 # Targets
 
-ALL :  "libfishsound.dll" "identify.exe"
+ALL :  "libfishsound.dll" "identify.exe" "encode.exe" "decode.exe"
 
 CLEAN:
 	-@erase ".\*.obj"
@@ -43,6 +43,15 @@ LINK32_OBJS= \
 "identify.exe" : "..\src\tools\identify.c"
 	$(CPP) $(CFLAGS) /Fo".\identify.obj" /c "..\src\tools\identify.c"
 	$(LINK32) $(PROG_LINK_FLAGS) /out:"identify.exe" ".\identify.obj" liboggz.lib libfishsound.lib
+
+"encode.exe" : "..\src\tools\encode.c"
+	$(CPP) $(CFLAGS) /Fo".\encode.obj" /c "..\src\tools\encode.c"
+	$(LINK32) $(PROG_LINK_FLAGS) /out:"encode.exe" ".\encode.obj" liboggz.lib libfishsound.lib libspeex.lib libsndfile.lib
+
+"decode.exe" : "..\src\tools\decode.c"
+	$(CPP) $(CFLAGS) /Fo".\decode.obj" /c "..\src\tools\decode.c"
+	$(LINK32) $(PROG_LINK_FLAGS) /out:"decode.exe" ".\decode.obj" liboggz.lib libfishsound.lib libspeex.lib vorbis.lib libsndfile.lib
+
 
 #====================================================================
 # C files in src
