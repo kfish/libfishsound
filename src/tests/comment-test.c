@@ -147,8 +147,8 @@ main (int argc, char * argv[])
   err = fish_sound_comment_add_byname (fsound, "ARTIST", ARTIST2);
   if (err < 0) FAIL ("Operation failed");
 
-  INFO ("+ Retrieving first ARTIST (expect ARTIST1)");
-  comment = fish_sound_comment_first_byname (fsound, "ARTIST");
+  INFO ("+ Retrieving first ARTIST using wierd caps (expect ARTIST1)");
+  comment = fish_sound_comment_first_byname (fsound, "ArTiSt");
 
   if (comment == NULL)
     FAIL ("Recently inserted ARTIST1 not retrieved");

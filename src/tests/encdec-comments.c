@@ -94,8 +94,8 @@ decoded (FishSound * fsound, float ** pcm, long frames, void * user_data)
   if (strcmp (comment->value, LICENSE))
     FAIL ("Incorrect LICENSE value found");
 
-  INFO ("+ Retrieving first ARTIST (expect ARTIST1)");
-  comment = fish_sound_comment_first_byname (fsound, "ARTIST");
+  INFO ("+ Retrieving first ARTIST using wierd caps (expect ARTIST1)");
+  comment = fish_sound_comment_first_byname (fsound, "ArTiSt");
 
   if (comment == NULL)
     FAIL ("First artist ARTIST1 not retrieved");
