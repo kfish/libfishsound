@@ -107,7 +107,7 @@ fs_speex_command (FishSound * fsound, int command, void * data, int datasize)
   return 0;
 }
 
-#ifdef FS_DECODE
+#if FS_DECODE
 static void *
 process_header(unsigned char * buf, long bytes, int enh_enabled,
 	       int * frame_size, int * rate,
@@ -206,7 +206,7 @@ process_header(unsigned char * buf, long bytes, int enh_enabled,
   if (*channels == -1)
     *channels = header->nb_channels;
 
-#ifdef DEBUG  
+#ifdef DEBUG
   fprintf (stderr, "Decoding %d Hz audio using %s mode",
 	   *rate, mode->modeName);
 
@@ -325,7 +325,7 @@ fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
 #endif
 
 
-#ifdef FS_ENCODE
+#if FS_ENCODE
 static FishSound *
 fs_speex_enc_headers (FishSound * fsound)
 {
@@ -351,7 +351,7 @@ fs_speex_enc_headers (FishSound * fsound)
     char vendor_string[128];
 
     /* header */
-    buf = (unsigned char *) speex_header_to_packet (&header, &bytes);    
+    buf = (unsigned char *) speex_header_to_packet (&header, &bytes);
     encoded (fsound, buf, (long)bytes, fsound->user_data);
     fss->packetno++;
     free (buf);
@@ -413,9 +413,9 @@ fs_speex_encode_block (FishSound * fsound)
 
   if (fsound->info.channels == 2)
     speex_encode_stereo (fss->ipcm, fse->pcm_offset, &fss->bits);
-  
+
   speex_encode (fss->st, fss->ipcm, &fss->bits);
-  
+
   fse->frame_offset++;
   if (fse->frame_offset == fss->nframes) {
     fsound->frameno += fss->frame_size * fss->nframes;
@@ -495,7 +495,7 @@ fs_speex_encode_n (FishSound * fsound, float * pcm[], long frames)
       fss->pcm[0] += len;
       if (fsound->info.channels == 2)
 	fss->pcm[1] += len;
-      
+
       remaining -= len;
     } else {
       speex_bits_pack (&fss->bits, 15, 5);

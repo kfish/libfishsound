@@ -237,7 +237,7 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
       } else {
 	retpcm = pcm;
       }
-      
+
       if (fsound->callback) {
 	((FishSoundDecoded)fsound->callback) (fsound, retpcm, samples,
 					      fsound->user_data);
@@ -264,7 +264,7 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
 #endif
 
 
-#if (defined(FS_ENCODE) && defined(HAVE_VORBISENC))
+#if FS_ENCODE && HAVE_VORBISENC
 
 static FishSound *
 fs_vorbis_enc_headers (FishSound * fsound)
@@ -291,15 +291,15 @@ fs_vorbis_enc_headers (FishSound * fsound)
 #endif
     vorbis_comment_add_tag (&fsv->vc, comment->name, comment->value);
   }
-  
+
   /* Generate the headers */
   vorbis_analysis_headerout(&fsv->vd, &fsv->vc,
 			    &header, &header_comm, &header_code);
-  
+
   /* Pass the generated headers to the user */
   if (fsound->callback) {
     FishSoundEncoded encoded = (FishSoundEncoded)fsound->callback;
-    
+
     encoded (fsound, header.packet, header.bytes, fsound->user_data);
     encoded (fsound, header_comm.packet, header_comm.bytes,
 	     fsound->user_data);
@@ -318,11 +318,11 @@ fs_vorbis_encode_write (FishSound * fsound, long len)
   ogg_packet op;
 
   vorbis_analysis_wrote (&fsv->vd, len);
-  
+
   while (vorbis_analysis_blockout (&fsv->vd, &fsv->vb) == 1) {
     vorbis_analysis (&fsv->vb, NULL);
     vorbis_bitrate_addblock (&fsv->vb);
-    
+
     while (vorbis_bitrate_flushpacket (&fsv->vd, &op)) {
       if (fsound->callback) {
 	FishSoundEncoded encoded = (FishSoundEncoded)fsound->callback;
@@ -423,23 +423,6 @@ fs_vorbis_encode_n (FishSound * fsound, float * pcm[], long frames)
   return 0;
 }
 
-#else /* !FS_ENCODE || !HAVE_VORBISENC */
-
-#define fs_vorbis_encode_i NULL
-#define fs_vorbis_encode_n NULL
-
-#endif
-
-static int
-fs_vorbis_reset (FishSound * fsound)
-{
-  FishSoundVorbisInfo * fsv = (FishSoundVorbisInfo *)fsound->codec_data;
-
-  vorbis_block_init (&fsv->vd, &fsv->vb);
-
-  return 0;
-}
-
 static FishSound *
 fs_vorbis_enc_init (FishSound * fsound)
 {
@@ -463,6 +446,23 @@ fs_vorbis_enc_init (FishSound * fsound)
   return fsound;
 }
 
+#else /* ! FS_ENCODE && HAVE_VORBISENC */
+
+#define fs_vorbis_encode_i NULL
+#define fs_vorbis_encode_n NULL
+
+#endif /* ! FS_ENCODE && HAVE_VORBISENC */
+
+static int
+fs_vorbis_reset (FishSound * fsound)
+{
+  FishSoundVorbisInfo * fsv = (FishSoundVorbisInfo *)fsound->codec_data;
+
+  vorbis_block_init (&fsv->vd, &fsv->vb);
+
+  return 0;
+}
+
 static FishSound *
 fs_vorbis_init (FishSound * fsound)
 {
@@ -479,9 +479,13 @@ fs_vorbis_init (FishSound * fsound)
 
   fsound->codec_data = fsv;
 
+#if FS_ENCODE && HAVE_VORBISENC
+
   if (fsound->mode == FISH_SOUND_ENCODE) {
     fs_vorbis_enc_init (fsound);
   }
+
+#endif /* FS_ENCODE && HAVE_VORBISENC */
 
   return fsound;
 }
@@ -532,18 +536,6 @@ fish_sound_vorbis_identify (unsigned char * buf, long bytes)
 {
   return FISH_SOUND_UNKNOWN;
 }
-
-FishSoundCodec fish_sound_vorbis = {
-  NULL, /* format */
-  NULL, /* init */
-  NULL, /* delete */
-  NULL, /* reset */
-  NULL, /* command */
-  NULL, /* decode */
-  NULL, /* encode_i */
-  NULL, /* encode_n */
-  NULL  /* flush */
-};
 
 FishSoundCodec *
 fish_sound_vorbis_codec (void)
