@@ -378,12 +378,14 @@ fs_speex_decode_short (FishSound * fsound)
 #if FS_FLOAT
     case FISH_SOUND_PCM_FLOAT:
       _fs_convert_s_f (fss->ipcm.s, fss->ipcm_out.f,
-		       fss->frame_size * fsound->info.channels, (1/32767.0));
+		       fss->frame_size * fsound->info.channels,
+		       (float)(1/32767.0));
       fs_speex_float_dispatch (fsound);
       break;
     case FISH_SOUND_PCM_DOUBLE:
       _fs_convert_s_d (fss->ipcm.s, fss->ipcm_out.d,
-		       fss->frame_size * fsound->info.channels, (1/32767.0));
+		       fss->frame_size * fsound->info.channels,
+		       (double)(1/32767.0));
       fs_speex_double_dispatch (fsound);
       break;
 #endif
@@ -426,12 +428,12 @@ fs_speex_decode_short_dlv (FishSound * fsound)
 #if FS_FLOAT
     case FISH_SOUND_PCM_FLOAT:
       _fs_deinterleave_s_f ((short **)fss->ipcm.s, fss->pcm_out.f,
-			    fss->frame_size, channels, (1/32767.0));
+			    fss->frame_size, channels, (float)(1/32767.0));
       fs_speex_float_dispatch (fsound);
       break;
     case FISH_SOUND_PCM_DOUBLE:
       _fs_deinterleave_s_d ((short **)fss->ipcm.s, fss->pcm_out.d,
-			    fss->frame_size, channels, (1/32767.0));
+			    fss->frame_size, channels, (double)(1/32767.0));
       fs_speex_double_dispatch (fsound);
       break;
 #endif
@@ -474,12 +476,14 @@ fs_speex_decode_float (FishSound * fsound)
       break;
     case FISH_SOUND_PCM_FLOAT:
       _fs_convert_f_f (fss->ipcm.f, fss->ipcm_out.f,
-		       fss->frame_size * fsound->info.channels, (1/32767.0));
+		       fss->frame_size * fsound->info.channels,
+		       (float)(1/32767.0));
       fs_speex_float_dispatch (fsound);
       break;
     case FISH_SOUND_PCM_DOUBLE:
       _fs_convert_f_d (fss->ipcm.f, fss->ipcm_out.d,
-		       fss->frame_size * fsound->info.channels, (1/32767.0));
+		       fss->frame_size * fsound->info.channels,
+		       (double)(1/32767.0));
       fs_speex_double_dispatch (fsound);
       break;
     default:
@@ -510,22 +514,22 @@ fs_speex_decode_float_dlv (FishSound * fsound)
     switch (fsound->pcm_type) {
     case FISH_SOUND_PCM_SHORT:
       _fs_deinterleave_f_s ((float **)fss->ipcm.f, fss->pcm_out.s,
-			    fss->frame_size, channels, 1.0);
+			    fss->frame_size, channels, (float)1.0);
       fs_speex_short_dispatch (fsound);
       break;
     case FISH_SOUND_PCM_INT:
       _fs_deinterleave_f_i ((float **)fss->ipcm.f, fss->pcm_out.i,
-			    fss->frame_size, channels, 32767.0);
+			    fss->frame_size, channels, (float)32767.0);
       fs_speex_int_dispatch (fsound);
       break;
     case FISH_SOUND_PCM_FLOAT:
       _fs_deinterleave_f_f ((float **)fss->ipcm.f, fss->pcm_out.f,
-			    fss->frame_size, channels, (1/32767.0));
+			    fss->frame_size, channels, (float)(1/32767.0));
       fs_speex_float_dispatch (fsound);
     break;
     case FISH_SOUND_PCM_DOUBLE:
       _fs_deinterleave_f_d ((float **)fss->ipcm.f, fss->pcm_out.d,
-			    fss->frame_size, channels, (1/32767.0));
+			    fss->frame_size, channels, (double)(1/32767.0));
       fs_speex_double_dispatch (fsound);
       break;
     default:

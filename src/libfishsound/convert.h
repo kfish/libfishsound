@@ -148,7 +148,7 @@ _fs_deinterleave_f_f (float ** src, float * dest[],
 
 static inline void
 _fs_deinterleave_f_d (float ** src, double * dest[],
-		      long frames, int channels, float mult)
+		      long frames, int channels, double mult)
 {
   int i, j;
   float * s = (float *)src;
@@ -260,12 +260,12 @@ _fs_convert_f_f (float * src, float * dest, long samples, float mult)
 }
 
 static inline void
-_fs_convert_f_d (float * src, double * dest, long samples, float mult)
+_fs_convert_f_d (float * src, double * dest, long samples, double mult)
 {
   int i;
 
   for (i = 0; i < samples; i++) {
-    dest[i] = (double) (src[i] * mult);
+    dest[i] = (double)src[i] * mult;
   }
 }
 
