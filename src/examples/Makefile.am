@@ -21,7 +21,7 @@ endif
 noinst_PROGRAMS = $(oggz_examples) $(oggz_sndfile_examples)
 
 identify_SOURCES = identify.c
-identify_LDADD = $(FISHSOUND_LIBS) $(OGGZ_LIBS) $(SNDFILE_LIBS)
+identify_LDADD = $(FISHSOUND_LIBS) $(OGGZ_LIBS)
 
 decode_SOURCES = decode.c
 decode_LDADD = $(FISHSOUND_LIBS) $(OGGZ_LIBS) $(SNDFILE_LIBS)
