@@ -37,6 +37,10 @@
 
 #include "private.h"
 
+#if HAVE_LIBOIL
+#include <liboil/liboil.h>
+#endif
+
 int
 fish_sound_identify (unsigned char * buf, long bytes)
 {
@@ -93,6 +97,10 @@ fish_sound_new (int mode, FishSoundInfo * fsinfo)
   } else if (mode != FISH_SOUND_DECODE) {
     return NULL;
   }
+
+#if HAVE_LIBOIL
+  oil_init();
+#endif
 
   fsound = fs_malloc (sizeof (FishSound));
 
