@@ -42,8 +42,11 @@
 #include <fishsound/fishsound.h>
 #include <sndfile.h>
 
-long serialno;
-int b_o_s = 1;
+static long serialno;
+static int b_o_s = 1;
+
+static SF_INFO sfinfo;
+static long last_flush_frameno = 0;
 
 static int
 encoded (FishSound * fsound, unsigned char * buf, long bytes, void * user_data)
@@ -51,15 +54,24 @@ encoded (FishSound * fsound, unsigned char * buf, long bytes, void * user_data)
   OGGZ * oggz = (OGGZ *)user_data;
   ogg_packet op;
   int err;
+  int flush = 0;
+  long frameno;
+
+  frameno =  fish_sound_get_frameno (fsound);
 
   op.packet = buf;
   op.bytes = bytes;
   op.b_o_s = b_o_s;
   op.e_o_s = 0;
-  op.granulepos = 0; /* frameno */
+  op.granulepos = frameno;
   op.packetno = -1;
 
-  err = oggz_write_feed (oggz, &op, serialno, 0, NULL);
+  if (frameno - last_flush_frameno > sfinfo.samplerate / 10) {
+    flush = OGGZ_FLUSH_AFTER;
+    last_flush_frameno = frameno;
+  }
+
+  err = oggz_write_feed (oggz, &op, serialno, flush, NULL);
   if (err) printf ("err: %d\n", err);
 
   b_o_s = 0;
@@ -74,7 +86,6 @@ main (int argc, char ** argv)
   FishSound * fsound;
   FishSoundInfo fsinfo;
   SNDFILE * sndfile;
-  SF_INFO sfinfo;
 
   char * infilename, * outfilename;
   char * ext = NULL;

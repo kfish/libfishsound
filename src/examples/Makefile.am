@@ -5,7 +5,7 @@ AM_CFLAGS = -Wall -pedantic -g
 INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/src/libfishsound \
 	$(OGGZ_CFLAGS)
 
-FISHSOUNDDIR = ../libfishsound
+FISHSOUNDDIR = $(top_builddir)/src/libfishsound
 FISHSOUND_LIBS = $(FISHSOUNDDIR)/libfishsound.la $(VORBIS_LIBS) $(SPEEX_LIBS)
 
 if HAVE_OGGZ
