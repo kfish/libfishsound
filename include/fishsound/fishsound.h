@@ -52,7 +52,9 @@
  * read and write these files are provided in the libfishsound sources.
  *
  * For more information on the design and history of libfishsound, see the
- * \link about About \endlink section.
+ * \link about About \endlink section of this documentation, and the
+ * <a href="http://www.annodex.net/software/libfishsound/">libfishsound</a>
+ * homepage.
  *
  * \subsection contents Contents
  *
