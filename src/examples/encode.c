@@ -1,4 +1,4 @@
-/*
+/**
    Copyright (c) 2002, 2003, Xiph.org Foundation
 
    Redistribution and use in source and binary forms, with or without

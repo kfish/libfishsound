@@ -61,6 +61,14 @@
  * - \link fishsound.h fishsound.h \endlink:
  * Documentation of the FishSound API.
  *
+ * - \link decode Decoding audio data \endlink:
+ * How to decode audio data with FishSound, including source for a fully
+ * working Ogg Vorbis and Ogg Speex decoder.
+ *
+ * - \link encode Encoding audio data \endlink:
+ * How to encode audio data with FishSound, including source for a fully
+ * working Ogg Vorbis and Ogg Speex encoder.
+ *
  * - \link configuration Configuration \endlink:
  * Customizing libfishsound to only decode or encode,
  * or to disable support for a particular codec.
