@@ -459,28 +459,6 @@ fish_sound_identify (unsigned char * buf, long bytes);
 FishSound * fish_sound_new (int mode, FishSoundInfo * fsinfo);
 
 /**
- * Set the callback for libfishsound to call when it has a block of
- * encoded data ready
- * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
- * \param encoded The callback to call
- * \param user_data Arbitrary user data to pass to the callback
- * \returns 0 on success, -1 on failure
- */
-int fish_sound_set_encoded_callback (FishSound * fsound,
-				     FishSoundEncoded encoded,
-				     void * user_data);
-/**
- * Encode a block of audio
- * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
- * \param pcm The audio data to encode
- * \param frames A count of frames to encode
- * \returns The number of frames encoded
- * \note For multichannel audio, the audio data is interpreted according
- * to the current PCM style
- */
-long fish_sound_encode (FishSound * fsound, float ** pcm, long frames);
-
-/**
  * Flush any internally buffered data, forcing encode
  * \param fsound A FishSound* handle
  * \returns 0 on success, -1 on failure
@@ -597,6 +575,7 @@ int fish_sound_prepare_truncation (FishSound * fsound, long next_granulepos,
 #endif
 
 #include <fishsound/decode.h>
+#include <fishsound/encode.h>
 #include <fishsound/comments.h>
 
 #include <fishsound/deprecated.h>
