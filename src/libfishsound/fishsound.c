@@ -64,7 +64,7 @@ fish_sound_set_format (FishSound * fsound, int format)
     return -1;
   }
 
-  if (fsound->codec->init)
+  if (fsound->codec && fsound->codec->init)
     fsound->codec->init (fsound);
 
   fsound->info.format = format;
@@ -158,6 +158,8 @@ fish_sound_delete (FishSound * fsound)
 
   if (fsound->codec && fsound->codec->del)
     fsound->codec->del (fsound);
+
+  fs_free (fsound->codec);
 
   fish_sound_comments_free (fsound);
 
