@@ -12,8 +12,10 @@ lib_LTLIBRARIES = libfishsound.la
 libfishsound_la_SOURCES = \
 	fishsound.c \
 	private.h \
+	comments.c \
 	speex.c \
 	vorbis.c \
+	fs_vector.c fs_vector.h \
 	fs_compat.h
 
 libfishsound_la_LDFLAGS = -version-info @SHARED_VERSION_INFO@ @SHLIB_VERSION_ARG@

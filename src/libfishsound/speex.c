@@ -49,6 +49,11 @@
 #include <speex_stereo.h>
 #include <speex_callbacks.h>
 
+/* Format for the vendor string: "Encoded with Speex VERSION", where VERSION
+ * is the libspeex version as read from a newly-generated Speex header.
+ */
+#define VENDOR_FORMAT "Encoded with Speex %s"
+
 #define DEFAULT_ENH_ENABLED 1
 
 #define MAX_FRAME_BYTES 2000
@@ -264,8 +269,11 @@ fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
 
     if (fss->nframes == 0) fss->nframes = 1;
 
+  } else if (fss->packetno == 1) {
+    /* Comments */
+    fish_sound_comments_decode (fsound, buf, bytes);
   } else if (fss->packetno <= 1+fss->extra_headers) {
-    /* XXX: metadata etc. */
+    /* Unknown extra headers */
   } else {
     speex_bits_read_from (&fss->bits, (char *)buf, (int)bytes);
 
@@ -324,7 +332,7 @@ fs_speex_enc_headers (FishSound * fsound)
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
   SpeexMode * mode = NULL;
   SpeexHeader header;
-  char * buf;
+  unsigned char * buf;
   int bytes;
 
   /* XXX: set wb, nb, uwb modes */
@@ -340,15 +348,23 @@ fs_speex_enc_headers (FishSound * fsound)
 
   if (fsound->callback) {
     FishSoundEncoded encoded = (FishSoundEncoded)fsound->callback;
+    char vendor_string[128];
 
     /* header */
-    buf = speex_header_to_packet (&header, &bytes);    
-    encoded (fsound, (unsigned char *)buf, (long)bytes, fsound->user_data);
+    buf = (unsigned char *) speex_header_to_packet (&header, &bytes);    
+    encoded (fsound, buf, (long)bytes, fsound->user_data);
     fss->packetno++;
     free (buf);
 
-    /* XXX: and comments */
-    encoded (fsound, NULL, 0, fsound->user_data);
+    /* comments */
+    snprintf (vendor_string, 128, VENDOR_FORMAT, header.speex_version);
+    fish_sound_comment_set_vendor (fsound, vendor_string);
+    bytes = fish_sound_comments_encode (fsound, NULL, 0);
+    buf = malloc (bytes);
+    bytes = fish_sound_comments_encode (fsound, buf, bytes);
+    encoded (fsound, buf, (long)bytes, fsound->user_data);
+    fss->packetno++;
+    free (buf);
   }
 
   speex_encoder_ctl (fss->st, SPEEX_SET_SAMPLING_RATE,

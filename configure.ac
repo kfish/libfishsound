@@ -60,6 +60,7 @@ if test "x${ac_enable_decode}" = xyes ; then
 else
     AC_DEFINE(FS_DECODE, [0], [Do not build decoding support])
 fi
+AM_CONDITIONAL(FS_DECODE, [test "x${ac_enable_decode}" = "xyes"])
 
 dnl
 dnl  Configuration option for building of encoding support.
@@ -75,6 +76,7 @@ if test "x${ac_enable_encode}" = xyes ; then
 else
     AC_DEFINE(FS_ENCODE, [0], [Do not build encoding support])
 fi
+AM_CONDITIONAL(FS_ENCODE, [test "x${ac_enable_encode}" = "xyes"])
 
 dnl
 dnl  Check decode/encode option sanity

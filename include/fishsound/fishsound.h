@@ -609,4 +609,6 @@ int fish_sound_set_frameno (FishSound * fsound, long frameno);
 }
 #endif
 
+#include <fishsound/comments.h>
+
 #endif /* __FISH_SOUND_H__ */

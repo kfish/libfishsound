@@ -36,6 +36,7 @@
 #include <stdlib.h>
 
 #include "fs_compat.h"
+#include "fs_vector.h"
 
 #include <fishsound/constants.h>
 
@@ -47,6 +48,7 @@ typedef struct _FishSound FishSound;
 typedef struct _FishSoundInfo FishSoundInfo;
 typedef struct _FishSoundCodec FishSoundCodec;
 typedef struct _FishSoundFormat FishSoundFormat;
+typedef struct _FishSoundComment FishSoundComment;
 
 typedef int         (*FSCodecIdentify) (unsigned char * buf, long bytes);
 typedef FishSound * (*FSCodecInit) (FishSound * fsound);
@@ -81,6 +83,11 @@ struct _FishSoundInfo {
   int format;
 };
 
+struct _FishSoundComment {
+  char * name;
+  char * value;
+};
+
 struct _FishSound {
   /** FISH_SOUND_DECODE or FISH_SOUND_ENCODE */
   FishSoundMode mode;
@@ -102,6 +109,10 @@ struct _FishSound {
 
   /** user data for encode/decode callback */
   void * user_data; 
+
+  /** The comments */
+  char * vendor;
+  FishSoundVector * comments;
 };
 
 struct _FishSoundFormat {
@@ -116,8 +127,31 @@ typedef int (*FishSoundDecoded) (FishSound * fsound, float ** pcm,
 typedef int (*FishSoundEncoded) (FishSound * fsound, unsigned char * buf,
 				 long bytes, void * user_data);
 
+/* data */
 extern FishSoundCodec fish_sound_vorbis;
 extern FishSoundCodec fish_sound_speex;
+
+/* comments */
+int fish_sound_comments_init (FishSound * fsound);
+int fish_sound_comments_decode (FishSound * fsound, unsigned char * buf,
+				long bytes);
+long fish_sound_comments_encode (FishSound * fsound, unsigned char * buf,
+				 long length);
+
+/**
+ * Set the vendor string.
+ * \param fsound A FishSound* handle (created with FISH_SOUND_ENCODE)
+ * \param vendor The vendor string.
+ * \retval 0 Success
+ * \retval FISH_SOUND_ERR_BAD \a fsound is not a valid FishSound* handle
+ * \retval FISH_SOUND_ERR_INVALID Operation not suitable for this FishSound
+ */
+int
+fish_sound_comment_set_vendor (FishSound * fsound, const char * vendor);
+
+const FishSoundComment * fish_sound_comment_first (FishSound * fsound);
+const FishSoundComment *
+fish_sound_comment_next (FishSound * fsound, const FishSoundComment * comment);
 
 /* inline functions */
 
@@ -126,10 +160,12 @@ _fs_deinterleave (float ** src, float * dest[],
 		  long frames, int channels, float mult_factor)
 {
   int i, j;
+  float * d, * s = (float *)src;
 
   for (i = 0; i < frames; i++) {
     for (j = 0; j < channels; j++) {
-      dest[j][i] = src[i][j] * mult_factor;
+      d = dest[j];
+      d[i] = s[i*channels + j] * mult_factor;
     }
   }
 }

@@ -119,6 +119,9 @@ main (int argc, char ** argv)
 
   fish_sound_set_interleave (fsound, 1);
 
+  fish_sound_comment_add_byname (fsound, "Author", "crazy fish heads");
+  fish_sound_comment_add_byname (fsound, "FWOARR!", NULL);
+
   while (sf_readf_float (sndfile, pcm, 1024) > 0) {
     fish_sound_encode (fsound, (float **)pcm, 1024);
     while ((n = oggz_write (oggz, 1024)) > 0);

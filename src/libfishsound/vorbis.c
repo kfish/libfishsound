@@ -197,6 +197,7 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
   op.packetno = fsv->packetno;
 
   if (fsv->packetno < 3) {
+
     if ((ret = vorbis_synthesis_headerin (&fsv->vi, &fsv->vc, &op)) == 0) {
       if (fsv->vi.rate != 0) {
 #ifdef DEBUG
@@ -208,7 +209,12 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
       }
     }
 
-    if (fsv->packetno == 2) {
+    /* Decode comments from packet 1. Vorbis has 7 bytes of marker at the
+     * start of vorbiscomment packet. */
+    if (fsv->packetno == 1 && bytes > 7 && buf[0] == 0x03 &&
+	!strncmp ((char *)&buf[1], "vorbis", 6)) {
+      fish_sound_comments_decode (fsound, buf+7, bytes-7);
+    } else if (fsv->packetno == 2) {
       vorbis_synthesis_init (&fsv->vd, &fsv->vi);
       vorbis_block_init (&fsv->vd, &fsv->vb);
     }
@@ -258,6 +264,7 @@ static FishSound *
 fs_vorbis_enc_headers (FishSound * fsound)
 {
   FishSoundVorbisInfo * fsv = (FishSoundVorbisInfo *)fsound->codec_data;
+  const FishSoundComment * comment;
   ogg_packet header;
   ogg_packet header_comm;
   ogg_packet header_code;
@@ -268,10 +275,22 @@ fs_vorbis_enc_headers (FishSound * fsound)
      third header holds the bitstream codebook.  We merely need to
      make the headers, then pass them to libvorbis one at a time;
      libvorbis handles the additional Ogg bitstream constraints */
+
+  /* Update the comments */
+  for (comment = fish_sound_comment_first (fsound); comment;
+       comment = fish_sound_comment_next (fsound, comment)) {
+#ifdef DEBUG
+    fprintf (stderr, "fs_vorbis_enc_headers: %s = %s\n",
+	     comment->name, comment->value);
+#endif
+    vorbis_comment_add_tag (&fsv->vc, comment->name, comment->value);
+  }
   
+  /* Generate the headers */
   vorbis_analysis_headerout(&fsv->vd, &fsv->vc,
 			    &header, &header_comm, &header_code);
   
+  /* Pass the generated headers to the user */
   if (fsound->callback) {
     FishSoundEncoded encoded = (FishSoundEncoded)fsound->callback;
     
@@ -318,7 +337,6 @@ fs_vorbis_encode_i (FishSound * fsound, float ** pcm, long frames)
   FishSoundVorbisInfo * fsv = (FishSoundVorbisInfo *)fsound->codec_data;
   float ** vpcm;
   long len, remaining = frames;
-  int i, j;
   float * d = (float *)pcm;
 
   if (fsv->packetno == 0) {
@@ -331,12 +349,7 @@ fs_vorbis_encode_i (FishSound * fsound, float ** pcm, long frames)
     /* expose the buffer to submit data */
     vpcm = vorbis_analysis_buffer (&fsv->vd, 1024);
 
-    /*_fs_deinterleave (p, vpcm, len, fsound->info.channels, 1.0);*/
-    for (i = 0; i < fsound->info.channels; i++) {
-      for (j = 0; j < len; j++) {
-	vpcm[i][j] = d[j*fsound->info.channels + i];
-      }
-    }
+    _fs_deinterleave ((float **)d, vpcm, len, fsound->info.channels, 1.0);
 
     d += (len * fsound->info.channels);
 

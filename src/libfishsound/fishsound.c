@@ -106,6 +106,8 @@ fish_sound_new (int mode, FishSoundInfo * fsinfo)
   fsound->callback = NULL;
   fsound->user_data = NULL;
 
+  fish_sound_comments_init (fsound);
+
   if (mode == FISH_SOUND_DECODE) {
     fsound->info.samplerate = 0;
     fsound->info.channels = 0;
