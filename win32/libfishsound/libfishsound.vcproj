@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..;..\..\include;&quot;..\..\..\libvorbis-1.0\include&quot;;..\..\..\libogg\include;&quot;..\..\..\speex-1.0.3\libspeex&quot;"
+				AdditionalIncludeDirectories="..;..\..\include;&quot;..\..\..\libvorbis\include&quot;;..\..\..\libogg\include;&quot;..\..\..\libspeex\libspeex&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="0"
@@ -112,7 +112,7 @@
 	</Configurations>
 	<References>
 		<ProjectReference
-			ReferencedProjectIdentifier="{489FD1FF-0FAA-4247-81E6-F8CCE39C11E7}"
+			ReferencedProjectIdentifier="{828108A5-367D-4716-B6E7-0F66C8E8E93B}"
 			Name="libspeex"/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{3F81B6B4-5CA9-4AE7-9A42-F911D4C33BCD}"

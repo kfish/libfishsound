@@ -1,0 +1,54 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ogg_dynamic", "..\..\..\libogg\win32\ogg_dynamic.vcproj", "{3F81B6B4-5CA9-4AE7-9A42-F911D4C33BCD}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vorbis_dynamic", "..\..\..\libvorbis\win32\vorbis_dynamic.vcproj", "{FF462AB0-48E8-4E15-B5FB-BCC470E647F8}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libspeex", "..\..\..\libspeex\win32\libspeex\libspeex.vcproj", "{828108A5-367D-4716-B6E7-0F66C8E8E93B}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libfishsound", "libfishsound.vcproj", "{2C6AD331-1E46-4DE5-85F3-9D0F579CF48F}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		MakeFile = MakeFile
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{3F81B6B4-5CA9-4AE7-9A42-F911D4C33BCD}.Debug.ActiveCfg = Debug|Win32
+		{3F81B6B4-5CA9-4AE7-9A42-F911D4C33BCD}.Debug.Build.0 = Debug|Win32
+		{3F81B6B4-5CA9-4AE7-9A42-F911D4C33BCD}.MakeFile.ActiveCfg = MakeFile|Win32
+		{3F81B6B4-5CA9-4AE7-9A42-F911D4C33BCD}.MakeFile.Build.0 = MakeFile|Win32
+		{3F81B6B4-5CA9-4AE7-9A42-F911D4C33BCD}.Release.ActiveCfg = Release|Win32
+		{3F81B6B4-5CA9-4AE7-9A42-F911D4C33BCD}.Release.Build.0 = Release|Win32
+		{FF462AB0-48E8-4E15-B5FB-BCC470E647F8}.Debug.ActiveCfg = Debug|Win32
+		{FF462AB0-48E8-4E15-B5FB-BCC470E647F8}.Debug.Build.0 = Debug|Win32
+		{FF462AB0-48E8-4E15-B5FB-BCC470E647F8}.MakeFile.ActiveCfg = MakeFile|Win32
+		{FF462AB0-48E8-4E15-B5FB-BCC470E647F8}.MakeFile.Build.0 = MakeFile|Win32
+		{FF462AB0-48E8-4E15-B5FB-BCC470E647F8}.Release.ActiveCfg = Release|Win32
+		{FF462AB0-48E8-4E15-B5FB-BCC470E647F8}.Release.Build.0 = Release|Win32
+		{828108A5-367D-4716-B6E7-0F66C8E8E93B}.Debug.ActiveCfg = Debug|Win32
+		{828108A5-367D-4716-B6E7-0F66C8E8E93B}.Debug.Build.0 = Debug|Win32
+		{828108A5-367D-4716-B6E7-0F66C8E8E93B}.MakeFile.ActiveCfg = MakeFile|Win32
+		{828108A5-367D-4716-B6E7-0F66C8E8E93B}.MakeFile.Build.0 = MakeFile|Win32
+		{828108A5-367D-4716-B6E7-0F66C8E8E93B}.Release.ActiveCfg = Release|Win32
+		{828108A5-367D-4716-B6E7-0F66C8E8E93B}.Release.Build.0 = Release|Win32
+		{2C6AD331-1E46-4DE5-85F3-9D0F579CF48F}.Debug.ActiveCfg = Debug|Win32
+		{2C6AD331-1E46-4DE5-85F3-9D0F579CF48F}.Debug.Build.0 = Debug|Win32
+		{2C6AD331-1E46-4DE5-85F3-9D0F579CF48F}.MakeFile.ActiveCfg = Release|Win32
+		{2C6AD331-1E46-4DE5-85F3-9D0F579CF48F}.MakeFile.Build.0 = Release|Win32
+		{2C6AD331-1E46-4DE5-85F3-9D0F579CF48F}.Release.ActiveCfg = Release|Win32
+		{2C6AD331-1E46-4DE5-85F3-9D0F579CF48F}.Release.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
