@@ -83,6 +83,7 @@ main (int argc, char ** argv)
 
   if (argc < 3) {
     printf ("usage: %s infile outfile\n", argv[0]);
+    printf ("*** FishSound example program. ***\n");
     printf ("Opens a pcm audio file and encodes it to an Ogg Vorbis or Speex file.\n");
     exit (1);
   }
