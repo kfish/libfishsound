@@ -2,10 +2,10 @@
 
 AM_CFLAGS = -Wall -pedantic
 
-INCLUDES = -I$(top_srcdir)/include $(VORBIS_CFLAGS) $(SPEEX_CFLAGS)
+INCLUDES = -I$(top_srcdir)/include $(VORBIS_CFLAGS) $(SPEEX_CFLAGS) $(LIBOIL_CFLAGS)
 
 FISHSOUNDDIR = ../libfishsound
-FISHSOUND_LIBS = $(FISHSOUNDDIR)/libfishsound.la $(VORBIS_LIBS) $(SPEEX_LIBS)
+FISHSOUND_LIBS = $(FISHSOUNDDIR)/libfishsound.la $(VORBIS_LIBS) $(SPEEX_LIBS) $(LIBOIL_LIBS)
 
 # Test programs
 
