@@ -36,5 +36,6 @@
 #ifdef WIN32
 #define inline __inline
 #define alloca _alloca
+#define strncasecmp _strnicmp
 #endif
  

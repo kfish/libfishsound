@@ -21,7 +21,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include\,.\"
+				AdditionalIncludeDirectories="..\..\..\libogg\include\,..\..\..\liboggz\include\,..\..\include\,..\,.\,..\..\src\libfishsound\"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="5"
@@ -41,7 +41,7 @@
 				OutputFile="./encode.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories=".\"
+				AdditionalLibraryDirectories=".\,..\,..\..\..\libogg\lib,..\..\..\liboggz\win32\"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="./encode.pdb"
 				SubSystem="1"
@@ -83,7 +83,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\include\,.\"
+				AdditionalIncludeDirectories="..\..\..\libogg\include\,..\..\..\liboggz\include\,..\..\include\,..\,.\,..\..\src\libfishsound\"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				StringPooling="TRUE"
 				RuntimeLibrary="4"
@@ -103,7 +103,7 @@
 				OutputFile="./encode.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories=".\"
+				AdditionalLibraryDirectories=".\,..\,..\..\..\libogg\lib,..\..\..\liboggz\win32\"
 				ProgramDatabaseFile="./encode.pdb"
 				SubSystem="1"
 				TargetMachine="1"/>
@@ -148,6 +148,9 @@
 			Filter="h;hpp;hxx;hm;inl">
 			<File
 				RelativePath="..\config.h">
+			</File>
+			<File
+				RelativePath="..\..\src\libfishsound\fs_compat.h">
 			</File>
 		</Filter>
 		<Filter

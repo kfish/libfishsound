@@ -30,6 +30,7 @@
 */
 
 #include "config.h"
+#include "fs_compat.h"
 
 #include <stdio.h>
 #include <stdlib.h>
