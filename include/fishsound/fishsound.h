@@ -299,7 +299,7 @@ typedef struct {
   int channels;
 
   /** FISH_SOUND_VORBIS, FISH_SOUND_SPEEX etc. */
-  int format;
+  FishSoundCodecID format;
 } FishSoundInfo;
 
 /**
@@ -307,7 +307,7 @@ typedef struct {
  */
 typedef struct {
   /** FISH_SOUND_VORBIS, FISH_SOUND_SPEEX etc. */
-  int format;
+  FishSoundCodecID format;
 
   /** Printable name */
   const char * name;     

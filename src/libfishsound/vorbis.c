@@ -351,7 +351,7 @@ fs_vorbis_encode_n (FishSound * fsound, float * pcm[], long frames)
   float ** vpcm;
   long len, remaining = frames;
   int i;
-  float ** ppcm = alloca (sizeof (float *) * fsound->info.channels);
+  float ** ppcm = _alloca (sizeof (float *) * fsound->info.channels);
 
   if (fsv->packetno == 0) {
     fs_vorbis_enc_headers (fsound);
@@ -409,6 +409,7 @@ fs_vorbis_enc_init (FishSound * fsound)
   printf ("Vorbis enc init: %d channels, %d Hz\n", fsound->info.channels,
 	  fsound->info.samplerate);
 #endif
+
 
   vorbis_encode_init_vbr (&fsv->vi, fsound->info.channels,
 			  fsound->info.samplerate, 0.3 /* quality */);

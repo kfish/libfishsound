@@ -44,7 +44,7 @@ enum FishSoundMode {
   FISH_SOUND_ENCODE = 0x20
 };
 
-enum FishSoundFormat {
+enum FishSoundCodecID {
   /** Unknown */
   FISH_SOUND_UNKNOWN = 0x00,
 
