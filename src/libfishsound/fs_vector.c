@@ -70,7 +70,7 @@ fs_vector_new (FishSoundCmpFunc cmp)
 static void
 fs_vector_clear (FishSoundVector * vector)
 {
-  fs_free (vector->data);
+  if (vector->data) fs_free (vector->data);
   vector->data = NULL;
   vector->nr_elements = 0;
   vector->max_elements = 0;
@@ -79,8 +79,10 @@ fs_vector_clear (FishSoundVector * vector)
 void
 fs_vector_delete (FishSoundVector * vector)
 {
-  fs_vector_clear (vector);
-  fs_free (vector);
+  if (vector) {
+    fs_vector_clear (vector);
+    fs_free (vector);
+  }
 }
 
 int

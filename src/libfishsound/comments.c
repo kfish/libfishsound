@@ -189,8 +189,8 @@ static void
 fs_comment_free (FishSoundComment * comment)
 {
   if (!comment) return;
-  fs_free (comment->name);
-  fs_free (comment->value);
+  if (comment->name) fs_free (comment->name);
+  if (comment->value) fs_free (comment->value);
   fs_free (comment);
 }
 
@@ -421,8 +421,7 @@ fish_sound_comments_free (FishSound * fsound)
   fs_vector_delete (fsound->comments);
   fsound->comments = NULL;
 
-  if (fsound->vendor)
-    fs_free (fsound->vendor);
+  if (fsound->vendor) fs_free (fsound->vendor);
   fsound->vendor = NULL;
 
   return 0;
