@@ -84,6 +84,17 @@ int fish_sound_set_decoded_callback (FishSound * fsound,
 				     FishSoundDecoded decoded,
 				     void * user_data);
 
+/**
+ * Encode a block of audio
+ * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
+ * \param pcm The audio data to encode
+ * \param frames A count of frames to encode
+ * \returns The number of frames encoded
+ * \note For multichannel audio, the audio data is interpreted according
+ * to the current PCM style
+ */
+long fish_sound_encode (FishSound * fsound, float ** pcm, long frames);
+
 #ifdef __cplusplus
 }
 #endif

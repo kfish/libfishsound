@@ -787,41 +787,7 @@ fs_speex_encode_block (FishSound * fsound)
 }
 
 static long
-fs_speex_encode_i (FishSound * fsound, float ** pcm, long frames)
-{
-  FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
-  FishSoundSpeexEnc * fse = (FishSoundSpeexEnc *)fss->enc;
-  long remaining = frames, len, nencoded = 0;
-  int j, start, end;
-  int channels = fsound->info.channels;
-  float * p = (float *)pcm;
-
-  if (fss->packetno == 0)
-    fs_speex_enc_headers (fsound);
-
-  while (remaining > 0) {
-    len = MIN (remaining, fss->frame_size - fse->pcm_offset);
-
-    start = fse->pcm_offset * channels;
-    end = (len + fse->pcm_offset) * channels;
-    for (j = start; j < end; j++) {
-      fss->ipcm.f[j] = *p++ * (float)32767.0;
-    }
-
-    fse->pcm_offset += len;
-
-    if (fse->pcm_offset == fss->frame_size) {
-      nencoded += fs_speex_encode_block (fsound);
-    }
-
-    remaining -= len;
-  }
-
-  return nencoded;
-}
-
-static long
-fs_speex_encode_n (FishSound * fsound, float * pcm[], long frames)
+fs_speex_encode_f (FishSound * fsound, float * pcm[], long frames)
 {
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
   FishSoundSpeexEnc * fse = (FishSoundSpeexEnc *)fss->enc;
@@ -861,6 +827,40 @@ fs_speex_encode_n (FishSound * fsound, float * pcm[], long frames)
 }
 
 static long
+fs_speex_encode_f_ilv (FishSound * fsound, float ** pcm, long frames)
+{
+  FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
+  FishSoundSpeexEnc * fse = (FishSoundSpeexEnc *)fss->enc;
+  long remaining = frames, len, nencoded = 0;
+  int j, start, end;
+  int channels = fsound->info.channels;
+  float * p = (float *)pcm;
+
+  if (fss->packetno == 0)
+    fs_speex_enc_headers (fsound);
+
+  while (remaining > 0) {
+    len = MIN (remaining, fss->frame_size - fse->pcm_offset);
+
+    start = fse->pcm_offset * channels;
+    end = (len + fse->pcm_offset) * channels;
+    for (j = start; j < end; j++) {
+      fss->ipcm.f[j] = *p++ * (float)32767.0;
+    }
+
+    fse->pcm_offset += len;
+
+    if (fse->pcm_offset == fss->frame_size) {
+      nencoded += fs_speex_encode_block (fsound);
+    }
+
+    remaining -= len;
+  }
+
+  return nencoded;
+}
+
+static long
 fs_speex_flush (FishSound * fsound)
 {
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
@@ -889,8 +889,8 @@ fs_speex_flush (FishSound * fsound)
 
 #else /* !FS_ENCODE */
 
-#define fs_speex_encode_i NULL
-#define fs_speex_encode_n NULL
+#define fs_speex_encode_f NULL
+#define fs_speex_encode_f_ilv NULL
 #define fs_speex_flush NULL
 
 #endif
@@ -990,8 +990,14 @@ fish_sound_speex_codec (void)
   codec->update = fs_speex_update;
   codec->command = fs_speex_command;
   codec->decode = fs_speex_decode;
-  codec->encode_i = fs_speex_encode_i;
-  codec->encode_n = fs_speex_encode_n;
+  codec->encode_s = NULL;
+  codec->encode_s_ilv = NULL;
+  codec->encode_i = NULL;
+  codec->encode_i_ilv = NULL;
+  codec->encode_f = fs_speex_encode_f;
+  codec->encode_f_ilv = fs_speex_encode_f_ilv;
+  codec->encode_d = NULL;
+  codec->encode_d_ilv = NULL;
   codec->flush = fs_speex_flush;
 
   return codec;

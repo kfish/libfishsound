@@ -38,6 +38,20 @@ extern "C" {
 #endif
 
 /**
+ * Signature of a callback for libfishsound to call when it has encoded
+ * data.
+ * \param fsound The FishSound* handle
+ * \param buf The encoded data
+ * \param bytes The count of bytes encoded
+ * \param user_data Arbitrary user data
+ * \retval 0 to continue
+ * \retval non-zero to stop encoding immediately and
+ * return control to the fish_sound_encode() caller
+ */
+typedef int (*FishSoundEncoded) (FishSound * fsound, unsigned char * buf,
+				 long bytes, void * user_data);
+
+/**
  * Set the callback for libfishsound to call when it has a block of
  * encoded data ready
  * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
@@ -48,8 +62,9 @@ extern "C" {
 int fish_sound_set_encoded_callback (FishSound * fsound,
 				     FishSoundEncoded encoded,
 				     void * user_data);
+
 /**
- * Encode a block of audio
+ * Encode a block of PCM audio given as non-interleaved shorts.
  * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
  * \param pcm The audio data to encode
  * \param frames A count of frames to encode
@@ -57,7 +72,88 @@ int fish_sound_set_encoded_callback (FishSound * fsound,
  * \note For multichannel audio, the audio data is interpreted according
  * to the current PCM style
  */
-long fish_sound_encode (FishSound * fsound, float ** pcm, long frames);
+long fish_sound_encode_short (FishSound * fsound, short * pcm[], long frames);
+
+/**
+ * Encode a block of PCM audio given as interleaved shorts.
+ * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
+ * \param pcm The audio data to encode
+ * \param frames A count of frames to encode
+ * \returns The number of frames encoded
+ * \note For multichannel audio, the audio data is interpreted according
+ * to the current PCM style
+ */
+long fish_sound_encode_short_ilv (FishSound * fsound, short ** pcm,
+				  long frames);
+
+/**
+ * Encode a block of PCM audio given as non-interleaved ints.
+ * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
+ * \param pcm The audio data to encode
+ * \param frames A count of frames to encode
+ * \returns The number of frames encoded
+ * \note For multichannel audio, the audio data is interpreted according
+ * to the current PCM style
+ */
+long fish_sound_encode_int (FishSound * fsound, int * pcm[], long frames);
+
+/**
+ * Encode a block of PCM audio given as interleaved ints.
+ * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
+ * \param pcm The audio data to encode
+ * \param frames A count of frames to encode
+ * \returns The number of frames encoded
+ * \note For multichannel audio, the audio data is interpreted according
+ * to the current PCM style
+ */
+long fish_sound_encode_int_ilv (FishSound * fsound, int ** pcm, long frames);
+
+/**
+ * Encode a block of PCM audio given as non-interleaved floats.
+ * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
+ * \param pcm The audio data to encode
+ * \param frames A count of frames to encode
+ * \returns The number of frames encoded
+ * \note For multichannel audio, the audio data is interpreted according
+ * to the current PCM style
+ */
+long fish_sound_encode_float (FishSound * fsound, float * pcm[], long frames);
+
+/**
+ * Encode a block of audio given as interleaved floats.
+ * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
+ * \param pcm The audio data to encode
+ * \param frames A count of frames to encode
+ * \returns The number of frames encoded
+ * \note For multichannel audio, the audio data is interpreted according
+ * to the current PCM style
+ */
+long fish_sound_encode_float_ilv (FishSound * fsound, float ** pcm,
+				  long frames);
+
+/**
+ * Encode a block of PCM audio given as non-interleaved doubles.
+ * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
+ * \param pcm The audio data to encode
+ * \param frames A count of frames to encode
+ * \returns The number of frames encoded
+ * \note For multichannel audio, the audio data is interpreted according
+ * to the current PCM style
+ */
+long fish_sound_encode_double (FishSound * fsound, double * pcm[],
+			       long frames);
+
+/**
+ * Encode a block of PCM audio given as interleaved doubles.
+ * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
+ * \param pcm The audio data to encode
+ * \param frames A count of frames to encode
+ * \returns The number of frames encoded
+ * \note For multichannel audio, the audio data is interpreted according
+ * to the current PCM style
+ */
+long fish_sound_encode_double_ilv (FishSound * fsound, double ** pcm,
+				   long frames);
 
 #ifdef __cplusplus
 }

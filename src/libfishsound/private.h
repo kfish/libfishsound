@@ -78,13 +78,28 @@ typedef int         (*FSCodecCommand) (FishSound * fsound, int command,
 				       void * data, int datasize);
 typedef long        (*FSCodecDecode) (FishSound * fsound, unsigned char * buf,
 				      long bytes);
-typedef long        (*FSCodecEncodeI) (FishSound * fsound, float ** pcm,
-				       long frames);
-typedef long        (*FSCodecEncodeN) (FishSound * fsound, float ** pcm,
-				       long frames);
+
+typedef long        (*FSCodecEncode_Short) (FishSound * fsound, short * pcm[],
+					    long frames);
+typedef long        (*FSCodecEncode_ShortIlv) (FishSound * fsound,
+					       short ** pcm, long frames);
+typedef long        (*FSCodecEncode_Int) (FishSound * fsound, int * pcm[],
+					  long frames);
+typedef long        (*FSCodecEncode_IntIlv) (FishSound * fsound,
+					     int ** pcm, long frames);
+typedef long        (*FSCodecEncode_Float) (FishSound * fsound, float * pcm[],
+					    long frames);
+typedef long        (*FSCodecEncode_FloatIlv) (FishSound * fsound,
+					       float ** pcm, long frames);
+typedef long        (*FSCodecEncode_Double) (FishSound * fsound,
+					     double * pcm[], long frames);
+typedef long        (*FSCodecEncode_DoubleIlv) (FishSound * fsound,
+						double ** pcm, long frames);
+
 typedef long        (*FSCodecFlush) (FishSound * fsound);
 
 #include <fishsound/decode.h>
+#include <fishsound/encode.h>
 
 struct _FishSoundFormat {
   int format;
@@ -100,8 +115,14 @@ struct _FishSoundCodec {
   FSCodecUpdate update;
   FSCodecCommand command;
   FSCodecDecode decode;
-  FSCodecEncodeI encode_i;
-  FSCodecEncodeN encode_n;
+  FSCodecEncode_Short encode_s;
+  FSCodecEncode_ShortIlv encode_s_ilv;
+  FSCodecEncode_Int encode_i;
+  FSCodecEncode_IntIlv encode_i_ilv;
+  FSCodecEncode_Float encode_f;
+  FSCodecEncode_FloatIlv encode_f_ilv;
+  FSCodecEncode_Double encode_d;
+  FSCodecEncode_DoubleIlv encode_d_ilv;
   FSCodecFlush flush;
 };
 
@@ -125,7 +146,7 @@ union FishSoundCallback {
   FishSoundDecoded_FloatIlv decoded_float_ilv;
   FishSoundDecoded_Double decoded_double;
   FishSoundDecoded_DoubleIlv decoded_double_ilv;
-  void * encoded;
+  FishSoundEncoded * encoded;
 };
 
 struct _FishSound {
@@ -177,9 +198,6 @@ struct _FishSound {
   char * vendor;
   FishSoundVector * comments;
 };
-
-typedef int (*FishSoundEncoded) (FishSound * fsound, unsigned char * buf,
-				 long bytes, void * user_data);
 
 int fish_sound_identify (unsigned char * buf, long bytes);
 int fish_sound_set_format (FishSound * fsound, int format);

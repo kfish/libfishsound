@@ -17,6 +17,7 @@ noinst_HEADERS = \
 libfishsound_la_SOURCES = \
 	fishsound.c \
 	decode.c \
+	encode.c \
 	comments.c \
 	speex.c \
 	vorbis.c \

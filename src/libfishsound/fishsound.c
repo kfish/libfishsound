@@ -129,43 +129,6 @@ fish_sound_new (int mode, FishSoundInfo * fsinfo)
   return fsound;
 }
 
-int
-fish_sound_set_encoded_callback (FishSound * fsound,
-				 FishSoundEncoded encoded,
-				 void * user_data)
-{
-  if (fsound == NULL) return -1;
-
-#if FS_ENCODE
-  fsound->callback.encoded = (void *)encoded;
-  fsound->user_data = user_data;
-#else
-  return FISH_SOUND_ERR_DISABLED;
-#endif
-
-  return 0;
-}
-
-long
-fish_sound_encode (FishSound * fsound, float ** pcm, long frames)
-{
-  if (fsound == NULL) return -1;
-
-#if FS_ENCODE
-  if (fsound->interleave) {
-    if (fsound->codec && fsound->codec->encode_i)
-      return fsound->codec->encode_i (fsound, pcm, frames);
-  } else {
-    if (fsound->codec && fsound->codec->encode_n)
-      return fsound->codec->encode_n (fsound, pcm, frames);
-  }
-#else
-  return FISH_SOUND_ERR_DISABLED;
-#endif
-
-  return 0;
-}
-
 long
 fish_sound_flush (FishSound * fsound)
 {
@@ -238,7 +201,7 @@ fish_sound_get_interleave (FishSound * fsound)
   return fsound->interleave;
 }
 
-/* DEPRECATED */
+#ifndef FS_DISABLE_DEPRECATED
 int
 fish_sound_set_interleave (FishSound * fsound, int interleave)
 {
@@ -248,6 +211,7 @@ fish_sound_set_interleave (FishSound * fsound, int interleave)
 
   return 0;
 }
+#endif
 
 long
 fish_sound_get_frameno (FishSound * fsound)
