@@ -1133,6 +1133,7 @@ fs_speex_delete (FishSound * fsound)
     if (fss->st) speex_decoder_destroy (fss->st);
   } else if (fsound->mode == FISH_SOUND_ENCODE) {
     if (fss->st) speex_encoder_destroy (fss->st);
+    if (fss->enc) fs_free (fss->enc);
   }
   speex_bits_destroy (&fss->bits);
 
