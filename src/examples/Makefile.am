@@ -2,10 +2,20 @@
 
 AM_CFLAGS = -Wall -pedantic -g
 
-INCLUDES = -I$(top_srcdir)/include
+INCLUDES = -I$(top_srcdir)/include $(OGGZ_CFLAGS)
+
+FISHSOUNDDIR = ../libfishsound
+FISHSOUND_LIBS = $(FISHSOUNDDIR)/libfishsound.la $(VORBIS_LIBS) $(SPEEX_LIBS)
 
 # Programs to build
-#noinst_PROGRAMS = example
+noinst_PROGRAMS = identify decode encode
 
-#example_SOURCES = example.c
-#example_LDADD = $(OGGZ_LIBS)
+identify_SOURCES = identify.c
+identify_LDADD = $(FISHSOUND_LIBS) $(OGGZ_LIBS) $(SNDFILE_LIBS)
+
+decode_SOURCES = decode.c
+decode_LDADD = $(FISHSOUND_LIBS) $(OGGZ_LIBS) $(SNDFILE_LIBS)
+
+encode_SOURCES = encode.c
+encode_LDADD = $(FISHSOUND_LIBS) $(OGGZ_LIBS) $(SNDFILE_LIBS)
+
