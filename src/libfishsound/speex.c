@@ -39,6 +39,7 @@
 #include <ctype.h>
 
 #include "private.h"
+#include "convert.h"
 
 /*#define DEBUG*/
 
