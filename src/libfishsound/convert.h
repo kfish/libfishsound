@@ -209,6 +209,13 @@ _fs_interleave_s_f (short * src[], float ** dest,
   }
 }
 
+static inline ogg_int32_t CLIP_TO_15(ogg_int32_t x) {
+  int ret=x;
+  ret-= ((x<=32767)-1)&(x-32767);
+  ret-= ((x>=-32768)-1)&(x+32768);
+  return(ret);
+}
+
 static inline void
 _fs_interleave_i_s (int * src[], short ** dest,
 		    long frames, int channels, int shift)
@@ -220,7 +227,7 @@ _fs_interleave_i_s (int * src[], short ** dest,
   for (i = 0; i < frames; i++) {
     for (j = 0; j < channels; j++) {
       s = src[j];
-      d[i*channels + j] = s[i] >> shift;
+      d[i*channels + j] = CLIP_TO_15(s[i]>>9);
     }
   }
 }
