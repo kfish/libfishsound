@@ -37,6 +37,10 @@
 extern "C" {
 #endif
 
+/** \file
+ * Decode functions and callback prototypes
+ */
+
 /**
  * Signature of a callback for libfishsound to call when it has decoded
  * PCM audio data, and you want this provided as non-interleaved shorts.

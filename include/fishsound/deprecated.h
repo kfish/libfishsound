@@ -33,6 +33,10 @@
 #ifndef __FISH_SOUND_DEPRECATED_H__
 #define __FISH_SOUND_DEPRECATED_H__
 
+/** \file
+ * Deprecated interfaces
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
