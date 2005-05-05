@@ -105,6 +105,7 @@ typedef struct {
   FishSound * decoder;
   int interleave;
   int channels;
+  int retval;
   union {
     short ** s;
     int ** i;
@@ -122,7 +123,7 @@ decoded_short (FishSound * fsound, short ** pcm, long frames, void * user_data)
 
   ed->frames_out += frames;
 
-  return 0;
+  return ed->retval;
 }
 
 static int
@@ -133,7 +134,7 @@ decoded_short_ilv (FishSound * fsound, short * pcm[], long frames,
 
   ed->frames_out += frames;
 
-  return 0;
+  return ed->retval;
 }
 
 static int
@@ -143,7 +144,7 @@ decoded_int (FishSound * fsound, int ** pcm, long frames, void * user_data)
 
   ed->frames_out += frames;
 
-  return 0;
+  return ed->retval;
 }
 
 static int
@@ -154,7 +155,7 @@ decoded_int_ilv (FishSound * fsound, int * pcm[], long frames,
 
   ed->frames_out += frames;
 
-  return 0;
+  return ed->retval;
 }
 
 static int
@@ -164,7 +165,7 @@ decoded_float (FishSound * fsound, float ** pcm, long frames, void * user_data)
 
   ed->frames_out += frames;
 
-  return 0;
+  return ed->retval;
 }
 
 static int
@@ -175,7 +176,7 @@ decoded_float_ilv (FishSound * fsound, float * pcm[], long frames,
 
   ed->frames_out += frames;
 
-  return 0;
+  return ed->retval;
 }
 
 static int
@@ -186,7 +187,7 @@ decoded_double (FishSound * fsound, double ** pcm, long frames,
 
   ed->frames_out += frames;
 
-  return 0;
+  return ed->retval;
 }
 
 static int
@@ -197,7 +198,7 @@ decoded_double_ilv (FishSound * fsound, double * pcm[], long frames,
 
   ed->frames_out += frames;
 
-  return 0;
+  return ed->retval;
 }
 
 static int
@@ -267,7 +268,7 @@ fs_fill_square_double (double * pcm, int length)
 
 static FS_EncDec *
 fs_encdec_new (FishSoundPCM pcm_type, int samplerate, int channels,
-	       int format, int interleave, int blocksize)
+	       int format, int interleave, int blocksize, int retval)
 {
   FS_EncDec * ed;
   FishSoundInfo fsinfo;
@@ -294,6 +295,7 @@ fs_encdec_new (FishSoundPCM pcm_type, int samplerate, int channels,
 
   ed->interleave = interleave;
   ed->channels = channels;
+  ed->retval = retval;
 
   switch (pcm_type) {
   case FISH_SOUND_PCM_SHORT:
@@ -401,7 +403,7 @@ fs_encdec_test (FishSoundPCM pcm_type, int samplerate, int channels,
   INFO (msg);
   
   ed = fs_encdec_new (pcm_type, samplerate, channels, format,
-		      interleave, blocksize);
+		      interleave, blocksize, 0 /* retval */);
 
   for (i = 0; i < iter; i++) {
     ed->frames_in += blocksize;
