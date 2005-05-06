@@ -48,9 +48,11 @@ extern "C" {
  * \param pcm The decoded audio
  * \param frames The count of frames decoded
  * \param user_data Arbitrary user data
- * \retval 0 to continue
- * \retval non-zero to stop decoding immediately and
+ * \retval FISH_SOUND_CONTINUE Continue decoding
+ * \retval FISH_SOUND_STOP_OK Stop decoding immediately and
  * return control to the fish_sound_decode() caller
+ * \retval FISH_SOUND_STOP_ERR Stop decoding immediately, purge buffered
+ * data, and return control to the fish_sound_decode() caller
  */
 typedef int (*FishSoundDecoded_Short) (FishSound * fsound, short * pcm[],
 				       long frames, void * user_data);
@@ -62,9 +64,11 @@ typedef int (*FishSoundDecoded_Short) (FishSound * fsound, short * pcm[],
  * \param pcm The decoded audio
  * \param frames The count of frames decoded
  * \param user_data Arbitrary user data
- * \retval 0 to continue
- * \retval non-zero to stop decoding immediately and
+ * \retval FISH_SOUND_CONTINUE Continue decoding
+ * \retval FISH_SOUND_STOP_OK Stop decoding immediately and
  * return control to the fish_sound_decode() caller
+ * \retval FISH_SOUND_STOP_ERR Stop decoding immediately, purge buffered
+ * data, and return control to the fish_sound_decode() caller
  */
 typedef int (*FishSoundDecoded_ShortIlv) (FishSound * fsound, short ** pcm,
 					  long frames, void * user_data);
@@ -76,9 +80,11 @@ typedef int (*FishSoundDecoded_ShortIlv) (FishSound * fsound, short ** pcm,
  * \param pcm The decoded audio
  * \param frames The count of frames decoded
  * \param user_data Arbitrary user data
- * \retval 0 to continue
- * \retval non-zero to stop decoding immediately and
+ * \retval FISH_SOUND_CONTINUE Continue decoding
+ * \retval FISH_SOUND_STOP_OK Stop decoding immediately and
  * return control to the fish_sound_decode() caller
+ * \retval FISH_SOUND_STOP_ERR Stop decoding immediately, purge buffered
+ * data, and return control to the fish_sound_decode() caller
  */
 typedef int (*FishSoundDecoded_Int) (FishSound * fsound, int * pcm[],
 				     long frames, void * user_data);
@@ -90,9 +96,11 @@ typedef int (*FishSoundDecoded_Int) (FishSound * fsound, int * pcm[],
  * \param pcm The decoded audio
  * \param frames The count of frames decoded
  * \param user_data Arbitrary user data
- * \retval 0 to continue
- * \retval non-zero to stop decoding immediately and
+ * \retval FISH_SOUND_CONTINUE Continue decoding
+ * \retval FISH_SOUND_STOP_OK Stop decoding immediately and
  * return control to the fish_sound_decode() caller
+ * \retval FISH_SOUND_STOP_ERR Stop decoding immediately, purge buffered
+ * data, and return control to the fish_sound_decode() caller
  */
 typedef int (*FishSoundDecoded_IntIlv) (FishSound * fsound, int ** pcm,
 					long frames, void * user_data);
@@ -104,9 +112,11 @@ typedef int (*FishSoundDecoded_IntIlv) (FishSound * fsound, int ** pcm,
  * \param pcm The decoded audio
  * \param frames The count of frames decoded
  * \param user_data Arbitrary user data
- * \retval 0 to continue
- * \retval non-zero to stop decoding immediately and
+ * \retval FISH_SOUND_CONTINUE Continue decoding
+ * \retval FISH_SOUND_STOP_OK Stop decoding immediately and
  * return control to the fish_sound_decode() caller
+ * \retval FISH_SOUND_STOP_ERR Stop decoding immediately, purge buffered
+ * data, and return control to the fish_sound_decode() caller
  */
 typedef int (*FishSoundDecoded_Float) (FishSound * fsound, float * pcm[],
 				       long frames, void * user_data);
@@ -118,9 +128,11 @@ typedef int (*FishSoundDecoded_Float) (FishSound * fsound, float * pcm[],
  * \param pcm The decoded audio
  * \param frames The count of frames decoded
  * \param user_data Arbitrary user data
- * \retval 0 to continue
- * \retval non-zero to stop decoding immediately and
+ * \retval FISH_SOUND_CONTINUE Continue decoding
+ * \retval FISH_SOUND_STOP_OK Stop decoding immediately and
  * return control to the fish_sound_decode() caller
+ * \retval FISH_SOUND_STOP_ERR Stop decoding immediately, purge buffered
+ * data, and return control to the fish_sound_decode() caller
  */
 typedef int (*FishSoundDecoded_FloatIlv) (FishSound * fsound, float ** pcm,
 					  long frames, void * user_data);
@@ -132,9 +144,11 @@ typedef int (*FishSoundDecoded_FloatIlv) (FishSound * fsound, float ** pcm,
  * \param pcm The decoded audio
  * \param frames The count of frames decoded
  * \param user_data Arbitrary user data
- * \retval 0 to continue
- * \retval non-zero to stop decoding immediately and
+ * \retval FISH_SOUND_CONTINUE Continue decoding
+ * \retval FISH_SOUND_STOP_OK Stop decoding immediately and
  * return control to the fish_sound_decode() caller
+ * \retval FISH_SOUND_STOP_ERR Stop decoding immediately, purge buffered
+ * data, and return control to the fish_sound_decode() caller
  */
 typedef int (*FishSoundDecoded_Double) (FishSound * fsound, double * pcm[],
 					long frames, void * user_data);
@@ -146,9 +160,11 @@ typedef int (*FishSoundDecoded_Double) (FishSound * fsound, double * pcm[],
  * \param pcm The decoded audio
  * \param frames The count of frames decoded
  * \param user_data Arbitrary user data
- * \retval 0 to continue
- * \retval non-zero to stop decoding immediately and
+ * \retval FISH_SOUND_CONTINUE Continue decoding
+ * \retval FISH_SOUND_STOP_OK Stop decoding immediately and
  * return control to the fish_sound_decode() caller
+ * \retval FISH_SOUND_STOP_ERR Stop decoding immediately, purge buffered
+ * data, and return control to the fish_sound_decode() caller
  */
 typedef int (*FishSoundDecoded_DoubleIlv) (FishSound * fsound, double ** pcm,
 					   long frames, void * user_data);
@@ -255,6 +271,14 @@ int fish_sound_set_decoded_double_ilv (FishSound * fsound,
  * \param buf A buffer of data
  * \param bytes A count of bytes to decode (ie. the length of buf)
  * \returns The number of bytes consumed
+ * \retval FISH_SOUND_ERR_STOP_OK Decoding was stopped by a FishSoundDecode*
+ * callback returning FISH_SOUND_STOP_OK before any input bytes were consumed.
+ * This will occur when PCM is decoded from previously buffered input, and
+ * stopping is immediately requested.
+ * \retval FISH_SOUND_ERR_STOP_ERR Decoding was stopped by a FishSoundDecode*
+ * callback returning FISH_SOUND_STOP_ERR before any input bytes were consumed.
+ * This will occur when PCM is decoded from previously buffered input, and
+ * stopping is immediately requested.
  */
 long fish_sound_decode (FishSound * fsound, unsigned char * buf, long bytes);
 
