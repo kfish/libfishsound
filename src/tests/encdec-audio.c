@@ -220,7 +220,7 @@ static int
 encoded (FishSound * fsound, unsigned char * buf, long bytes, void * user_data)
 {
   FS_EncDec * ed = (FS_EncDec *) user_data;
-  long ret = FISH_SOUND_ERR_STOP_OK, bytes_decoded = 0;
+  long ret = ed->retval, bytes_decoded = 0;
 
   switch (ed->retval) {
   case FISH_SOUND_CONTINUE:
@@ -235,8 +235,24 @@ encoded (FishSound * fsound, unsigned char * buf, long bytes, void * user_data)
 			       bytes-bytes_decoded);
       if (ret > 0) bytes_decoded += ret;
     }
+    if (ret != FISH_SOUND_ERR_STOP_OK && ret < 0)
+      FAIL ("FISH_SOUND_STOP_OK: Bad return value from fish_sound_decode");
     if (bytes_decoded != bytes)
       FAIL ("FISH_SOUND_STOP_OK: Incorrect byte count decoded");
+    break;
+  case FISH_SOUND_STOP_ERR:
+    while (bytes_decoded < bytes &&
+	   (ret == FISH_SOUND_ERR_STOP_ERR || ret > 0)) {
+      ret = fish_sound_decode (ed->decoder, buf+bytes_decoded,
+			       bytes-bytes_decoded);
+      if (ret > 0) bytes_decoded += ret;
+    }
+    if (ret != FISH_SOUND_ERR_STOP_ERR && ret < -1) {
+      fprintf (stderr, "STOP_ERR: retval %d\n", ret);
+      FAIL ("FISH_SOUND_STOP_ERR: Bad return value from fish_sound_decode");
+    }
+    if (bytes_decoded > bytes)
+      FAIL ("FISH_SOUND_STOP_ERR: Bad byte count decoded");
     break;
   default:
     break;
@@ -568,6 +584,9 @@ main (int argc, char * argv[])
 		fs_encdec_test (pcm_type, test_samplerates[s], test_channels[c],
 				FISH_SOUND_SPEEX, 0, test_blocksizes[b],
 				FISH_SOUND_STOP_OK);
+		fs_encdec_test (pcm_type, test_samplerates[s], test_channels[c],
+				FISH_SOUND_SPEEX, 0, test_blocksizes[b],
+				FISH_SOUND_STOP_ERR);
 	      }
 	    }
 	  }
@@ -590,6 +609,9 @@ main (int argc, char * argv[])
 		fs_encdec_test (pcm_type, test_samplerates[s], test_channels[c],
 				FISH_SOUND_SPEEX, 1, test_blocksizes[b],
 				FISH_SOUND_STOP_OK);
+		fs_encdec_test (pcm_type, test_samplerates[s], test_channels[c],
+				FISH_SOUND_SPEEX, 1, test_blocksizes[b],
+				FISH_SOUND_STOP_ERR);
 	      }
 	    }
 	  }
