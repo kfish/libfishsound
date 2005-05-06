@@ -205,7 +205,20 @@ static int
 encoded (FishSound * fsound, unsigned char * buf, long bytes, void * user_data)
 {
   FS_EncDec * ed = (FS_EncDec *) user_data;
-  fish_sound_decode (ed->decoder, buf, bytes);
+  long bytes_decoded;
+
+  bytes_decoded = fish_sound_decode (ed->decoder, buf, bytes);
+
+  switch (ed->retval) {
+  case FISH_SOUND_CONTINUE:
+    if (bytes_decoded != bytes) {
+      FAIL ("Incorrect byte count decoded");
+    }
+    break;
+  default:
+    break;
+  }
+
   return 0;
 }
 

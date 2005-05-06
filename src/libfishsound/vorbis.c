@@ -268,7 +268,7 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
   int ret, retval;
 
   /* Assume success */
-  retval=0;
+  retval = bytes;
 
   /* Make an ogg_packet structure to pass the data to libvorbis */
   op.packet = buf;
@@ -295,7 +295,7 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
      * start of vorbiscomment packet. */
     if (fsv->packetno == 1 && bytes > 7 && buf[0] == 0x03 &&
 	!strncmp ((char *)&buf[1], "vorbis", 6)) {
-      retval=fish_sound_comments_decode (fsound, buf+7, bytes-7);
+      fish_sound_comments_decode (fsound, buf+7, bytes-7);
     } else if (fsv->packetno == 2) {
       vorbis_synthesis_init (&fsv->vd, &fsv->vi);
       vorbis_block_init (&fsv->vd, &fsv->vb);

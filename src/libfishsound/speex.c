@@ -106,6 +106,8 @@ typedef struct _FishSoundSpeexInfo {
   SpeexStereoState stereo;
   int pcm_len; /* nr frames in pcm */
 
+  int current_frame; /* current frame of nframes */
+
   union {
     short * s;
     float * f;
@@ -286,83 +288,98 @@ process_header(unsigned char * buf, long bytes, int enh_enabled,
   return st;
 }
 
-static inline void
+static inline FishSoundStopCtl
 fs_speex_short_dispatch (FishSound * fsound)
 {
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
   FishSoundDecoded_ShortIlv ds;
   FishSoundDecoded_Short dsi;
+  FishSoundStopCtl retval;
 
   if (fsound->interleave) {
     dsi = (FishSoundDecoded_ShortIlv)fsound->callback.decoded_short_ilv;
-    dsi (fsound, (short **)fss->ipcm_out.s, fss->frame_size,
-	 fsound->user_data);
+    retval = dsi (fsound, (short **)fss->ipcm_out.s, fss->frame_size,
+		  fsound->user_data);
   } else {
     ds = (FishSoundDecoded_Short)fsound->callback.decoded_short;
-    ds (fsound, fss->pcm_out.s, fss->frame_size, fsound->user_data);
+    retval = ds (fsound, fss->pcm_out.s, fss->frame_size, fsound->user_data);
   }
+
+  return retval;
 }
 
-static inline void
+static inline FishSoundStopCtl
 fs_speex_int_dispatch (FishSound * fsound)
 {
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
   FishSoundDecoded_IntIlv di;
   FishSoundDecoded_Int dii;
+  FishSoundStopCtl retval;
 
   if (fsound->interleave) {
     dii = (FishSoundDecoded_IntIlv)fsound->callback.decoded_int_ilv;
-    dii (fsound, (int **)fss->ipcm_out.i, fss->frame_size, fsound->user_data);
+    retval = dii (fsound, (int **)fss->ipcm_out.i, fss->frame_size,
+		  fsound->user_data);
   } else {
     di = (FishSoundDecoded_Int)fsound->callback.decoded_int;
-    di (fsound, fss->pcm_out.i, fss->frame_size, fsound->user_data);
+    retval = di (fsound, fss->pcm_out.i, fss->frame_size, fsound->user_data);
   }
+
+  return retval;
 }
 
 #if FS_FLOAT
-static inline void
+static inline FishSoundStopCtl
 fs_speex_float_dispatch (FishSound * fsound)
 {
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
   FishSoundDecoded_FloatIlv df;
   FishSoundDecoded_Float dfi;
+  FishSoundStopCtl retval;
 
   if (fsound->interleave) {
     dfi = (FishSoundDecoded_FloatIlv)fsound->callback.decoded_float_ilv;
-    dfi (fsound, (float **)fss->ipcm_out.f, fss->frame_size,
-	 fsound->user_data);
+    retval = dfi (fsound, (float **)fss->ipcm_out.f, fss->frame_size,
+		  fsound->user_data);
   } else {
     df = (FishSoundDecoded_Float)fsound->callback.decoded_float;
-    df (fsound, fss->pcm_out.f, fss->frame_size, fsound->user_data);
+    retval = df (fsound, fss->pcm_out.f, fss->frame_size, fsound->user_data);
   }
+
+  return retval;
 }
 
-static inline void
+static inline FishSoundStopCtl
 fs_speex_double_dispatch (FishSound * fsound)
 {
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
   FishSoundDecoded_DoubleIlv dd;
   FishSoundDecoded_Double ddi;
+  FishSoundStopCtl retval;
 
   if (fsound->interleave) {
     ddi = (FishSoundDecoded_DoubleIlv)fsound->callback.decoded_double_ilv;
-    ddi (fsound, (double **)fss->ipcm_out.f, fss->frame_size,
-	 fsound->user_data);
+    retval = ddi (fsound, (double **)fss->ipcm_out.f, fss->frame_size,
+		  fsound->user_data);
   } else {
     dd = (FishSoundDecoded_Double)fsound->callback.decoded_double;
-    dd (fsound, fss->pcm_out.d, fss->frame_size, fsound->user_data);
+    retval = dd (fsound, fss->pcm_out.d, fss->frame_size, fsound->user_data);
   }
+
+  return retval;
 }
 #endif
 
 #if HAVE_SPEEX_1_1
-static long
+static FishSoundStopCtl
 fs_speex_decode_short (FishSound * fsound)
 {
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
+  FishSoundStopCtl retval = FISH_SOUND_CONTINUE;
   int i;
 
-  for (i = 0; i < fss->nframes; i++) {
+  for (i = fss->current_frame;
+       retval == FISH_SOUND_CONTINUE && i < fss->nframes; i++) {
     /* Decode frame */
     speex_decode_int (fss->st, &fss->bits, fss->ipcm.s);
 
@@ -375,25 +392,25 @@ fs_speex_decode_short (FishSound * fsound)
     case FISH_SOUND_PCM_SHORT:
       _fs_convert_s_s (fss->ipcm.s, fss->ipcm_out.s,
 		       fss->frame_size * fsound->info.channels);
-      fs_speex_short_dispatch (fsound);
+      retval = fs_speex_short_dispatch (fsound);
       break;
     case FISH_SOUND_PCM_INT:
       _fs_convert_s_i (fss->ipcm.s, fss->ipcm_out.i,
 		       fss->frame_size * fsound->info.channels);
-      fs_speex_int_dispatch (fsound);
+      retval = fs_speex_int_dispatch (fsound);
       break;
 #if FS_FLOAT
     case FISH_SOUND_PCM_FLOAT:
       _fs_convert_s_f (fss->ipcm.s, fss->ipcm_out.f,
 		       fss->frame_size * fsound->info.channels,
 		       (float)(1/32767.0));
-      fs_speex_float_dispatch (fsound);
+      retval = fs_speex_float_dispatch (fsound);
       break;
     case FISH_SOUND_PCM_DOUBLE:
       _fs_convert_s_d (fss->ipcm.s, fss->ipcm_out.d,
 		       fss->frame_size * fsound->info.channels,
 		       (double)(1/32767.0));
-      fs_speex_double_dispatch (fsound);
+      retval = fs_speex_double_dispatch (fsound);
       break;
 #endif
     default:
@@ -402,18 +419,22 @@ fs_speex_decode_short (FishSound * fsound)
     }
   }
 
-  return 0;
+  fss->current_frame = (i % fss->nframes);
+
+  return retval;
 }
 
-static long
+static FishSoundStopCtl
 fs_speex_decode_short_dlv (FishSound * fsound)
 {
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
+  FishSoundStopCtl retval = FISH_SOUND_CONTINUE;
   int i, channels;
 
   channels = fsound->info.channels;
 
-  for (i = 0; i < fss->nframes; i++) {
+  for (i = fss->current_frame;
+       retval == FISH_SOUND_CONTINUE && i < fss->nframes; i++) {
     /* Decode frame */
     speex_decode_int (fss->st, &fss->bits, fss->ipcm.s);
 
@@ -426,23 +447,23 @@ fs_speex_decode_short_dlv (FishSound * fsound)
     case FISH_SOUND_PCM_SHORT:
       _fs_deinterleave_s_s ((short **)fss->ipcm.s, fss->pcm_out.s,
 			    fss->frame_size, channels);
-      fs_speex_short_dispatch (fsound);
+      retval = fs_speex_short_dispatch (fsound);
       break;
     case FISH_SOUND_PCM_INT:
       _fs_deinterleave_s_i ((short **)fss->ipcm.s, fss->pcm_out.i,
 			    fss->frame_size, channels);
-      fs_speex_int_dispatch (fsound);
+      retval = fs_speex_int_dispatch (fsound);
       break;
 #if FS_FLOAT
     case FISH_SOUND_PCM_FLOAT:
       _fs_deinterleave_s_f ((short **)fss->ipcm.s, fss->pcm_out.f,
 			    fss->frame_size, channels, (float)(1/32767.0));
-      fs_speex_float_dispatch (fsound);
+      retval = fs_speex_float_dispatch (fsound);
       break;
     case FISH_SOUND_PCM_DOUBLE:
       _fs_deinterleave_s_d ((short **)fss->ipcm.s, fss->pcm_out.d,
 			    fss->frame_size, channels, (double)(1/32767.0));
-      fs_speex_double_dispatch (fsound);
+      retval = fs_speex_double_dispatch (fsound);
       break;
 #endif
     default:
@@ -451,15 +472,18 @@ fs_speex_decode_short_dlv (FishSound * fsound)
     }
   }
 
-  return 0;
+  fss->current_frame = (i % fss->nframes);
+
+  return retval;
 }
 #endif /* HAVE_SPEEX_1_1 */
 
 #if (FS_FLOAT && !HAVE_SPEEX_1_1)
-static long
+static FishSoundStopCtl
 fs_speex_decode_float (FishSound * fsound)
 {
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
+  FishSoundStopCtl retval = FISH_SOUND_CONTINUE;
   int i;
 
   for (i = 0; i < fss->nframes; i++) {
@@ -475,24 +499,24 @@ fs_speex_decode_float (FishSound * fsound)
     case FISH_SOUND_PCM_SHORT:
       _fs_convert_f_s (fss->ipcm.f, fss->ipcm_out.s,
 		       fss->frame_size * fsound->info.channels, 1.0);
-      fs_speex_short_dispatch (fsound);
+      retval = fs_speex_short_dispatch (fsound);
       break;
     case FISH_SOUND_PCM_INT:
       _fs_convert_f_i (fss->ipcm.f, fss->ipcm_out.i,
 		       fss->frame_size * fsound->info.channels, 32767.0);
-      fs_speex_int_dispatch (fsound);
+      retval = fs_speex_int_dispatch (fsound);
       break;
     case FISH_SOUND_PCM_FLOAT:
       _fs_convert_f_f (fss->ipcm.f, fss->ipcm_out.f,
 		       fss->frame_size * fsound->info.channels,
 		       (float)(1/32767.0));
-      fs_speex_float_dispatch (fsound);
+      retval = fs_speex_float_dispatch (fsound);
       break;
     case FISH_SOUND_PCM_DOUBLE:
       _fs_convert_f_d (fss->ipcm.f, fss->ipcm_out.d,
 		       fss->frame_size * fsound->info.channels,
 		       (double)(1/32767.0));
-      fs_speex_double_dispatch (fsound);
+      retval = fs_speex_double_dispatch (fsound);
       break;
     default:
       /* notreached */
@@ -500,13 +524,16 @@ fs_speex_decode_float (FishSound * fsound)
     }
   }
 
-  return 0;
+  fss->current_frame = (i % fss->nframes);
+
+  return retval;
 }
 
-static long
+static FishSoundStopCtl
 fs_speex_decode_float_dlv (FishSound * fsound)
 {
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
+  FishSoundStopCtl retval = FISH_SOUND_CONTINUE;
   int i, channels;
 
   channels = fsound->info.channels;
@@ -547,7 +574,9 @@ fs_speex_decode_float_dlv (FishSound * fsound)
     }
   }
 
-  return 0;
+  fss->current_frame = (i % fss->nframes);
+
+  return retval;
 }
 #endif /* FS_FLOAT */
 
@@ -773,10 +802,12 @@ static long
 fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
 {
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
+  long bytes_decoded = 0;
   int enh_enabled = DEFAULT_ENH_ENABLED;
   int rate = 0;
   int channels = -1;
   int forceMode = -1;
+  FishSoundStopCtl retval = FISH_SOUND_CONTINUE;
 
 #if !FS_FLOAT
   if (fsound->pcm_type == FISH_SOUND_PCM_FLOAT ||
@@ -794,6 +825,8 @@ fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
 
     if (fss->st == NULL) {
       /* XXX: error */
+    } else {
+      bytes_decoded += bytes;
     }
 
 #ifdef DEBUG
@@ -810,26 +843,33 @@ fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
   } else if (fss->packetno == 1) {
     /* Comments */
     fish_sound_comments_decode (fsound, buf, bytes);
+    bytes_decoded += bytes;
   } else if (fss->packetno <= 1+fss->extra_headers) {
-    /* Unknown extra headers */
+    /* Unknown extra headers -- ignore */
+    bytes_decoded += bytes;
   } else {
 #ifdef DEBUG
     printf ("[fs_speex_decode] decode bits\n");
 #endif
 
-    speex_bits_read_from (&fss->bits, (char *)buf, (int)bytes);
+    /* Only process the bytes if we don't have data buffered from previous
+     * calls */
+    if (fss->current_frame == 0) {
+      speex_bits_read_from (&fss->bits, (char *)buf, (int)bytes);
+      bytes_decoded += bytes;
+    }
 
 #if HAVE_SPEEX_1_1
     if (fsound->interleave) {
-      fs_speex_decode_short (fsound);
+      retval = fs_speex_decode_short (fsound);
     } else {
-      fs_speex_decode_short_dlv (fsound);
+      retval = fs_speex_decode_short_dlv (fsound);
     }
 #elif FS_FLOAT      
     if (fsound->interleave) {
-      fs_speex_decode_float (fsound);
+      retval = fs_speex_decode_float (fsound);
     } else {
-      fs_speex_decode_float_dlv (fsound);
+      retval = fs_speex_decode_float_dlv (fsound);
     }
 #else
     return FISH_SOUND_ERR_DISABLED; /* notreached */
@@ -838,7 +878,15 @@ fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
 
   fss->packetno++;
 
-  return 0;
+  if (bytes_decoded == 0 && retval == FISH_SOUND_STOP_OK) {
+    return FISH_SOUND_ERR_STOP_OK;
+  } else if (bytes_decoded == 0 && retval == FISH_SOUND_STOP_ERR) {
+    /* Reset current frame count */
+    fss->current_frame = 0;
+    return FISH_SOUND_ERR_STOP_ERR;
+  } else {
+    return bytes_decoded;
+  }
 }
 #else /* !FS_DECODE */
 
@@ -1391,6 +1439,9 @@ fs_speex_init (FishSound * fsound)
   fss->frame_size = 0;
   fss->nframes = 1;
   fss->pcm_len = 0;
+
+  fss->current_frame = 0;
+
   fss->ipcm.s = NULL;
   fss->ipcm_out.s = NULL;
   fss->pcm_out.s[0] = NULL;
