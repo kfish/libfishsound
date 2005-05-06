@@ -116,6 +116,21 @@ typedef struct {
   long frames_out;
 } FS_EncDec;
 
+static const char *
+stopctl_string (FishSoundStopCtl stopctl)
+{
+  switch (stopctl) {
+  case FISH_SOUND_CONTINUE:
+    return "C";
+  case FISH_SOUND_STOP_OK:
+    return "O";
+  case FISH_SOUND_STOP_ERR:
+    return "E";
+  default:
+    FAIL("stopctl_string(): Unknown FishSoundStopCtl method");
+  }
+}
+
 static int
 decoded_short (FishSound * fsound, short ** pcm, long frames, void * user_data)
 {
@@ -205,15 +220,23 @@ static int
 encoded (FishSound * fsound, unsigned char * buf, long bytes, void * user_data)
 {
   FS_EncDec * ed = (FS_EncDec *) user_data;
-  long bytes_decoded;
-
-  bytes_decoded = fish_sound_decode (ed->decoder, buf, bytes);
+  long ret = FISH_SOUND_ERR_STOP_OK, bytes_decoded = 0;
 
   switch (ed->retval) {
   case FISH_SOUND_CONTINUE:
-    if (bytes_decoded != bytes) {
-      FAIL ("Incorrect byte count decoded");
+    bytes_decoded = fish_sound_decode (ed->decoder, buf, bytes);
+    if (bytes_decoded != bytes)
+      FAIL ("FISH_SOUND_CONTINUE: Incorrect byte count decoded");
+    break;
+  case FISH_SOUND_STOP_OK:
+    while (bytes_decoded < bytes &&
+	   (ret == FISH_SOUND_ERR_STOP_OK || ret > 0)) {
+      ret = fish_sound_decode (ed->decoder, buf+bytes_decoded,
+			       bytes-bytes_decoded);
+      if (ret > 0) bytes_decoded += ret;
     }
+    if (bytes_decoded != bytes)
+      FAIL ("FISH_SOUND_STOP_OK: Incorrect byte count decoded");
     break;
   default:
     break;
@@ -408,11 +431,12 @@ fs_encdec_test (FishSoundPCM pcm_type, int samplerate, int channels,
   int i;
 
   snprintf (msg, 128,
-	    "+ %2d channel %6d Hz %s %d frame %-6s (%s)",
+	    "+ %2d channel %6d Hz %s %d frame %-6s (%s) [%s]",
 	    channels, samplerate,
 	    format == FISH_SOUND_VORBIS ? "Vorbis," : "Speex, ",
 	    blocksize, pcm_name[pcm_type],
-	    interleave ? "interleave" : "non-interleave");
+	    interleave ? "interleave" : "non-interleave",
+	    stopctl_string(retval));
   INFO (msg);
   
   ed = fs_encdec_new (pcm_type, samplerate, channels, format,
@@ -541,6 +565,9 @@ main (int argc, char * argv[])
 				FISH_SOUND_SPEEX, 0, test_blocksizes[b],
 				FISH_SOUND_CONTINUE);
 	      
+		fs_encdec_test (pcm_type, test_samplerates[s], test_channels[c],
+				FISH_SOUND_SPEEX, 0, test_blocksizes[b],
+				FISH_SOUND_STOP_OK);
 	      }
 	    }
 	  }
@@ -560,6 +587,9 @@ main (int argc, char * argv[])
 				FISH_SOUND_SPEEX, 1, test_blocksizes[b],
 				FISH_SOUND_CONTINUE);
 	      
+		fs_encdec_test (pcm_type, test_samplerates[s], test_channels[c],
+				FISH_SOUND_SPEEX, 1, test_blocksizes[b],
+				FISH_SOUND_STOP_OK);
 	      }
 	    }
 	  }
