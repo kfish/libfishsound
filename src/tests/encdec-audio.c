@@ -388,7 +388,7 @@ fs_encdec_delete (FS_EncDec * ed)
 
 static int
 fs_encdec_test (FishSoundPCM pcm_type, int samplerate, int channels,
-		int format, int interleave, int blocksize)
+		int format, int interleave, int blocksize, int retval)
 {
   FS_EncDec * ed;
   char msg[128];
@@ -403,7 +403,7 @@ fs_encdec_test (FishSoundPCM pcm_type, int samplerate, int channels,
   INFO (msg);
   
   ed = fs_encdec_new (pcm_type, samplerate, channels, format,
-		      interleave, blocksize, 0 /* retval */);
+		      interleave, blocksize, retval);
 
   for (i = 0; i < iter; i++) {
     ed->frames_in += blocksize;
@@ -517,14 +517,16 @@ main (int argc, char * argv[])
 	    /* Test VORBIS */
 	    if (test_vorbis) {
 	      fs_encdec_test (pcm_type, test_samplerates[s], test_channels[c],
-			      FISH_SOUND_VORBIS, 0, test_blocksizes[b]);
+			      FISH_SOUND_VORBIS, 0, test_blocksizes[b],
+			      FISH_SOUND_CONTINUE);
 	    }
 	  
 	    /* Test SPEEX */
 	    if (test_speex) {
 	      if (test_channels[c] <= 2) {
 		fs_encdec_test (pcm_type, test_samplerates[s], test_channels[c],
-				FISH_SOUND_SPEEX, 0, test_blocksizes[b]);
+				FISH_SOUND_SPEEX, 0, test_blocksizes[b],
+				FISH_SOUND_CONTINUE);
 	      
 	      }
 	    }
@@ -534,14 +536,16 @@ main (int argc, char * argv[])
 	    /* Test VORBIS */
 	    if (test_vorbis) {
 	      fs_encdec_test (pcm_type, test_samplerates[s], test_channels[c],
-			      FISH_SOUND_VORBIS, 1, test_blocksizes[b]);
+			      FISH_SOUND_VORBIS, 1, test_blocksizes[b],
+			      FISH_SOUND_CONTINUE);
 	    }
 	  
 	    /* Test SPEEX */
 	    if (test_speex) {
 	      if (test_channels[c] <= 2) {
 		fs_encdec_test (pcm_type, test_samplerates[s], test_channels[c],
-				FISH_SOUND_SPEEX, 1, test_blocksizes[b]);
+				FISH_SOUND_SPEEX, 1, test_blocksizes[b],
+				FISH_SOUND_CONTINUE);
 	      
 	      }
 	    }

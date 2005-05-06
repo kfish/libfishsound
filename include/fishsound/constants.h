@@ -58,6 +58,18 @@ typedef enum _FishSoundCodecID {
   FISH_SOUND_SPEEX   = 0x02
 } FishSoundCodecID;
 
+/** Decode callback return values */
+typedef enum _FishSoundStopCtl {
+  /** Continue calling decode callbacks */
+  FISH_SOUND_CONTINUE = 0,
+
+  /** Stop calling callbacks, but retain buffered data */
+  FISH_SOUND_STOP_OK  = 1,
+
+  /** Stop calling callbacks, and purge buffered data */
+  FISH_SOUND_STOP_ERR = -1
+} FishSoundStopCtl;
+
 /** Command codes */
 typedef enum _FishSoundCommand {
   /** No operation */
@@ -102,6 +114,14 @@ typedef enum _FishSoundError {
 
   /** Functionality disabled at build time */
   FISH_SOUND_ERR_DISABLED               = -10,
+
+  /** Decoding was stopped by a FishSoundDecode* callback returning
+   * FISH_SOUND_STOP_OK before any input bytes were consumed */
+  FISH_SOUND_ERR_STOP_OK                = -14,
+
+  /** Decoding was stopped by a FishSoundDecode* callback returning
+   * FISH_SOUND_STOP_ERR before any input bytes were consumed */
+  FISH_SOUND_ERR_STOP_ERR               = -15,
 
   /** Too few bytes passed to fish_sound_identify() */
   FISH_SOUND_ERR_SHORT_IDENTIFY         = -20,
