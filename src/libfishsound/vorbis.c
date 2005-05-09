@@ -299,6 +299,7 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
     } else if (fsv->packetno == 2) {
       vorbis_synthesis_init (&fsv->vd, &fsv->vi);
       vorbis_block_init (&fsv->vd, &fsv->vb);
+      fsound->finalized = 1;
     }
   } else {
 #if FS_FLOAT
@@ -579,10 +580,6 @@ fs_vorbis_init (FishSound * fsound)
   fsv->max_pcm = 0;
 
   fsound->codec_data = fsv;
-
-  if (fsound->mode == FISH_SOUND_DECODE) {
-    fsound->finalized = 1;
-  }
 
 #if FS_ENCODE && HAVE_VORBISENC
 
