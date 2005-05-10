@@ -57,21 +57,9 @@
 
 #define HAVE_OGGZ 1
 
-/* We have libspeex */
+/* We do not have libspeex */
 
-#define HAVE_SPEEX 1
-
-/* We have libspeex 1.1 */
-
-#define HAVE_SPEEX_1_1 1
-
-/* We have speex_free() */
-
-#define HAVE_SPEEX_FREE 1
-
-/* We have speex_lib_get_mode() */
-
-#define HAVE_SPEEX_LIB_GET_MODE 1
+#define HAVE_SPEEX 0
 
 /* We do not have libvorbisenc */
 
