@@ -21,6 +21,9 @@ AC_PROG_MAKE_SET
 AC_C_CONST
 AC_C_BIGENDIAN
 
+dnl Add parameters for aclocal
+AC_SUBST(ACLOCAL_AMFLAGS, "-I m4")
+
 # Check for doxygen
 AC_CHECK_PROG(HAVE_DOXYGEN, doxygen, true, false)
 AM_CONDITIONAL(HAVE_DOXYGEN,$HAVE_DOXYGEN)
@@ -535,6 +538,11 @@ src/examples/Makefile
 fishsound.pc
 ])
 
+AS_AC_EXPAND(LIBDIR, ${libdir})
+AS_AC_EXPAND(INCLUDEDIR, ${includedir})
+AS_AC_EXPAND(BINDIR, ${bindir})
+AS_AC_EXPAND(DOCDIR, ${datadir}/doc)
+
 AC_MSG_RESULT([
 ------------------------------------------------------------------------
   $PACKAGE $VERSION:  Automatic configuration OK.
@@ -558,11 +566,19 @@ AC_MSG_RESULT([
 
   Installation paths:
 
-    libfishsound: ................ ${prefix}/lib
-    C header files: .............. ${prefix}/include/fishsound
-    Documentation: ............... ${prefix}/share/doc/$PACKAGE
+    libfishsound: ................ ${LIBDIR}
+    C header files: .............. ${INCLUDEDIR}/fishsound
+    Documentation: ............... ${DOCDIR}/$PACKAGE
 
-  ${TESTS_INFO}
+  Building:
+
+    Type 'make' to compile $PACKAGE.
+
+    Type 'make install' to install $PACKAGE.
+
+    Type 'make check' to test $PACKAGE using the unittests
+    contained in the src/tests directory.
+    ${TESTS_INFO}
 
   Example programs will be built but not installed.
 ------------------------------------------------------------------------
