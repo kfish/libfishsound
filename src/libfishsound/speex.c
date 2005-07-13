@@ -237,6 +237,21 @@ process_header(unsigned char * buf, long bytes, int enh_enabled,
   return st;
 }
 
+static int
+fs_speex_free_buffers (FishSound * fsound)
+{
+  FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
+
+  if (fsound->mode == FISH_SOUND_DECODE) {
+    if (fss->ipcm && fss->ipcm != fss->pcm[0]) fs_free (fss->ipcm);
+    if (fss->pcm[0]) fs_free (fss->pcm[0]);
+    if (fss->pcm[1]) fs_free (fss->pcm[1]);
+  } else {
+    if (fss->ipcm) fs_free (fss->ipcm);
+  }
+
+  return 0;
+}
 
 static long
 fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
@@ -606,6 +621,8 @@ static FishSound *
 fs_speex_delete (FishSound * fsound)
 {
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
+
+  fs_speex_free_buffers (fsound);
 
   if (fsound->mode == FISH_SOUND_DECODE) {
     if (fss->st) speex_decoder_destroy (fss->st);
