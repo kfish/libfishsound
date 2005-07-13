@@ -188,16 +188,29 @@ AC_ARG_ENABLE(speex,
      [ ac_enable_speex=no ], [ ac_enable_speex=yes] )
 
 if test "x${ac_enable_speex}" = xyes ; then
-  AC_CHECK_LIB(speex, speex_encoder_init, HAVE_SPEEX="maybe", , [-lm])
-  if test "x$HAVE_SPEEX" = xmaybe; then
-    AC_CHECK_HEADER(speex.h, HAVE_SPEEX="yes", HAVE_SPEEX="no")
+  PKG_CHECK_MODULES(SPEEX, speex, HAVE_SPEEX="yes", HAVE_SPEEX="no)
+
+  if test "x$HAVE_SPEEX" = "xno" ; then
+    AC_CHECK_LIB(speex, speex_encoder_init, HAVE_SPEEX="maybe", , [-lm])
+    if test "x$HAVE_SPEEX" = xmaybe; then
+      AC_CHECK_HEADER(speex.h, HAVE_SPEEX="yes", HAVE_SPEEX="no")
+    fi
+    if test "x$HAVE_SPEEX" = "xyes" ; then
+      SPEEX_CFLAGS=""
+      SPEEX_LIBS="-lspeex -lm"
+    fi
   fi
+
   if test "x$HAVE_SPEEX" = xyes ; then
 
+    saved_CFLAGS="$CFLAGS"
+    CFLAGS="$CFLAGS $SPEEX_CFLAGS"
+
     dnl Test for libspeex 1.1.x
-    AC_CHECK_LIB(speex, speex_preprocess, HAVE_SPEEX_1_1="maybe", , [-lm])
+    AC_CHECK_LIB(speex, speex_preprocess, HAVE_SPEEX_1_1="maybe", ,
+      [$SPEEX_LIBS])
     if test "x$HAVE_SPEEX_1_1" = xmaybe; then
-      AC_CHECK_HEADER(speex_preprocess.h, HAVE_SPEEX_1_1="yes",
+      AC_CHECK_HEADER([speex/speex_preprocess.h], HAVE_SPEEX_1_1="yes",
         HAVE_SPEEX_1_1="no")
     fi
     if test "x$HAVE_SPEEX_1_1" = xyes ; then
@@ -207,8 +220,10 @@ if test "x${ac_enable_speex}" = xyes ; then
       SPEEX_SUPPORT="yes (1.0.x)"
     fi
 
+    CFLAGS="$saved_CFLAGS"
+
     AC_DEFINE(HAVE_SPEEX, [1], [Define to 1 if you have libspeex])
-    SPEEX_LIBS="-lspeex -lm"
+    AC_SUBST(SPEEX_CFLAGS)
     AC_SUBST(SPEEX_LIBS)
   else
     AC_DEFINE(HAVE_SPEEX, [0], [Define to 1 if you have libspeex])

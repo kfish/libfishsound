@@ -44,10 +44,19 @@
 
 #if HAVE_SPEEX
 
+#if HAVE_SPEEX_1_1
+#include <speex/speex.h>
+#include <speex/speex_header.h>
+#include <speex/speex_stereo.h>
+#include <speex/speex_callbacks.h>
+
+#else /* Speex 1.0 */
+
 #include <speex.h>
 #include <speex_header.h>
 #include <speex_stereo.h>
 #include <speex_callbacks.h>
+#endif
 
 /* Format for the vendor string: "Encoded with Speex VERSION", where VERSION
  * is the libspeex version as read from a newly-generated Speex header.
