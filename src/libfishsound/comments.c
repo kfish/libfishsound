@@ -44,7 +44,7 @@ static char *
 fs_strdup (const char * s)
 {
   char * ret;
-  if (!s) return NULL;
+  if (s == NULL) return NULL;
   ret = fs_malloc (strlen(s) + 1);
   return strcpy (ret, s);
 }
@@ -53,9 +53,10 @@ static char *
 fs_strdup_len (const char * s, int len)
 {
   char * ret;
-  if (!s) return NULL;
+  if (s == NULL) return NULL;
+  if (len == 0) return NULL;
   ret = fs_malloc (len + 1);
-  if (!strncpy (ret, s, len)) {
+  if (strncpy (ret, s, len) == NULL) {
     fs_free (ret);
     return NULL;
   }
@@ -161,7 +162,9 @@ fs_comment_validate_byname (const char * name, const char * value)
 
   for (c = name; *c; c++) {
     if (*c < 0x20 || *c > 0x7D || *c == 0x3D) {
+#ifdef DEBUG
       printf ("XXX char %c in %s invalid\n", *c, name);
+#endif
       return 0;
     }
   }
@@ -189,8 +192,8 @@ static void
 fs_comment_free (FishSoundComment * comment)
 {
   if (!comment) return;
-  fs_free (comment->name);
-  fs_free (comment->value);
+  if (comment->name) fs_free (comment->name);
+  if (comment->value) fs_free (comment->value);
   fs_free (comment);
 }
 
@@ -413,8 +416,7 @@ fish_sound_comments_free (FishSound * fsound)
   fs_vector_delete (fsound->comments);
   fsound->comments = NULL;
 
-  if (fsound->vendor)
-    fs_free (fsound->vendor);
+  if (fsound->vendor) fs_free (fsound->vendor);
   fsound->vendor = NULL;
 
   return 0;
@@ -442,6 +444,7 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
    /* Vendor */
    nvalue = fs_strdup_len (c, len);
    fish_sound_comment_set_vendor (fsound, nvalue);
+   if (nvalue) fs_free (nvalue);
 #ifdef DEBUG
    fwrite(c, 1, len, stderr); fputc ('\n', stderr);
 #endif
