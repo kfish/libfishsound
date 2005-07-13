@@ -178,6 +178,7 @@ fs_encdec_delete (FS_EncDec * ed)
 
   fish_sound_delete (ed->encoder);
   fish_sound_delete (ed->decoder);
+  free (ed->pcm);
   free (ed);
 
   return 0;
