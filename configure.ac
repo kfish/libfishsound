@@ -32,6 +32,7 @@ if test $HAVE_DOXYGEN = "false"; then
 fi
 
 # Check for valgrind
+VALGRIND_ENVIRONMENT=""
 ac_enable_valgrind=no
 AC_ARG_ENABLE(valgrind-testing,
      [  --enable-valgrind-testing     enable running of tests inside Valgrind ],
@@ -39,15 +40,12 @@ AC_ARG_ENABLE(valgrind-testing,
 
 if test "x${ac_enable_valgrind}" = xyes ; then
   if test "x${enable_shared}" = xyes ; then
-    AC_MSG_WARN([
-*** You have requested to test under valgrind, but have not disabled the
-*** building of shared libraries. You usually need to do:
-***   ./configure --disable-shared --enable-valgrind-testing
-*** for Valgrind to produce useful output.])
+    VALGRIND_ENVIRONMENT="libtool --mode=execute "
   fi
 
   AC_CHECK_PROG(HAVE_VALGRIND, valgrind, yes, no)
-  if test "x$HAVE_VALGRIND" = xyes ; then     VALGRIND_ENVIRONMENT="valgrind -q --leak-check=yes --show-reachable=yes --num-callers=100"
+  if test "x$HAVE_VALGRIND" = xyes ; then
+    VALGRIND_ENVIRONMENT="$VALGRIND_ENVIRONMENT valgrind -q --leak-check=yes --show-reachable=yes --num-callers=100"
     AC_SUBST(VALGRIND_ENVIRONMENT)
     TESTS_INFO="'make check' test suite will be run under:
   ${VALGRIND_ENVIRONMENT}"
