@@ -188,7 +188,7 @@ AC_ARG_ENABLE(speex,
      [ ac_enable_speex=no ], [ ac_enable_speex=yes] )
 
 if test "x${ac_enable_speex}" = xyes ; then
-  PKG_CHECK_MODULES(SPEEX, speex, HAVE_SPEEX="yes", HAVE_SPEEX="no)
+  PKG_CHECK_MODULES(SPEEX, speex, HAVE_SPEEX="yes", HAVE_SPEEX="no")
 
   if test "x$HAVE_SPEEX" = "xno" ; then
     AC_CHECK_LIB(speex, speex_encoder_init, HAVE_SPEEX="maybe", , [-lm])
