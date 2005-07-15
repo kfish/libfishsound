@@ -57,10 +57,10 @@ typedef int         (*FSCodecCommand) (FishSound * fsound, int command,
 				       void * data, int datasize);
 typedef long        (*FSCodecDecode) (FishSound * fsound, unsigned char * buf,
 				      long bytes);
-typedef long        (*FSCodecEncodeI) (FishSound * fsound, float ** pcm,
-				       long frames);
-typedef long        (*FSCodecEncodeN) (FishSound * fsound, float ** pcm,
-				       long frames);
+typedef long        (*FSCodecEncode_Float) (FishSound * fsound, float * pcm[],
+					    long frames);
+typedef long        (*FSCodecEncode_FloatIlv) (FishSound * fsound,
+					       float ** pcm, long frames);
 typedef long        (*FSCodecFlush) (FishSound * fsound);
 
 struct _FishSoundFormat {
@@ -76,8 +76,8 @@ struct _FishSoundCodec {
   FSCodecReset reset;
   FSCodecCommand command;
   FSCodecDecode decode;
-  FSCodecEncodeI encode_i;
-  FSCodecEncodeN encode_n;
+  FSCodecEncode_FloatIlv encode_f_ilv;
+  FSCodecEncode_Float encode_f;
   FSCodecFlush flush;
 };
 

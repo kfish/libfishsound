@@ -195,11 +195,11 @@ fish_sound_encode (FishSound * fsound, float ** pcm, long frames)
 
 #if FS_ENCODE
   if (fsound->interleave) {
-    if (fsound->codec && fsound->codec->encode_i)
-      return fsound->codec->encode_i (fsound, pcm, frames);
+    if (fsound->codec && fsound->codec->encode_f_ilv)
+      return fsound->codec->encode_f_ilv (fsound, pcm, frames);
   } else {
-    if (fsound->codec && fsound->codec->encode_n)
-      return fsound->codec->encode_n (fsound, pcm, frames);
+    if (fsound->codec && fsound->codec->encode_f)
+      return fsound->codec->encode_f (fsound, pcm, frames);
   }
 #else
   return FISH_SOUND_ERR_DISABLED;

@@ -343,7 +343,7 @@ fs_vorbis_encode_write (FishSound * fsound, long len)
 }
 
 static long
-fs_vorbis_encode_i (FishSound * fsound, float ** pcm, long frames)
+fs_vorbis_encode_f_ilv (FishSound * fsound, float ** pcm, long frames)
 {
   FishSoundVorbisInfo * fsv = (FishSoundVorbisInfo *)fsound->codec_data;
   float ** vpcm;
@@ -380,7 +380,7 @@ fs_vorbis_encode_i (FishSound * fsound, float ** pcm, long frames)
 }
 
 static long
-fs_vorbis_encode_n (FishSound * fsound, float * pcm[], long frames)
+fs_vorbis_encode_f (FishSound * fsound, float * pcm[], long frames)
 {
   FishSoundVorbisInfo * fsv = (FishSoundVorbisInfo *)fsound->codec_data;
   float ** vpcm;
@@ -524,8 +524,8 @@ fish_sound_vorbis_codec (void)
   codec->reset = fs_vorbis_reset;
   codec->command = fs_vorbis_command;
   codec->decode = fs_vorbis_decode;
-  codec->encode_i = fs_vorbis_encode_i;
-  codec->encode_n = fs_vorbis_encode_n;
+  codec->encode_f = fs_vorbis_encode_f;
+  codec->encode_f_ilv = fs_vorbis_encode_f_ilv;
   codec->flush = NULL;
 
   return codec;

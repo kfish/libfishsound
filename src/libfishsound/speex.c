@@ -453,7 +453,7 @@ fs_speex_encode_block (FishSound * fsound)
 }
 
 static long
-fs_speex_encode_i (FishSound * fsound, float ** pcm, long frames)
+fs_speex_encode_f_ilv (FishSound * fsound, float ** pcm, long frames)
 {
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
   FishSoundSpeexEnc * fse = (FishSoundSpeexEnc *)fss->enc;
@@ -487,7 +487,7 @@ fs_speex_encode_i (FishSound * fsound, float ** pcm, long frames)
 }
 
 static long
-fs_speex_encode_n (FishSound * fsound, float * pcm[], long frames)
+fs_speex_encode_f (FishSound * fsound, float * pcm[], long frames)
 {
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
   FishSoundSpeexEnc * fse = (FishSoundSpeexEnc *)fss->enc;
@@ -654,8 +654,8 @@ fish_sound_speex_codec (void)
   codec->reset = fs_speex_reset;
   codec->command = fs_speex_command;
   codec->decode = fs_speex_decode;
-  codec->encode_i = fs_speex_encode_i;
-  codec->encode_n = fs_speex_encode_n;
+  codec->encode_f = fs_speex_encode_f;
+  codec->encode_f_ilv = fs_speex_encode_f_ilv;
   codec->flush = fs_speex_flush;
 
   return codec;
