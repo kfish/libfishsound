@@ -569,6 +569,35 @@ fs_speex_reset (FishSound * fsound)
   return 0;
 }
 
+static void
+fs_speex_update (FishSound * fsound, int interleave)
+{
+  FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
+  size_t pcm_size = sizeof (float);
+
+  fss->ipcm = (float *)
+    fs_realloc (fss->ipcm,
+		pcm_size * fss->frame_size * fsound->info.channels);
+
+  if (interleave) {
+    /* if transitioning from non-interleave to interleave,
+       free non-ilv buffers */
+    if (!fsound->interleave && fsound->info.channels == 2) {
+      if (fss->pcm[0]) fs_free (fss->pcm[0]);
+      if (fss->pcm[1]) fs_free (fss->pcm[1]);
+      fss->pcm[0] = NULL;
+      fss->pcm[1] = NULL;
+    }
+  } else {
+    if (fsound->info.channels == 1) {
+      fss->pcm[0] = (float *) fss->ipcm;
+    } else if (fsound->info.channels == 2) {
+      fss->pcm[0] = fs_realloc (fss->pcm[0], pcm_size * fss->frame_size);
+      fss->pcm[1] = fs_realloc (fss->pcm[1], pcm_size * fss->frame_size);
+    }
+  }
+}
+
 static FishSound *
 fs_speex_enc_init (FishSound * fsound)
 {
@@ -652,7 +681,7 @@ fish_sound_speex_codec (void)
   codec->init = fs_speex_init;
   codec->del = fs_speex_delete;
   codec->reset = fs_speex_reset;
-  codec->update = NULL; /* XXX */
+  codec->update = fs_speex_update;
   codec->command = fs_speex_command;
   codec->decode = fs_speex_decode;
   codec->encode_f = fs_speex_encode_f;
