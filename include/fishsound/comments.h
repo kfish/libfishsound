@@ -1,4 +1,3 @@
-
 /*
    Copyright (C) 2003 Commonwealth Scientific and Industrial Research
    Organisation (CSIRO) Australia
