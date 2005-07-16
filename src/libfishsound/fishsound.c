@@ -129,23 +129,6 @@ fish_sound_new (int mode, FishSoundInfo * fsinfo)
 }
 
 int
-fish_sound_set_decoded_callback (FishSound * fsound,
-				 FishSoundDecoded_Float decoded,
-				 void * user_data)
-{
-  if (fsound == NULL) return -1;
-
-#if FS_DECODE
-  fsound->callback.decoded_float = decoded;
-  fsound->user_data = user_data;
-#else
-  return FISH_SOUND_ERR_DISABLED;
-#endif
-
-  return 0;
-}
-
-int
 fish_sound_set_encoded_callback (FishSound * fsound,
 				 FishSoundEncoded encoded,
 				 void * user_data)
@@ -155,32 +138,6 @@ fish_sound_set_encoded_callback (FishSound * fsound,
 #if FS_ENCODE
   fsound->callback.encoded = (void *)encoded;
   fsound->user_data = user_data;
-#else
-  return FISH_SOUND_ERR_DISABLED;
-#endif
-
-  return 0;
-}
-
-long
-fish_sound_decode (FishSound * fsound, unsigned char * buf, long bytes)
-{
-  int format;
-
-  if (fsound == NULL) return -1;
-
-#if FS_DECODE
-  if (fsound->info.format == FISH_SOUND_UNKNOWN) {
-    format = fish_sound_identify (buf, bytes);
-    if (format == FISH_SOUND_UNKNOWN) return -1;
-
-    fish_sound_set_format (fsound, format);
-  }
-
-  /*printf ("format: %s\n", fsound->codec->format->name);*/
-
-  if (fsound->codec && fsound->codec->decode)
-    return fsound->codec->decode (fsound, buf, bytes);
 #else
   return FISH_SOUND_ERR_DISABLED;
 #endif

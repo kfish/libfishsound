@@ -151,7 +151,7 @@ fs_encdec_new (char * infilename, char * outfilename, int format,
 
   fish_sound_set_interleave (ed->decoder, interleave);
 
-  fish_sound_set_decoded_callback (ed->decoder, decoded, ed);
+  fish_sound_set_decoded_float_ilv (ed->decoder, decoded, ed);
 
   ed->format = format;
   ed->begun = 0;

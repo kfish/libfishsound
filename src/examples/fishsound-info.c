@@ -101,7 +101,7 @@ main (int argc, char ** argv)
 
   fsound = fish_sound_new (FISH_SOUND_DECODE, &fsinfo);
   fish_sound_set_interleave (fsound, 1);
-  fish_sound_set_decoded_callback (fsound, decoded, NULL);
+  fish_sound_set_decoded_float_ilv (fsound, decoded, NULL);
 
   if ((oggz = oggz_open ((char *) infilename, OGGZ_READ)) == NULL) {
     printf ("unable to open file %s\n", infilename);

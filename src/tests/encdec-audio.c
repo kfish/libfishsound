@@ -83,7 +83,7 @@ typedef struct {
 } FS_EncDec;
 
 static int
-decoded (FishSound * fsound, float ** pcm, long frames, void * user_data)
+decoded_float (FishSound * fsound, float ** pcm, long frames, void * user_data)
 {
   FS_EncDec * ed = (FS_EncDec *) user_data;
 
@@ -136,7 +136,7 @@ fs_encdec_new (int samplerate, int channels, int format, int interleave,
   fish_sound_set_interleave (ed->decoder, interleave);
 
   fish_sound_set_encoded_callback (ed->encoder, encoded, ed);
-  fish_sound_set_decoded_callback (ed->decoder, decoded, ed);
+  fish_sound_set_decoded_float (ed->decoder, decoded_float, ed);
 
   ed->interleave = interleave;
   ed->channels = channels;

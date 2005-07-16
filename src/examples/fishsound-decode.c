@@ -60,7 +60,7 @@ open_output (int samplerate, int channels)
 }
 
 static int
-decoded (FishSound * fsound, float ** pcm, long frames, void * user_data)
+decoded_float (FishSound * fsound, float ** pcm, long frames, void * user_data)
 {
   if (!begun) {
     fish_sound_command (fsound, FISH_SOUND_GET_INFO, &fsinfo,
@@ -106,7 +106,7 @@ main (int argc, char ** argv)
 
   fish_sound_set_interleave (fsound, 1);
 
-  fish_sound_set_decoded_callback (fsound, decoded, NULL);
+  fish_sound_set_decoded_float_ilv (fsound, decoded_float, NULL);
 
   if ((oggz = oggz_open ((char *) infilename, OGGZ_READ)) == NULL) {
     printf ("unable to open file %s\n", infilename);
