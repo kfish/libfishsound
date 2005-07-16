@@ -37,6 +37,10 @@
 extern "C" {
 #endif
 
+/** \file
+ * Encode functions and callback prototypes
+ */
+
 /**
  * Signature of a callback for libfishsound to call when it has encoded
  * data.
