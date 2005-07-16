@@ -93,6 +93,17 @@ decoded_float (FishSound * fsound, float ** pcm, long frames, void * user_data)
 }
 
 static int
+decoded_float_ilv (FishSound * fsound, float * pcm[], long frames,
+		   void * user_data)
+{
+  FS_EncDec * ed = (FS_EncDec *) user_data;
+
+  ed->frames_out += frames;
+
+  return 0;
+}
+
+static int
 encoded (FishSound * fsound, unsigned char * buf, long bytes, void * user_data)
 {
   FS_EncDec * ed = (FS_EncDec *) user_data;
@@ -136,15 +147,16 @@ fs_encdec_new (int samplerate, int channels, int format, int interleave,
   fish_sound_set_interleave (ed->decoder, interleave);
 
   fish_sound_set_encoded_callback (ed->encoder, encoded, ed);
-  fish_sound_set_decoded_float (ed->decoder, decoded_float, ed);
 
   ed->interleave = interleave;
   ed->channels = channels;
 
   if (interleave) {
+    fish_sound_set_decoded_float_ilv (ed->decoder, decoded_float_ilv, ed);
     ed->pcm = (float **) malloc (sizeof (float) * channels * blocksize);
     fs_fill_square ((float *)ed->pcm, channels * blocksize);
   } else {
+    fish_sound_set_decoded_float (ed->decoder, decoded_float, ed);
     ed->pcm = (float **) malloc (sizeof (float *) * channels);
     for (i = 0; i < channels; i++) {
       ed->pcm[i] = (float *) malloc (sizeof (float) * blocksize);
