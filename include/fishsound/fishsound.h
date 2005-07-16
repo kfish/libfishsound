@@ -325,13 +325,13 @@
  * - create a FishSound* object with mode FISH_SOUND_DECODE. fish_sound_new()
  * will return a new FishSound* object, initialised for decoding, and the
  * FishSoundInfo structure will be cleared.
- * - provide a FishSoundDecoded callback for libfishsound to call when it has
+ * - provide a FishSoundDecoded_* callback for libfishsound to call when it has
  * decoded audio.
  * - (optionally) specify whether you want to receive interleaved or
  * per-channel PCM data, using a fish_sound_set_interleave().
  * The default is for per-channel (non-interleaved) PCM.
  * - feed encoded audio data to libfishsound via fish_sound_decode().
- * libfishsound will decode the audio for you, calling the FishSoundDecoded
+ * libfishsound will decode the audio for you, calling the FishSoundDecoded_*
  * callback you provided earlier each time it has a block of audio ready.
  * - when finished, call fish_sound_delete().
  *
@@ -360,9 +360,6 @@
  * encoding.
  * - provide a FishSoundEncoded callback for libfishsound to call when it
  * has a block of encoded audio
- * - (optionally) specify whether you will be providing interleaved or
- * per-channel PCM data, using a fish_sound_set_interleave().
- * The default is for per-channel (non-interleaved) PCM.
  * - feed raw PCM audio data to libfishsound via fish_sound_encode().
  * libfishsound will encode the audio for you, calling the FishSoundEncoded
  * callback you provided earlier each time it has a block of encoded audio
@@ -528,17 +525,6 @@ int fish_sound_command (FishSound * fsound, int command, void * data,
  * \retval -1 Invalid \a fsound
  */
 int fish_sound_get_interleave (FishSound * fsound);
-
-/**
- * Set the PCM format used by a FishSound object. The default value is
- * non-interleaved.
- * \param fsound A FishSound* handle
- * \param interleave Whether to use interleaved PCM or not. Valid values are
- * 0 for non-interleaved, and 1 for interleaved.
- * \retval 0 Success
- * \retval -1 Invalid \a fsound
- */
-int fish_sound_set_interleave (FishSound * fsound, int interleave);
 
 /**
  * Query the current frame number of a FishSound object.

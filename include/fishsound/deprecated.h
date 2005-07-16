@@ -88,6 +88,27 @@ int fish_sound_set_decoded_callback (FishSound * fsound,
 				     FishSoundDecoded decoded,
 				     void * user_data);
 
+/**
+ * DEPRECATED FUNCTION.
+ * Set the PCM format used by a FishSound object. The default value is
+ * non-interleaved.
+ * Prior to libfishsound 0.7.0, you would (optionally) specify whether you
+ * wanted to receive interleaved or per-channel PCM data using
+ * fish_sound_set_interleave(), the default being per-channel
+ * (non-interleaved) PCM.
+ * Whether or not your decoded callback expects interleaved or
+ * non-interleaved data is now implied by the particular
+ * fish_sound_set_decoded_TYPE() method you use to set it, such as
+ * fish_sound_set_decoded_float() or fish_sound_set_decode_float_ilv().
+ *
+ * \param fsound A FishSound* handle
+ * \param interleave Whether to use interleaved PCM or not. Valid values are
+ * 0 for non-interleaved, and 1 for interleaved.
+ * \retval 0 Success
+ * \retval -1 Invalid \a fsound
+ */
+int fish_sound_set_interleave (FishSound * fsound, int interleave);
+
 #ifdef __cplusplus
 }
 #endif
