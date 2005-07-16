@@ -60,8 +60,8 @@ int fish_sound_set_decoded_float (FishSound * fsound,
 
   if (fsound == NULL) return -1;
 
-#if (FS_DECODE && FS_FLOAT)
-  ret = fs_decode_update (fsound, 0, FISH_SOUND_PCM_FLOAT);
+#if FS_DECODE
+  ret = fs_decode_update (fsound, 0);
 
   if (ret >= 0) {
     fsound->callback.decoded_float = decoded;
@@ -82,8 +82,8 @@ int fish_sound_set_decoded_float_ilv (FishSound * fsound,
 
   if (fsound == NULL) return -1;
 
-#if (FS_DECODE && FS_FLOAT)
-  ret = fs_decode_update (fsound, 1, FISH_SOUND_PCM_FLOAT);
+#if FS_DECODE
+  ret = fs_decode_update (fsound, 1);
 
   if (ret >= 0) {
     fsound->callback.decoded_float_ilv = decoded;
