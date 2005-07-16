@@ -210,7 +210,11 @@ fs_encdec_test (int samplerate, int channels, int format, int interleave,
     snprintf (msg, 128,
 	      "%ld frames encoded, %ld frames decoded",
 	      ed->frames_in, ed->frames_out);
-    WARN (msg);
+    if (ed->frames_out < ed->frames_in) {
+      FAIL (msg);
+    } else {
+      WARN (msg);
+    }
   }
 
   fs_encdec_delete (ed);
