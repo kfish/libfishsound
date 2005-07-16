@@ -450,8 +450,8 @@ fs_vorbis_enc_init (FishSound * fsound)
 
 #else /* ! FS_ENCODE && HAVE_VORBISENC */
 
-#define fs_vorbis_encode_i NULL
-#define fs_vorbis_encode_n NULL
+#define fs_vorbis_encode_f NULL
+#define fs_vorbis_encode_f_ilv NULL
 
 #endif /* ! FS_ENCODE && HAVE_VORBISENC */
 

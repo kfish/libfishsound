@@ -413,20 +413,6 @@ typedef struct {
  */
 typedef void * FishSound;
 
-/**
- * Signature of a callback for libfishsound to call when it has encoded
- * data.
- * \param fsound The FishSound* handle
- * \param buf The encoded data
- * \param bytes The count of bytes encoded
- * \param user_data Arbitrary user data
- * \retval 0 to continue
- * \retval non-zero to stop encoding immediately and
- * return control to the fish_sound_encode() caller
- */
-typedef int (*FishSoundEncoded) (FishSound * fsound, unsigned char * buf,
-				 long bytes, void * user_data);
-
 #ifdef __cplusplus
 extern "C" {
 #endif

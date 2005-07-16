@@ -65,6 +65,7 @@ typedef long        (*FSCodecEncode_FloatIlv) (FishSound * fsound,
 typedef long        (*FSCodecFlush) (FishSound * fsound);
 
 #include <fishsound/decode.h>
+#include <fishsound/encode.h>
 
 struct _FishSoundFormat {
   int format;
@@ -99,7 +100,7 @@ struct _FishSoundComment {
 union FishSoundCallback {
   FishSoundDecoded_Float decoded_float;
   FishSoundDecoded_FloatIlv decoded_float_ilv;
-  void * encoded;
+  FishSoundEncoded * encoded;
 };
 
 struct _FishSound {
@@ -148,9 +149,6 @@ struct _FishSound {
   char * vendor;
   FishSoundVector * comments;
 };
-
-typedef int (*FishSoundEncoded) (FishSound * fsound, unsigned char * buf,
-				 long bytes, void * user_data);
 
 int fish_sound_identify (unsigned char * buf, long bytes);
 int fish_sound_set_format (FishSound * fsound, int format);  
