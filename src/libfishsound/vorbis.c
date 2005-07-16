@@ -331,10 +331,10 @@ fs_vorbis_encode_write (FishSound * fsound, long len)
       if (fsound->callback.encoded) {
 	FishSoundEncoded encoded = (FishSoundEncoded)fsound->callback.encoded;
 
-	encoded (fsound, op.packet, op.bytes, fsound->user_data);
-
 	if (op.granulepos != -1)
 	  fsound->frameno = op.granulepos;
+
+	encoded (fsound, op.packet, op.bytes, fsound->user_data);
 
 	fsv->packetno++;
       }
