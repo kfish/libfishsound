@@ -330,10 +330,10 @@ fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
       fsound->frameno += fss->frame_size;
 
       /* fss->pcm is ready to go! */
-      if (fsound->callback) {
-	((FishSoundDecoded)fsound->callback) (fsound, retpcm,
-					      fss->frame_size,
-					      fsound->user_data);
+      if (fsound->callback.decoded_float) {
+	((FishSoundDecoded_Float)fsound->callback.decoded_float) (fsound, retpcm,
+								  fss->frame_size,
+								  fsound->user_data);
       }
     }
   }
@@ -370,8 +370,8 @@ fs_speex_enc_headers (FishSound * fsound)
 
   fss->st = speex_encoder_init (mode);
 
-  if (fsound->callback) {
-    FishSoundEncoded encoded = (FishSoundEncoded)fsound->callback;
+  if (fsound->callback.encoded) {
+    FishSoundEncoded encoded = (FishSoundEncoded)fsound->callback.encoded;
     char vendor_string[128];
 
     /* header */
@@ -418,8 +418,8 @@ fs_speex_encode_write (FishSound * fsound)
   bytes = speex_bits_write (&fss->bits, fse->cbits, MAX_FRAME_BYTES);
   speex_bits_reset (&fss->bits);
 
-  if (fsound->callback) {
-    FishSoundEncoded encoded = (FishSoundEncoded)fsound->callback;
+  if (fsound->callback.encoded) {
+    FishSoundEncoded encoded = (FishSoundEncoded)fsound->callback.encoded;
 
     encoded (fsound, (unsigned char *)fse->cbits, (long)bytes,
 	     fsound->user_data);
@@ -652,6 +652,7 @@ fish_sound_speex_codec (void)
   codec->init = fs_speex_init;
   codec->del = fs_speex_delete;
   codec->reset = fs_speex_reset;
+  codec->update = NULL; /* XXX */
   codec->command = fs_speex_command;
   codec->decode = fs_speex_decode;
   codec->encode_f = fs_speex_encode_f;

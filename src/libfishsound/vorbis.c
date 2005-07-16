@@ -240,9 +240,10 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
 	retpcm = pcm;
       }
 
-      if (fsound->callback) {
-	((FishSoundDecoded)fsound->callback) (fsound, retpcm, samples,
-					      fsound->user_data);
+      if (fsound->callback.decoded_float) {
+	((FishSoundDecoded_Float)fsound->callback.decoded_float) (fsound,
+								  retpcm, samples,
+								  fsound->user_data);
       }
 
       if (fsound->frameno != -1)
@@ -299,8 +300,8 @@ fs_vorbis_enc_headers (FishSound * fsound)
 			    &header, &header_comm, &header_code);
 
   /* Pass the generated headers to the user */
-  if (fsound->callback) {
-    FishSoundEncoded encoded = (FishSoundEncoded)fsound->callback;
+  if (fsound->callback.encoded) {
+    FishSoundEncoded encoded = (FishSoundEncoded)fsound->callback.encoded;
 
     encoded (fsound, header.packet, header.bytes, fsound->user_data);
     encoded (fsound, header_comm.packet, header_comm.bytes,
@@ -326,8 +327,8 @@ fs_vorbis_encode_write (FishSound * fsound, long len)
     vorbis_bitrate_addblock (&fsv->vb);
 
     while (vorbis_bitrate_flushpacket (&fsv->vd, &op)) {
-      if (fsound->callback) {
-	FishSoundEncoded encoded = (FishSoundEncoded)fsound->callback;
+      if (fsound->callback.encoded) {
+	FishSoundEncoded encoded = (FishSoundEncoded)fsound->callback.encoded;
 
 	encoded (fsound, op.packet, op.bytes, fsound->user_data);
 
@@ -522,6 +523,7 @@ fish_sound_vorbis_codec (void)
   codec->init = fs_vorbis_init;
   codec->del = fs_vorbis_delete;
   codec->reset = fs_vorbis_reset;
+  codec->update = NULL; /* XXX */
   codec->command = fs_vorbis_command;
   codec->decode = fs_vorbis_decode;
   codec->encode_f = fs_vorbis_encode_f;

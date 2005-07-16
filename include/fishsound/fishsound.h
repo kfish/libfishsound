@@ -417,20 +417,6 @@ typedef struct {
 typedef void * FishSound;
 
 /**
- * Signature of a callback for libfishsound to call when it has decoded
- * audio PCM data.
- * \param fsound The FishSound* handle
- * \param pcm The decoded audio
- * \param frames The count of frames decoded
- * \param user_data Arbitrary user data
- * \retval 0 to continue
- * \retval non-zero to stop decoding immediately and
- * return control to the fish_sound_decode() caller
- */
-typedef int (*FishSoundDecoded) (FishSound * fsound, float ** pcm,
-				 long frames, void * user_data);
-
-/**
  * Signature of a callback for libfishsound to call when it has encoded
  * data.
  * \param fsound The FishSound* handle
@@ -477,18 +463,6 @@ FishSound * fish_sound_new (int mode, FishSoundInfo * fsinfo);
 
 /**
  * Set the callback for libfishsound to call when it has a block of
- * decoded audio ready
- * \param fsound A FishSound* handle (created with mode FISH_SOUND_DECODE)
- * \param decoded The callback to call
- * \param user_data Arbitrary user data to pass to the callback
- * \returns 0 on success, -1 on failure
- */
-int fish_sound_set_decoded_callback (FishSound * fsound,
-				     FishSoundDecoded decoded,
-				     void * user_data);
-
-/**
- * Set the callback for libfishsound to call when it has a block of
  * encoded data ready
  * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
  * \param encoded The callback to call
@@ -498,15 +472,6 @@ int fish_sound_set_decoded_callback (FishSound * fsound,
 int fish_sound_set_encoded_callback (FishSound * fsound,
 				     FishSoundEncoded encoded,
 				     void * user_data);
-
-/**
- * Decode a block of data
- * \param fsound A FishSound* handle (created with mode FISH_SOUND_DECODE)
- * \param buf A buffer of data
- * \param bytes A count of bytes to decode (ie. the length of buf)
- * \returns The number of bytes consumed
- */
-long fish_sound_decode (FishSound * fsound, unsigned char * buf, long bytes);
 
 /**
  * Encode a block of audio
@@ -646,6 +611,9 @@ int fish_sound_prepare_truncation (FishSound * fsound, long next_granulepos,
 }
 #endif
 
+#include <fishsound/decode.h>
 #include <fishsound/comments.h>
+
+#include <fishsound/deprecated.h>
 
 #endif /* __FISH_SOUND_H__ */

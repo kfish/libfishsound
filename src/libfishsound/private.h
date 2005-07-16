@@ -53,6 +53,7 @@ typedef int         (*FSCodecIdentify) (unsigned char * buf, long bytes);
 typedef FishSound * (*FSCodecInit) (FishSound * fsound);
 typedef FishSound * (*FSCodecDelete) (FishSound * fsound);
 typedef int         (*FSCodecReset) (FishSound * fsound);
+typedef int         (*FSCodecUpdate) (FishSound * fsound, int interleave);
 typedef int         (*FSCodecCommand) (FishSound * fsound, int command,
 				       void * data, int datasize);
 typedef long        (*FSCodecDecode) (FishSound * fsound, unsigned char * buf,
@@ -62,6 +63,8 @@ typedef long        (*FSCodecEncode_Float) (FishSound * fsound, float * pcm[],
 typedef long        (*FSCodecEncode_FloatIlv) (FishSound * fsound,
 					       float ** pcm, long frames);
 typedef long        (*FSCodecFlush) (FishSound * fsound);
+
+#include <fishsound/decode.h>
 
 struct _FishSoundFormat {
   int format;
@@ -74,6 +77,7 @@ struct _FishSoundCodec {
   FSCodecInit init;
   FSCodecDelete del;
   FSCodecReset reset;
+  FSCodecUpdate update;
   FSCodecCommand command;
   FSCodecDecode decode;
   FSCodecEncode_FloatIlv encode_f_ilv;
@@ -90,6 +94,12 @@ struct _FishSoundInfo {
 struct _FishSoundComment {
   char * name;
   char * value;
+};
+
+union FishSoundCallback {
+  FishSoundDecoded_Float decoded_float;
+  FishSoundDecoded_FloatIlv decoded_float_ilv;
+  void * encoded;
 };
 
 struct _FishSound {
@@ -129,7 +139,7 @@ struct _FishSound {
   void * codec_data;
 
   /* encode or decode callback */
-  void * callback;
+  union FishSoundCallback callback;
 
   /** user data for encode/decode callback */
   void * user_data; 
@@ -139,11 +149,11 @@ struct _FishSound {
   FishSoundVector * comments;
 };
 
-typedef int (*FishSoundDecoded) (FishSound * fsound, float ** pcm,
-				 long frames, void * user_data);
-
 typedef int (*FishSoundEncoded) (FishSound * fsound, unsigned char * buf,
 				 long bytes, void * user_data);
+
+int fish_sound_identify (unsigned char * buf, long bytes);
+int fish_sound_set_format (FishSound * fsound, int format);  
 
 /* Format specific interfaces */
 int fish_sound_vorbis_identify (unsigned char * buf, long bytes);

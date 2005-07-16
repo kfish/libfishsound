@@ -53,7 +53,7 @@ fish_sound_identify (unsigned char * buf, long bytes)
   return FISH_SOUND_UNKNOWN;
 }
 
-static int
+int
 fish_sound_set_format (FishSound * fsound, int format)
 {
   if (format == FISH_SOUND_VORBIS) {
@@ -105,7 +105,7 @@ fish_sound_new (int mode, FishSoundInfo * fsinfo)
   fsound->next_eos = 0;
   fsound->codec = NULL;
   fsound->codec_data = NULL;
-  fsound->callback = NULL;
+  fsound->callback.encoded = NULL;
   fsound->user_data = NULL;
 
   fish_sound_comments_init (fsound);
@@ -130,13 +130,13 @@ fish_sound_new (int mode, FishSoundInfo * fsinfo)
 
 int
 fish_sound_set_decoded_callback (FishSound * fsound,
-				 FishSoundDecoded decoded,
+				 FishSoundDecoded_Float decoded,
 				 void * user_data)
 {
   if (fsound == NULL) return -1;
 
 #if FS_DECODE
-  fsound->callback = (void *)decoded;
+  fsound->callback.decoded_float = decoded;
   fsound->user_data = user_data;
 #else
   return FISH_SOUND_ERR_DISABLED;
@@ -153,7 +153,7 @@ fish_sound_set_encoded_callback (FishSound * fsound,
   if (fsound == NULL) return -1;
 
 #if FS_ENCODE
-  fsound->callback = (void *)encoded;
+  fsound->callback.encoded = (void *)encoded;
   fsound->user_data = user_data;
 #else
   return FISH_SOUND_ERR_DISABLED;
