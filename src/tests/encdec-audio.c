@@ -502,7 +502,11 @@ fs_encdec_test (FishSoundPCM pcm_type, int samplerate, int channels,
     snprintf (msg, 128,
 	      "%ld frames encoded, %ld frames decoded",
 	      ed->frames_in, ed->frames_out);
-    WARN (msg);
+    if (retval == FISH_SOUND_CONTINUE && ed->frames_out < ed->frames_in) {
+      FAIL (msg);
+    } else {
+      WARN (msg);
+    }
   }
 
   fs_encdec_delete (ed);
