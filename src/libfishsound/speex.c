@@ -359,6 +359,7 @@ fs_speex_enc_headers (FishSound * fsound)
   SpeexHeader header;
   unsigned char * buf;
   int bytes;
+  size_t buflen;
 
   /* XXX: set wb, nb, uwb modes */
   /* These modes are declared const in speex 1.1.x, hence the explicit cast */
@@ -403,8 +404,9 @@ fs_speex_enc_headers (FishSound * fsound)
 
   /* XXX: blah blah blah ... set VBR etc. */
 
-  fss->ipcm = fs_malloc (fss->frame_size * fsound->info.channels
-			 * sizeof (float));
+  buflen = fss->frame_size * fsound->info.channels * sizeof (float);
+  fss->ipcm = fs_malloc (buflen);
+  memset (fss->ipcm, 0, buflen);
 
   return fsound;
 }
@@ -416,6 +418,7 @@ fs_speex_encode_write (FishSound * fsound)
   FishSoundSpeexEnc * fse = (FishSoundSpeexEnc *)fss->enc;
   int bytes;
 
+  speex_bits_insert_terminator (&fss->bits);
   bytes = speex_bits_write (&fss->bits, fse->cbits, MAX_FRAME_BYTES);
   speex_bits_reset (&fss->bits);
 
@@ -541,6 +544,12 @@ fs_speex_flush (FishSound * fsound)
     nencoded += fs_speex_encode_block (fsound);
   }
 
+  /* If, at this point, fse->frame_offset == 0, then either:
+     - all remaining encoded data has just been flushed out via
+     fs_speex_encode_block(), OR
+     - there was no data remaining to flush at the beginning of this
+     function (fse->pcm_offset == 0 && fse->frame_offset == 0)
+  */
   if (fse->frame_offset == 0) return 0;
 
   while (fse->frame_offset < fss->nframes) {
