@@ -47,7 +47,7 @@
  *   audio data in the stream.
  * - When encoding, FishSound will generate the comment block and pass it
  *   to the encoded() callback in sequence, just like any other packet.
- *   Hence, all comments must be set before any call to fish_sound_encode().
+ *   Hence, all comments must be set before any call to fish_sound_encode_*().
  * - When decoding, FishSound will decode the comment block before calling
  *   the first decoded() callback. Hence, retrieving comment data is possible
  *   from as soon as the decoded() callback is first called.
