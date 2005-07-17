@@ -2,5 +2,6 @@
 
 # Include files to install
 includedir = $(prefix)/include/fishsound
-include_HEADERS = fishsound.h decode.h comments.h constants.h deprecated.h
+include_HEADERS = fishsound.h decode.h encode.h comments.h constants.h \
+	deprecated.h
 
