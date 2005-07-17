@@ -195,7 +195,7 @@ if test "x${ac_enable_speex}" = xyes ; then
   if test "x$HAVE_SPEEX" = "xno" ; then
     AC_CHECK_LIB(speex, speex_encoder_init, HAVE_SPEEX="maybe", , [-lm])
     if test "x$HAVE_SPEEX" = xmaybe; then
-      AC_CHECK_HEADER(speex.h, HAVE_SPEEX="yes", HAVE_SPEEX="no")
+      AC_CHECK_HEADER(speex.h, HAVE_SPEEX="yes", HAVE_SPEEX="no", [])
     fi
     if test "x$HAVE_SPEEX" = "xyes" ; then
       SPEEX_CFLAGS=""
@@ -219,6 +219,7 @@ if test "x${ac_enable_speex}" = xyes ; then
       AC_DEFINE(HAVE_SPEEX_1_1, [1], [Define to 1 if you have libspeex 1.1.x])
       SPEEX_SUPPORT="yes (1.1.x)"
     else
+      AC_DEFINE(HAVE_SPEEX_1_1, [0], [Define to 1 if you have libspeex 1.1.x]) 
       SPEEX_SUPPORT="yes (1.0.x)"
     fi
 
