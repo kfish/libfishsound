@@ -21,6 +21,9 @@ AC_PROG_MAKE_SET
 AC_C_CONST
 AC_C_BIGENDIAN
 
+dnl Add parameters for aclocal
+AC_SUBST(ACLOCAL_AMFLAGS, "-I m4")
+
 # Check for doxygen
 AC_CHECK_PROG(HAVE_DOXYGEN, doxygen, true, false)
 AM_CONDITIONAL(HAVE_DOXYGEN,$HAVE_DOXYGEN)
@@ -43,13 +46,13 @@ if test "x${ac_enable_valgrind}" = xyes ; then
   if test "x$HAVE_VALGRIND" = xyes ; then
     VALGRIND_ENVIRONMENT="$VALGRIND_ENVIRONMENT valgrind -q --leak-check=yes --show-reachable=yes --num-callers=100"
     AC_SUBST(VALGRIND_ENVIRONMENT)
-    TESTS_INFO="'make check' test suite will be run under:
+    TESTS_INFO="Type 'make check' to run test suite. Tests will be run under:
   ${VALGRIND_ENVIRONMENT}"
   else
-    TESTS_INFO="'make check' to run test suite (Valgrind not found)"
+    TESTS_INFO="Type 'make check' to run test suite (Valgrind not found)"
   fi
 else
-  TESTS_INFO="'make check' to run test suite (Valgrind testing not enabled)"
+  TESTS_INFO="Type 'make check' to run test suite (Valgrind testing not enabled)"
 fi
 
 dnl Overall configuration success flag
@@ -411,6 +414,11 @@ src/examples/Makefile
 fishsound.pc
 ])
 
+AS_AC_EXPAND(LIBDIR, ${libdir})
+AS_AC_EXPAND(INCLUDEDIR, ${includedir})
+AS_AC_EXPAND(BINDIR, ${bindir})
+AS_AC_EXPAND(DOCDIR, ${datadir}/doc)
+
 AC_MSG_RESULT([
 ------------------------------------------------------------------------
   $PACKAGE $VERSION:  Automatic configuration OK.
@@ -432,11 +440,17 @@ AC_MSG_RESULT([
 
   Installation paths:
 
-    libfishsound: ................ ${prefix}/lib
-    C header files: .............. ${prefix}/include/fishsound
-    Documentation: ............... ${prefix}/share/doc/$PACKAGE
+    libfishsound: ................ ${LIBDIR}
+    C header files: .............. ${INCLUDEDIR}/fishsound
+    Documentation: ............... ${DOCDIR}/$PACKAGE
 
-  ${TESTS_INFO}
+  Building:
+
+    Type 'make' to compile $PACKAGE.
+
+    Type 'make install' to install $PACKAGE.
+
+    ${TESTS_INFO}
 
   Example programs will be built but not installed.
 ------------------------------------------------------------------------
