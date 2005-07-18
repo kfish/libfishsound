@@ -254,6 +254,26 @@ fs_speex_free_buffers (FishSound * fsound)
   return 0;
 }
 
+static inline int
+fs_speex_float_dispatch (FishSound * fsound)
+{
+  FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
+  FishSoundDecoded_FloatIlv df;
+  FishSoundDecoded_Float dfi;
+  int retval;
+
+  if (fsound->interleave) {
+    dfi = (FishSoundDecoded_FloatIlv)fsound->callback.decoded_float_ilv;
+    retval = dfi (fsound, (float **)fss->ipcm, fss->frame_size,
+                  fsound->user_data);
+  } else {
+    df = (FishSoundDecoded_Float)fsound->callback.decoded_float;
+    retval = df (fsound, fss->pcm, fss->frame_size, fsound->user_data);
+  }
+  
+  return retval;
+}
+
 static long
 fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
 {
@@ -263,7 +283,6 @@ fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
   int channels = -1;
   int forceMode = -1;
   int i, j;
-  float ** retpcm;
 
   if (fss->packetno == 0) {
     fss->st = process_header (buf, bytes, enh_enabled,
@@ -322,20 +341,9 @@ fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
 	}
       }
 
-      if (fsound->interleave) {
-	retpcm = (float **)fss->ipcm;
-      } else {
-	retpcm = (float **)fss->pcm;
-      }
-
       fsound->frameno += fss->frame_size;
 
-      /* fss->pcm is ready to go! */
-      if (fsound->callback.decoded_float) {
-	((FishSoundDecoded_Float)fsound->callback.decoded_float) (fsound, retpcm,
-								  fss->frame_size,
-								  fsound->user_data);
-      }
+      fs_speex_float_dispatch (fsound);
     }
   }
 
