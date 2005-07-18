@@ -12,6 +12,7 @@ lib_LTLIBRARIES = libfishsound.la
 
 noinst_HEADERS = \
 	private.h \
+	convert.h \
 	fs_compat.h \
 	fs_vector.h
 
