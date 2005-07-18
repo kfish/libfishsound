@@ -56,8 +56,8 @@
 
 typedef struct _FishSoundVorbisInfo {
   int packetno;
-  struct vorbis_info vi;
-  struct vorbis_comment vc;
+  vorbis_info vi;
+  vorbis_comment vc;
   vorbis_dsp_state vd; /** central working state for the PCM->packet encoder */
   vorbis_block vb;     /** local working space for PCM->packet encode */
   float * pcm_out;
