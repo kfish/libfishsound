@@ -2,7 +2,9 @@ docdir=$(prefix)/share/doc/@PACKAGE@
 
 EXTRA_DIST = Doxyfile.in white-xifish.png
 
-doc_DATA = doxygen-build.stamp
+# ensure doxygen-build.stamp is included,  or else the documentation will
+# not be built or distributed
+noinst_DATA = doxygen-build.stamp
 
 if HAVE_DOXYGEN
 doxygen-build.stamp: Doxyfile $(top_srcdir)/include/fishsound/*.h
