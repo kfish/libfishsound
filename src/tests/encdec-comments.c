@@ -181,6 +181,8 @@ fs_encdec_delete (FS_EncDec * ed)
   free (ed->pcm);
   free (ed);
 
+  INFO ("- Deleted encoder and decoder");
+
   return 0;
 }
 

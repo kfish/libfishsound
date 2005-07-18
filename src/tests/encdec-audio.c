@@ -422,7 +422,7 @@ fs_encdec_delete (FS_EncDec * ed)
 {
   int i;
 
-  if (!ed) return -1;
+  if (!ed) FAIL("Test error: attempted to delete NULL FS_EncDec");
 
   fish_sound_delete (ed->encoder);
   fish_sound_delete (ed->decoder);
