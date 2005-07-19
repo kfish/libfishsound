@@ -20,23 +20,24 @@ This release includes features backported from the development trunk:
 
 	* Valgrind-clean: Removed memory leaks and other errors exposed by
 	running the entire suite of unit tests under valgrind.
-	(Changesets 1391, 1398, Backported changesets:
+	(Changeset 1398, and Backported changesets:
 	285:322 src/libfishsound/comments.c
 	304:323 src/libfishsound/fishsound.c 
 	332:328, 337:515, 568 src/libfishsound/vorbis.c 
-	308, 316, 333:514, 518 src/libfishsound/speex.c
+	308, 316, 333:514 src/libfishsound/speex.c
 	274:516 src/tests/encdec-comments.c
-	294: src/libfishsound/convert.h
-	300, 301, 302, 303, 341, 511, 532, 535, 607, 666, 1356, 1396)
 
-	* Added compatibility with Speex 1.1
-	(Changeset 1391, Backported changesets 306, 307)
+	* Added compatibility with and detection of Speex 1.1
+	(Changeset 1391, and Backported changesets 306, 307)
 
 	* Add support for compilation under MinGW (Erik de Castro Lopo)
 	(Backported changeset 602)
 
-	* Various build system improvements (Thomas van der Stichele)
+	* Various build system improvements (Thomas Vander Stichele)
 	(Backported changesets 536, 1337, 1355)
+
+	* Various minor backports (Backported changesets 294, 300, 301,
+	302, 303, 341, 511, 518, 532, 535, 568, 607, 666, 1356, 1396)
 
 	* Updated shared version info to 2:0:1
 
