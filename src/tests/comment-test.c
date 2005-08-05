@@ -43,7 +43,7 @@
 #define ARTIST1 "Trout Junkies"
 #define ARTIST2 "DJ Fugu"
 #define COPYRIGHT "Copyright (C) 2004. Some Rights Reserved."
-#define LICENSE "Creative Commons Attribute Share-Alike v1.0"
+#define LICENSE "Creative Commons Attribution-ShareAlike"
 #define COMMENT "Unstructured comments are evil."
 
 static FishSound * fsound;
