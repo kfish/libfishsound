@@ -587,7 +587,7 @@ fs_speex_reset (FishSound * fsound)
   return 0;
 }
 
-static void
+static int
 fs_speex_update (FishSound * fsound, int interleave)
 {
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
@@ -614,6 +614,8 @@ fs_speex_update (FishSound * fsound, int interleave)
       fss->pcm[1] = fs_realloc (fss->pcm[1], pcm_size * fss->frame_size);
     }
   }
+
+  return 0;
 }
 
 static FishSound *
