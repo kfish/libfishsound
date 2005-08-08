@@ -78,8 +78,10 @@ typedef struct {
   int interleave;
   int channels;
   float ** pcm;
-  long frames_in;
-  long frames_out;
+  long actual_frames_in; /* <= actual count of frames encoded */
+  long reported_frames_in; /* <= encoded frameno via fish_sound_frameno() */
+  long actual_frames_out; /* <= actual count of frames decoded */
+  long reported_frames_out; /* <= decoded frameno via fish_sound_frameno() */
 } FS_EncDec;
 
 static int
@@ -87,7 +89,8 @@ decoded_float (FishSound * fsound, float ** pcm, long frames, void * user_data)
 {
   FS_EncDec * ed = (FS_EncDec *) user_data;
 
-  ed->frames_out += frames;
+  ed->actual_frames_out += frames;
+  ed->reported_frames_out = fish_sound_get_frameno (ed->decoder);
 
   return 0;
 }
@@ -98,7 +101,8 @@ decoded_float_ilv (FishSound * fsound, float * pcm[], long frames,
 {
   FS_EncDec * ed = (FS_EncDec *) user_data;
 
-  ed->frames_out += frames;
+  ed->actual_frames_out += frames;
+  ed->reported_frames_out = fish_sound_get_frameno (ed->decoder);
 
   return 0;
 }
@@ -164,8 +168,8 @@ fs_encdec_new (int samplerate, int channels, int format, int interleave,
     }
   }
 
-  ed->frames_in = 0;
-  ed->frames_out = 0;
+  ed->actual_frames_in = 0;
+  ed->actual_frames_out = 0;
 
   return ed;
 }
@@ -210,23 +214,31 @@ fs_encdec_test (int samplerate, int channels, int format, int interleave,
   ed = fs_encdec_new (samplerate, channels, format, interleave, blocksize);
 
   for (i = 0; i < iter; i++) {
-    ed->frames_in += blocksize;
-    fish_sound_prepare_truncation (ed->encoder, ed->frames_in,
+    ed->actual_frames_in += blocksize;
+    fish_sound_prepare_truncation (ed->encoder, ed->actual_frames_in,
 				   (i == (iter - 1)));
     fish_sound_encode (ed->encoder, ed->pcm, blocksize);
+    ed->reported_frames_in = fish_sound_get_frameno (ed->encoder);
   }
 
   fish_sound_flush (ed->encoder);
 
-  if (ed->frames_in != ed->frames_out) {
+  if (ed->actual_frames_in != ed->actual_frames_out) {
     snprintf (msg, 128,
 	      "%ld frames encoded, %ld frames decoded",
-	      ed->frames_in, ed->frames_out);
-    if (ed->frames_out < ed->frames_in) {
+	      ed->actual_frames_in, ed->actual_frames_out);
+    if (ed->actual_frames_out < ed->actual_frames_in) {
       FAIL (msg);
     } else {
       WARN (msg);
     }
+  }
+
+  if (ed->reported_frames_in != ed->reported_frames_out) {
+    snprintf (msg, 128,
+	      "%ld frames reported in, %ld frames reported out",
+	      ed->reported_frames_in, ed->reported_frames_out);
+    WARN (msg);
   }
 
   fs_encdec_delete (ed);
