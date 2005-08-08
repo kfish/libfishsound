@@ -204,6 +204,7 @@ fs_encdec_test (int samplerate, int channels, int format, int interleave,
   FS_EncDec * ed;
   char msg[128];
   int i;
+  long expected_frames;
 
   snprintf (msg, 128,
 	    "+ %2d channel %6d Hz %s, %d frame buffer (%s)",
@@ -226,7 +227,12 @@ fs_encdec_test (int samplerate, int channels, int format, int interleave,
   fish_sound_flush (ed->encoder);
   ed->reported_frames_in = fish_sound_get_frameno (ed->encoder);
 
-  if (ed->actual_frames_in != ed->actual_frames_out) {
+  expected_frames = ed->actual_frames_in;
+  if (format == FISH_SOUND_SPEEX) {
+    expected_frames += (320 - (expected_frames % 320));
+  }
+
+  if (ed->actual_frames_out != expected_frames) {
     snprintf (msg, 128,
 	      "%ld frames encoded, %ld frames decoded",
 	      ed->actual_frames_in, ed->actual_frames_out);
@@ -237,7 +243,12 @@ fs_encdec_test (int samplerate, int channels, int format, int interleave,
     }
   }
 
-  if (ed->reported_frames_in != ed->reported_frames_out) {
+  expected_frames = ed->reported_frames_in;
+  if (format == FISH_SOUND_SPEEX) {
+    expected_frames += (320 - (expected_frames % 320));
+  }
+
+  if (ed->reported_frames_out != expected_frames) {
     snprintf (msg, 128,
 	      "%ld frames reported in, %ld frames reported out",
 	      ed->reported_frames_in, ed->reported_frames_out);
