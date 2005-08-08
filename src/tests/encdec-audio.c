@@ -169,7 +169,9 @@ fs_encdec_new (int samplerate, int channels, int format, int interleave,
   }
 
   ed->actual_frames_in = 0;
+  ed->reported_frames_in = 0;
   ed->actual_frames_out = 0;
+  ed->reported_frames_out = 0;
 
   return ed;
 }
@@ -222,6 +224,7 @@ fs_encdec_test (int samplerate, int channels, int format, int interleave,
   }
 
   fish_sound_flush (ed->encoder);
+  ed->reported_frames_in = fish_sound_get_frameno (ed->encoder);
 
   if (ed->actual_frames_in != ed->actual_frames_out) {
     snprintf (msg, 128,
