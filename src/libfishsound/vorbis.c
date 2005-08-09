@@ -373,7 +373,7 @@ fs_vorbis_encode_f_ilv (FishSound * fsound, float ** pcm, long frames)
 
   /**
    * End of input. Tell libvorbis we're at the end of stream so that it can
-   * handle the last frame and marke end of stream in the output properly.
+   * handle the last frame and mark the end of stream in the output properly.
    */
   if (fsound->next_eos)
     fs_vorbis_encode_write (fsound, 0);
@@ -419,7 +419,7 @@ fs_vorbis_encode_f (FishSound * fsound, float * pcm[], long frames)
 
   /**
    * End of input. Tell libvorbis we're at the end of stream so that it can
-   * handle the last frame and marke end of stream in the output properly.
+   * handle the last frame and mark the end of stream in the output properly.
    */
   if (fsound->next_eos)
     fs_vorbis_encode_write (fsound, 0);
