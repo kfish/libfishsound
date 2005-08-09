@@ -241,14 +241,14 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
 	retpcm = pcm;
       }
 
+      if (fsound->frameno != -1)
+	fsound->frameno += samples;
+
       if (fsound->callback.decoded_float) {
 	((FishSoundDecoded_Float)fsound->callback.decoded_float) (fsound,
 								  retpcm, samples,
 								  fsound->user_data);
       }
-
-      if (fsound->frameno != -1)
-	fsound->frameno += samples;
     }
   }
 
