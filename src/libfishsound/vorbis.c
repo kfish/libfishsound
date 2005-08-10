@@ -50,6 +50,7 @@
 
 typedef struct _FishSoundVorbisInfo {
   int packetno;
+  int finished;
   vorbis_info vi;
   vorbis_comment vc;
   vorbis_dsp_state vd; /** central working state for the PCM->packet encoder */
@@ -267,7 +268,6 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
 
 #endif
 
-
 #if FS_ENCODE && HAVE_VORBISENC
 
 static FishSound *
@@ -344,6 +344,21 @@ fs_vorbis_encode_write (FishSound * fsound, long len)
   return len;
 }
 
+static int
+fs_vorbis_finish (FishSound * fsound)
+{
+  FishSoundVorbisInfo * fsv = (FishSoundVorbisInfo *)fsound->codec_data;
+
+  if (!fsv->finished) {
+    if (fsound->mode == FISH_SOUND_ENCODE) {
+      fs_vorbis_encode_write (fsound, 0);
+    }
+    fsv->finished = 1;
+  }
+
+  return 0;
+}
+
 static long
 fs_vorbis_encode_f_ilv (FishSound * fsound, float ** pcm, long frames)
 {
@@ -354,6 +369,11 @@ fs_vorbis_encode_f_ilv (FishSound * fsound, float ** pcm, long frames)
 
   if (fsv->packetno == 0) {
     fs_vorbis_enc_headers (fsound);
+  }
+
+  if (frames == 0) {
+    fs_vorbis_finish (fsound);
+    return 0;
   }
 
   while (remaining > 0) {
@@ -376,7 +396,7 @@ fs_vorbis_encode_f_ilv (FishSound * fsound, float ** pcm, long frames)
    * handle the last frame and mark the end of stream in the output properly.
    */
   if (fsound->next_eos)
-    fs_vorbis_encode_write (fsound, 0);
+    fs_vorbis_finish (fsound);
 
   return 0;
 }
@@ -392,6 +412,11 @@ fs_vorbis_encode_f (FishSound * fsound, float * pcm[], long frames)
 
   if (fsv->packetno == 0) {
     fs_vorbis_enc_headers (fsound);
+  }
+
+  if (frames == 0) {
+    fs_vorbis_finish (fsound);
+    return 0;
   }
 
   for (i = 0; i < fsound->info.channels; i++) {
@@ -422,7 +447,7 @@ fs_vorbis_encode_f (FishSound * fsound, float * pcm[], long frames)
    * handle the last frame and mark the end of stream in the output properly.
    */
   if (fsound->next_eos)
-    fs_vorbis_encode_write (fsound, 0);
+    fs_vorbis_finish (fsound);
 
   return 0;
 }
@@ -452,6 +477,7 @@ fs_vorbis_enc_init (FishSound * fsound)
 
 #define fs_vorbis_encode_f NULL
 #define fs_vorbis_encode_f_ilv NULL
+#define fs_vorbis_finish NULL
 
 #endif /* ! FS_ENCODE && HAVE_VORBISENC */
 
@@ -474,6 +500,7 @@ fs_vorbis_init (FishSound * fsound)
   if (fsv == NULL) return NULL;
 
   fsv->packetno = 0;
+  fsv->finished = 0;
   vorbis_info_init (&fsv->vi);
   vorbis_comment_init (&fsv->vc);
   fsv->ipcm = NULL;
@@ -496,6 +523,8 @@ static FishSound *
 fs_vorbis_delete (FishSound * fsound)
 {
   FishSoundVorbisInfo * fsv = (FishSoundVorbisInfo *)fsound->codec_data;
+
+  fs_vorbis_finish (fsound);
 
   if (fsv->ipcm) fs_free (fsv->ipcm);
 
