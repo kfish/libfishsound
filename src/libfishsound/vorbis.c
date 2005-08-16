@@ -111,7 +111,7 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
 {
   FishSoundVorbisInfo * fsv = (FishSoundVorbisInfo *)fsound->codec_data;
   ogg_packet op;
-  float ** pcm, **retpcm;
+  float ** pcm;
   long samples;
   int ret;
 
@@ -146,11 +146,17 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
       vorbis_block_init (&fsv->vd, &fsv->vb);
     }
   } else {
+    FishSoundDecoded_FloatIlv df;
+    FishSoundDecoded_Float dfi;
+
     if (vorbis_synthesis (&fsv->vb, &op) == 0)
       vorbis_synthesis_blockin (&fsv->vd, &fsv->vb);
 
     while ((samples = vorbis_synthesis_pcmout (&fsv->vd, &pcm)) > 0) {
       vorbis_synthesis_read (&fsv->vd, samples);
+
+      if (fsound->frameno != -1)
+	fsound->frameno += samples;
 
       if (fsound->interleave) {
 	if (samples > fsv->max_pcm) {
@@ -160,18 +166,12 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
 	}
 	_fs_interleave (pcm, (float **)fsv->ipcm, samples,
 			fsound->info.channels, 1.0);
-	retpcm = (float **)fsv->ipcm;
+
+	dfi = (FishSoundDecoded_FloatIlv)fsound->callback.decoded_float_ilv;
+	dfi (fsound, (float **)fsv->ipcm, samples, fsound->user_data);
       } else {
-	retpcm = pcm;
-      }
-
-      if (fsound->frameno != -1)
-	fsound->frameno += samples;
-
-      if (fsound->callback.decoded_float) {
-	((FishSoundDecoded_Float)fsound->callback.decoded_float) (fsound,
-								  retpcm, samples,
-								  fsound->user_data);
+	df = (FishSoundDecoded_Float)fsound->callback.decoded_float;
+	df (fsound, pcm, samples, fsound->user_data);
       }
     }
   }
