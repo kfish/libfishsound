@@ -55,7 +55,8 @@ typedef struct _FishSoundVorbisInfo {
   vorbis_comment vc;
   vorbis_dsp_state vd; /** central working state for the PCM->packet encoder */
   vorbis_block vb;     /** local working space for PCM->packet encode */
-  float * ipcm;
+  float ** pcm; /** ongoing pcm working space for decoder (stateful) */
+  float * ipcm; /** interleaved pcm for interfacing with user */
   long max_pcm;
 } FishSoundVorbisInfo;
 
@@ -111,7 +112,6 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
 {
   FishSoundVorbisInfo * fsv = (FishSoundVorbisInfo *)fsound->codec_data;
   ogg_packet op;
-  float ** pcm;
   long samples;
   int ret;
 
@@ -152,7 +152,7 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
     if (vorbis_synthesis (&fsv->vb, &op) == 0)
       vorbis_synthesis_blockin (&fsv->vd, &fsv->vb);
 
-    while ((samples = vorbis_synthesis_pcmout (&fsv->vd, &pcm)) > 0) {
+    while ((samples = vorbis_synthesis_pcmout (&fsv->vd, &fsv->pcm)) > 0) {
       vorbis_synthesis_read (&fsv->vd, samples);
 
       if (fsound->frameno != -1)
@@ -164,14 +164,14 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
 			       fsound->info.channels);
 	  fsv->max_pcm = samples;
 	}
-	_fs_interleave (pcm, (float **)fsv->ipcm, samples,
+	_fs_interleave (fsv->pcm, (float **)fsv->ipcm, samples,
 			fsound->info.channels, 1.0);
 
 	dfi = (FishSoundDecoded_FloatIlv)fsound->callback.decoded_float_ilv;
 	dfi (fsound, (float **)fsv->ipcm, samples, fsound->user_data);
       } else {
 	df = (FishSoundDecoded_Float)fsound->callback.decoded_float;
-	df (fsound, pcm, samples, fsound->user_data);
+	df (fsound, fsv->pcm, samples, fsound->user_data);
       }
     }
   }
@@ -426,6 +426,7 @@ fs_vorbis_init (FishSound * fsound)
   fsv->finished = 0;
   vorbis_info_init (&fsv->vi);
   vorbis_comment_init (&fsv->vc);
+  fsv->pcm = NULL;
   fsv->ipcm = NULL;
   fsv->max_pcm = 0;
 
