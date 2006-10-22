@@ -439,7 +439,7 @@ fish_sound_identify (unsigned char * buf, long bytes);
 /**
  * Instantiate a new FishSound* handle
  * \param mode FISH_SOUND_DECODE or FISH_SOUND_ENCODE
- * \param fsinfo
+ * \param fsinfo Encoder configuration, may be NULL for FISH_SOUND_DECODE
  * \returns A new FishSound* handle, or NULL on error
  */
 FishSound * fish_sound_new (int mode, FishSoundInfo * fsinfo);

@@ -119,7 +119,7 @@ main (int argc, char ** argv)
   infilename = argv[1];
   outfilename = argv[2];
 
-  fsound = fish_sound_new (FISH_SOUND_DECODE, &fsinfo);
+  fsound = fish_sound_new (FISH_SOUND_DECODE, NULL);
 
   fish_sound_set_interleave (fsound, 1);
 
