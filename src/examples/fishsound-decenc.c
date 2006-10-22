@@ -147,7 +147,7 @@ fs_encdec_new (char * infilename, char * outfilename, int format,
   oggz_set_read_callback (ed->oggz_in, -1, read_packet, ed);
   ed->serialno = oggz_serialno_new (ed->oggz_out);
 
-  ed->decoder = fish_sound_new (FISH_SOUND_DECODE, &fsinfo);
+  ed->decoder = fish_sound_new (FISH_SOUND_DECODE, NULL);
 
   fish_sound_set_interleave (ed->decoder, interleave);
 
@@ -156,7 +156,7 @@ fs_encdec_new (char * infilename, char * outfilename, int format,
   ed->format = format;
   ed->begun = 0;
   ed->b_o_s = 1;
-  ed->channels = fsinfo.channels;
+  ed->channels = fsinfo.channels; /* FIXME: fsinfo is unitialized! */
   ed->interleave = interleave;
 
   if (interleave) {

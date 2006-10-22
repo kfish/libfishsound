@@ -105,7 +105,7 @@ fs_encdec_new (char * infilename, char * outfilename, int format,
   fsinfo.format = format;
 
   ed->encoder = fish_sound_new (FISH_SOUND_ENCODE, &fsinfo);
-  ed->decoder = fish_sound_new (FISH_SOUND_DECODE, &fsinfo);
+  ed->decoder = fish_sound_new (FISH_SOUND_DECODE, NULL);
 
   fish_sound_set_interleave (ed->encoder, 1);
   fish_sound_set_interleave (ed->decoder, 1);
