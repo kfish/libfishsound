@@ -98,10 +98,12 @@ int fish_sound_set_decoded_float_ilv (FishSound * fsound,
 				      void * user_data);
 
 /**
- * Decode a block of data
+ * Decode a block of compressed data.
+ * No internal buffering is done, so a complete compressed audio packet
+ * must be passed each time.
  * \param fsound A FishSound* handle (created with mode FISH_SOUND_DECODE)
- * \param buf A buffer of data
- * \param bytes A count of bytes to decode (ie. the length of buf)
+ * \param buf A buffer containing a compressed audio packet
+ * \param bytes A count of bytes to decode (i.e. the length of buf)
  * \returns The number of bytes consumed
  * \retval FISH_SOUND_ERR_STOP_OK Decoding was stopped by a FishSoundDecode*
  * callback returning FISH_SOUND_STOP_OK before any input bytes were consumed.
