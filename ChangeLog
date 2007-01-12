@@ -1,3 +1,10 @@
+2007-01-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* Makefile.am:
+	  dist m4 macro
+	* include/fishsound/Makefile.am:
+	  fix include directory when overriding includedir
+
 2005-06-13  Thomas Vander Stichele  <thomas at apestaart dot org>
 
 	* autogen.sh:
