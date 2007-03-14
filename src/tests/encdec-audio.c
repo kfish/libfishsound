@@ -112,8 +112,10 @@ typedef struct {
     float ** f;
     double ** d;
   } pcm;
-  long frames_in;
-  long frames_out;
+  long actual_frames_in; /* <= actual count of frames encoded */
+  long reported_frames_in; /* <= encoded frameno via fish_sound_frameno() */
+  long actual_frames_out; /* <= actual count of frames decoded */
+  long reported_frames_out; /* <= decoded frameno via fish_sound_frameno() */
 } FS_EncDec;
 
 static const char *
@@ -136,7 +138,8 @@ decoded_short (FishSound * fsound, short ** pcm, long frames, void * user_data)
 {
   FS_EncDec * ed = (FS_EncDec *) user_data;
 
-  ed->frames_out += frames;
+  ed->actual_frames_out += frames;
+  ed->reported_frames_out = fish_sound_get_frameno (ed->decoder);
 
   return ed->retval;
 }
@@ -147,7 +150,8 @@ decoded_short_ilv (FishSound * fsound, short * pcm[], long frames,
 {
   FS_EncDec * ed = (FS_EncDec *) user_data;
 
-  ed->frames_out += frames;
+  ed->actual_frames_out += frames;
+  ed->reported_frames_out = fish_sound_get_frameno (ed->decoder);
 
   return ed->retval;
 }
@@ -157,7 +161,8 @@ decoded_int (FishSound * fsound, int ** pcm, long frames, void * user_data)
 {
   FS_EncDec * ed = (FS_EncDec *) user_data;
 
-  ed->frames_out += frames;
+  ed->actual_frames_out += frames;
+  ed->reported_frames_out = fish_sound_get_frameno (ed->decoder);
 
   return ed->retval;
 }
@@ -168,7 +173,8 @@ decoded_int_ilv (FishSound * fsound, int * pcm[], long frames,
 {
   FS_EncDec * ed = (FS_EncDec *) user_data;
 
-  ed->frames_out += frames;
+  ed->actual_frames_out += frames;
+  ed->reported_frames_out = fish_sound_get_frameno (ed->decoder);
 
   return ed->retval;
 }
@@ -178,7 +184,8 @@ decoded_float (FishSound * fsound, float ** pcm, long frames, void * user_data)
 {
   FS_EncDec * ed = (FS_EncDec *) user_data;
 
-  ed->frames_out += frames;
+  ed->actual_frames_out += frames;
+  ed->reported_frames_out = fish_sound_get_frameno (ed->decoder);
 
   return ed->retval;
 }
@@ -189,7 +196,8 @@ decoded_float_ilv (FishSound * fsound, float * pcm[], long frames,
 {
   FS_EncDec * ed = (FS_EncDec *) user_data;
 
-  ed->frames_out += frames;
+  ed->actual_frames_out += frames;
+  ed->reported_frames_out = fish_sound_get_frameno (ed->decoder);
 
   return ed->retval;
 }
@@ -200,7 +208,8 @@ decoded_double (FishSound * fsound, double ** pcm, long frames,
 {
   FS_EncDec * ed = (FS_EncDec *) user_data;
 
-  ed->frames_out += frames;
+  ed->actual_frames_out += frames;
+  ed->reported_frames_out = fish_sound_get_frameno (ed->decoder);
 
   return ed->retval;
 }
@@ -211,7 +220,8 @@ decoded_double_ilv (FishSound * fsound, double * pcm[], long frames,
 {
   FS_EncDec * ed = (FS_EncDec *) user_data;
 
-  ed->frames_out += frames;
+  ed->actual_frames_out += frames;
+  ed->reported_frames_out = fish_sound_get_frameno (ed->decoder);
 
   return ed->retval;
 }
@@ -248,7 +258,7 @@ encoded (FishSound * fsound, unsigned char * buf, long bytes, void * user_data)
       if (ret > 0) bytes_decoded += ret;
     }
     if (ret != FISH_SOUND_ERR_STOP_ERR && ret < -1) {
-      fprintf (stderr, "STOP_ERR: retval %d\n", ret);
+      fprintf (stderr, "STOP_ERR: retval %ld\n", ret);
       FAIL ("FISH_SOUND_STOP_ERR: Bad return value from fish_sound_decode");
     }
     if (bytes_decoded > bytes)
@@ -411,8 +421,10 @@ fs_encdec_new (FishSoundPCM pcm_type, int samplerate, int channels,
     break;
   }
 
-  ed->frames_in = 0;
-  ed->frames_out = 0;
+  ed->actual_frames_in = 0;
+  ed->reported_frames_in = 0;
+  ed->actual_frames_out = 0;
+  ed->reported_frames_out = 0;
 
   return ed;
 }
@@ -445,6 +457,7 @@ fs_encdec_test (FishSoundPCM pcm_type, int samplerate, int channels,
   FS_EncDec * ed;
   char msg[128];
   int i;
+  long expected_frames;
 
   snprintf (msg, 128,
 	    "+ %2d channel %6d Hz %s %d frame %-6s (%s) [%s]",
@@ -459,8 +472,8 @@ fs_encdec_test (FishSoundPCM pcm_type, int samplerate, int channels,
 		      interleave, blocksize, retval);
 
   for (i = 0; i < iter; i++) {
-    ed->frames_in += blocksize;
-    fish_sound_prepare_truncation (ed->encoder, ed->frames_in,
+    ed->actual_frames_in += blocksize;
+    fish_sound_prepare_truncation (ed->encoder, ed->actual_frames_in,
 				   (i == (iter - 1)));
     switch (pcm_type) {
     case FISH_SOUND_PCM_SHORT:
@@ -494,19 +507,38 @@ fs_encdec_test (FishSoundPCM pcm_type, int samplerate, int channels,
     default:
       break;
     }
+    ed->reported_frames_in = fish_sound_get_frameno (ed->encoder);
   }
 
   fish_sound_flush (ed->encoder);
+  ed->reported_frames_in = fish_sound_get_frameno (ed->encoder);
 
-  if (ed->frames_in != ed->frames_out) {
+  expected_frames = ed->actual_frames_in;
+  if (format == FISH_SOUND_SPEEX) {
+    expected_frames += (320 - (expected_frames % 320));
+  } 
+
+  if (ed->actual_frames_out != expected_frames) {
     snprintf (msg, 128,
 	      "%ld frames encoded, %ld frames decoded",
-	      ed->frames_in, ed->frames_out);
-    if (retval == FISH_SOUND_CONTINUE && ed->frames_out < ed->frames_in) {
+	      ed->actual_frames_in, ed->actual_frames_out);
+    if (retval == FISH_SOUND_CONTINUE && ed->actual_frames_out < ed->actual_frames_in) {
       FAIL (msg);
     } else {
       WARN (msg);
     }
+  }
+
+  expected_frames = ed->reported_frames_in;
+  if (format == FISH_SOUND_SPEEX) {
+    expected_frames += (320 - (expected_frames % 320));
+  }
+
+  if (ed->reported_frames_out != expected_frames) {
+    snprintf (msg, 128,
+              "%ld frames reported in, %ld frames reported out",
+              ed->reported_frames_in, ed->reported_frames_out);
+    WARN (msg);
   }
 
   fs_encdec_delete (ed);
