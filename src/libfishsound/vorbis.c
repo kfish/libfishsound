@@ -312,6 +312,9 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
     while ((samples = vorbis_synthesis_pcmout (&fsv->vd, &pcm)) > 0) {
       vorbis_synthesis_read (&fsv->vd, samples);
 
+      if (fsound->frameno != -1)
+	fsound->frameno += samples;
+
       switch (fsound->pcm_type) {
       case FISH_SOUND_PCM_SHORT:
         fs_vorbis_short_dispatch (fsound, pcm, samples);
@@ -324,9 +327,6 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
       default:
         break;
       }
-
-      if (fsound->frameno != -1)
-	fsound->frameno += samples;
     }
   }
 
