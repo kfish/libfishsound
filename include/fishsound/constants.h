@@ -58,6 +58,18 @@ typedef enum _FishSoundCodecID {
   FISH_SOUND_SPEEX   = 0x02
 } FishSoundCodecID;
 
+/** Decode callback return values */
+typedef enum _FishSoundStopCtl {
+  /** Continue calling decode callbacks */
+  FISH_SOUND_CONTINUE = 0,
+  
+  /** Stop calling callbacks, but retain buffered data */
+  FISH_SOUND_STOP_OK  = 1,
+  
+  /** Stop calling callbacks, and purge buffered data */
+  FISH_SOUND_STOP_ERR = -1
+} FishSoundStopCtl;
+
 /** Command codes */
 typedef enum _FishSoundCommand {
   /** No operation */
