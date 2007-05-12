@@ -6,7 +6,7 @@ AC_PREREQ(2.53)
 
 AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE(libfishsound, 0.6.3.svn)
+AM_INIT_AUTOMAKE(libfishsound, 0.7.1.svn)
 AM_CONFIG_HEADER(config.h)
 
 SHARED_VERSION_INFO="1:0:0"
@@ -574,7 +574,7 @@ AC_MSG_RESULT([
 
     Type 'make install' to install $PACKAGE.
 
-    Type 'make check' to test $PACKAGE using the unittests
+    Type 'make check' to test $PACKAGE using the unit tests
     contained in the src/tests directory.
     ${TESTS_INFO}
 
