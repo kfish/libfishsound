@@ -24,6 +24,12 @@
 		fish_sound_set_frameno;
 		fish_sound_prepare_truncation;
 
+		fish_sound_set_decoded_float;
+		fish_sound_set_decoded_float_ilv;
+
+		fish_sound_encode_float;
+		fish_sound_encode_float_ilv;
+
 		fish_sound_comment_get_vendor;
 		fish_sound_comment_first;
 		fish_sound_comment_first_byname;
