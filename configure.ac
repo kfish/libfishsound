@@ -60,6 +60,9 @@ fishsound_config_ok=yes
 
 fishsound_examples=""
 
+dnl Optional requirements to report via pkg-config (in fishsound.pc)
+fishsound_pkgdeps=""
+
 dnl
 dnl  Configuration option for building of experimental code.
 dnl
@@ -142,6 +145,7 @@ if test "x${ac_enable_vorbis}" = xyes ; then
   fi
   if test "x$HAVE_VORBIS" = xyes ; then
     AC_DEFINE(HAVE_VORBIS, [1], [Define to 1 if you have libvorbis])
+    fishsound_pkgdeps="$fishsound_pkgdeps vorbis"
   else
     AC_DEFINE(HAVE_VORBIS, [0], [Define to 1 if you have libvorbis])
   fi
@@ -155,6 +159,7 @@ if test "x${ac_enable_vorbis}" = xyes ; then
     fi
     if test "x$HAVE_VORBISENC" = xyes ; then
       AC_DEFINE(HAVE_VORBISENC, [1], [Define to 1 if you have libvorbisenc])
+      fishsound_pkgdeps="$fishsound_pkgdeps vorbisenc"
     else
       AC_DEFINE(HAVE_VORBISENC, [0], [Define to 1 if you have libvorbisenc])
     fi
@@ -231,6 +236,8 @@ if test "x${ac_enable_speex}" = xyes ; then
     AC_DEFINE(HAVE_SPEEX, [1], [Define to 1 if you have libspeex])
     AC_SUBST(SPEEX_CFLAGS)
     AC_SUBST(SPEEX_LIBS)
+
+    fishsound_pkgdeps="$fishsound_pkgdeps speex"
   else
     AC_DEFINE(HAVE_SPEEX, [0], [Define to 1 if you have libspeex])
   fi
@@ -382,6 +389,8 @@ else
 
 AC_SUBST(SHLIB_VERSION_ARG)
 AC_SUBST(SHARED_VERSION_INFO)
+
+AC_SUBST(fishsound_pkgdeps)
 
 if test "x$HAVE_OGGZ" = xyes ; then
   fishsound_examples="fishsound-identify"

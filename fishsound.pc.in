@@ -5,7 +5,7 @@ includedir=@includedir@
 
 Name: fishsound
 Description: Encode and decode Vorbis, Speex compressed audio
-Requires:
+Requires: @fishsound_pkgdeps@
 Version: @VERSION@
 Libs: -L${libdir} -lfishsound
 Libs.private: @VORBIS_LIBS@ @SPEEX_LIBS@
