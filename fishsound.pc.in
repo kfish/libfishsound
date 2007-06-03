@@ -7,5 +7,6 @@ Name: fishsound
 Description: Encode and decode Vorbis, Speex compressed audio
 Requires:
 Version: @VERSION@
-Libs: -L${libdir} -lfishsound @VORBIS_LIBS@ @SPEEX_LIBS@
+Libs: -L${libdir} -lfishsound
+Libs.private: @VORBIS_LIBS@ @SPEEX_LIBS@
 Cflags: -I${includedir}
