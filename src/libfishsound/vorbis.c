@@ -548,8 +548,10 @@ fs_vorbis_delete (FishSound * fsound)
 {
   FishSoundVorbisInfo * fsv = (FishSoundVorbisInfo *)fsound->codec_data;
 
+#if FS_ENCODE && HAVE_VORBISENC
   if (fsound->finalized)
     fs_vorbis_finish (fsound);
+#endif /* FS_ENCODE && HAVE_VORBISENC */
 
   if (fsv->pcm_out && fsv->pcm_out != fsv->ipcm)
     fs_free (fsv->pcm_out);
