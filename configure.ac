@@ -273,12 +273,8 @@ if test "x${ac_enable_speex}" = xyes ; then
     CFLAGS="$CFLAGS $SPEEX_CFLAGS"
 
     dnl Test for libspeex 1.1.x
-    AC_CHECK_LIB(speex, speex_preprocess, HAVE_SPEEX_1_1="maybe", ,
-      [$SPEEX_LIBS])
-    if test "x$HAVE_SPEEX_1_1" = xmaybe; then
-      AC_CHECK_HEADER([speex/speex_preprocess.h], HAVE_SPEEX_1_1="yes",
-        HAVE_SPEEX_1_1="no")
-    fi
+    AC_CHECK_LIB(speex, speex_decode_int, HAVE_SPEEX_1_1="yes",
+        HAVE_SPEEX_1_1="no", [$SPEEX_LIBS])
     if test "x$HAVE_SPEEX_1_1" = xyes ; then
       AC_DEFINE(HAVE_SPEEX_1_1, [1], [Define to 1 if you have libspeex 1.1.x])
       SPEEX_SUPPORT="yes (1.1.x)"
