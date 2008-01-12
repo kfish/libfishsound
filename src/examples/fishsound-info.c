@@ -99,7 +99,7 @@ main (int argc, char ** argv)
   if (argc < 2) {
     printf ("usage: %s infilename\n", argv[0]);
     printf ("*** FishSound example program. ***\n");
-    printf ("Display information about an Ogg Speex or Ogg Vorbis file.\n");
+    printf ("Display information about an Ogg FLAC, Speex or Ogg Vorbis file.\n");
     exit (1);
   }
 

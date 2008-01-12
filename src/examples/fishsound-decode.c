@@ -95,7 +95,7 @@ main (int argc, char ** argv)
   if (argc < 3) {
     printf ("usage: %s infilename outfilename\n", argv[0]);
     printf ("*** FishSound example program. ***\n");
-    printf ("Decodes an Ogg Speex or Ogg Vorbis file producing a PCM wav file.\n");
+    printf ("Decodes an Ogg FLAC, Speex or Ogg Vorbis file producing a PCM wav file.\n");
     exit (1);
   }
 

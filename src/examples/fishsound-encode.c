@@ -88,7 +88,7 @@ main (int argc, char ** argv)
   if (argc < 3) {
     printf ("usage: %s infile outfile\n", argv[0]);
     printf ("*** FishSound example program. ***\n");
-    printf ("Opens a pcm audio file and encodes it to an Ogg Vorbis or Speex file.\n");
+    printf ("Opens a PCM audio file and encodes it to an Ogg FLAC, Speex or Ogg Vorbis file.\n");
     exit (1);
   }
 
@@ -109,7 +109,7 @@ main (int argc, char ** argv)
   ext = strrchr (outfilename, '.');
   if (ext && !strncasecmp (ext, ".spx", 4))
     format = FISH_SOUND_SPEEX;
-  else if (ext && !strncasecmp (ext, ".flc", 4))
+  else if (ext && !strncasecmp (ext, ".oga", 4))
     format = FISH_SOUND_FLAC;   
   else
     format = FISH_SOUND_VORBIS;
