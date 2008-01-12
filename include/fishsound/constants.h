@@ -55,7 +55,10 @@ typedef enum _FishSoundCodecID {
   FISH_SOUND_VORBIS  = 0x01,
 
   /** Speex */
-  FISH_SOUND_SPEEX   = 0x02
+  FISH_SOUND_SPEEX   = 0x02,
+
+  /** Flac */
+  FISH_SOUND_FLAC    = 0x03
 } FishSoundCodecID;
 
 /** Decode callback return values */

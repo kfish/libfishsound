@@ -50,6 +50,9 @@ fish_sound_identify (unsigned char * buf, long bytes)
       fish_sound_speex_identify (buf, bytes) != FISH_SOUND_UNKNOWN)
     return FISH_SOUND_SPEEX;
 
+  if (fish_sound_flac_identify (buf, bytes) != FISH_SOUND_UNKNOWN)
+    return FISH_SOUND_FLAC;
+
   return FISH_SOUND_UNKNOWN;
 }
 
@@ -60,7 +63,9 @@ fish_sound_set_format (FishSound * fsound, int format)
     fsound->codec = fish_sound_vorbis_codec ();
   } else if (format == FISH_SOUND_SPEEX) {
     fsound->codec = fish_sound_speex_codec ();
-  } else {
+  } else if (format == FISH_SOUND_FLAC) {
+    fsound->codec = fish_sound_flac_codec ();
+   } else {
     return -1;
   }
 
@@ -90,6 +95,9 @@ fish_sound_new (int mode, FishSoundInfo * fsinfo)
       }
       if (!HAVE_SPEEX) {
 	if (fsinfo->format == FISH_SOUND_SPEEX) return NULL;
+      }
+      if (!HAVE_FLAC) {
+        if (fsinfo->format == FISH_SOUND_FLAC) return NULL;
       }
     }
   } else if (mode != FISH_SOUND_DECODE) {

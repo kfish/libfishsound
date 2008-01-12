@@ -100,7 +100,7 @@ struct _FishSoundComment {
 union FishSoundCallback {
   FishSoundDecoded_Float decoded_float;
   FishSoundDecoded_FloatIlv decoded_float_ilv;
-  FishSoundEncoded * encoded;
+  FishSoundEncoded encoded;
 };
 
 struct _FishSound {
@@ -159,6 +159,9 @@ FishSoundCodec * fish_sound_vorbis_codec (void);
 
 int fish_sound_speex_identify (unsigned char * buf, long bytes);
 FishSoundCodec * fish_sound_speex_codec (void);
+
+int fish_sound_flac_identify (unsigned char * buf, long bytes);
+FishSoundCodec * fish_sound_flac_codec (void);
 
 /* comments */
 int fish_sound_comments_init (FishSound * fsound);

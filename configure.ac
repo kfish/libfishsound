@@ -244,6 +244,37 @@ fi
 AM_CONDITIONAL(HAVE_SPEEX, [test "x$HAVE_SPEEX" = "xyes"])
 
 dnl
+dnl  Detect flac
+dnl
+
+HAVE_FLAC=no
+FLAC_SUPPORT=no
+
+ac_enable_flac=yes
+AC_ARG_ENABLE(flac,
+     [  --disable-flac        enable building of Flac codec support ],
+     [ ac_enable_flac=no ], [ ac_enable_flac=yes] )
+
+if test "x${ac_enable_flac}" = xyes ; then
+   AC_CHECK_LIB(FLAC, FLAC__stream_decoder_init, HAVE_FLAC="maybe", , [-lm -logg])
+  if test "x$HAVE_FLAC" = xmaybe; then
+    AC_CHECK_HEADER(FLAC/all.h, HAVE_FLAC="yes", HAVE_FLAC="no")
+  fi
+  if test "x$HAVE_FLAC" = xyes ; then
+    AC_DEFINE(HAVE_FLAC, [1], [Define to 1 if you have libFLAC])
+    FLAC_LIBS="-lFLAC -logg -lm"
+    AC_SUBST(FLAC_LIBS)
+    FLAC_SUPPORT="yes"
+  else
+    AC_DEFINE(HAVE_FLAC, [0], [Define to 1 if you have libFLAC])
+  fi
+else
+  AC_DEFINE(HAVE_FLAC, [0], [Define to 1 if you have libFLAC])
+  FLAC_SUPPORT="disabled"
+fi
+AM_CONDITIONAL(HAVE_FLAC, [test "x$HAVE_FLAC" = "xyes"])
+
+dnl
 dnl  Check codec disabling sanity
 dnl
 if test "x${ac_enable_vorbis}" = xno && test "x${ac_enable_speex}" = xno ; then
@@ -358,6 +389,17 @@ if test "x$HAVE_SPEEX" = xmaybe ; then
 ])
 fi
 
+if test "x$HAVE_FLAC" != xyes ; then
+    AC_MSG_RESULT(
+[*** libFLAC, available from  http://flac.sourceforge.net/])
+fi
+if test "x$HAVE_FLAC" = xmaybe ; then
+    AC_MSG_RESULT(
+[      Development files missing: The libFLAC library binary seems to be
+      installed, but building of a test program failed.
+])
+fi
+
 AC_MSG_RESULT(
 [*** If you install the required libraries from source, you
 *** need to inform the dynamic linker of their location. If
@@ -438,6 +480,7 @@ AC_MSG_RESULT([
 
     Vorbis support: .............. $VORBIS_SUPPORT
     Speex support: ............... $SPEEX_SUPPORT
+    Flac support: ................ $FLAC_SUPPORT
 
   Example programs (./src/examples):
 

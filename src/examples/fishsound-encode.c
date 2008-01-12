@@ -42,6 +42,8 @@
 #include <fishsound/fishsound.h>
 #include <sndfile.h>
 
+#define ENCODE_BLOCK_SIZE (1152)
+
 long serialno;
 int b_o_s = 1;
 
@@ -56,7 +58,7 @@ encoded (FishSound * fsound, unsigned char * buf, long bytes, void * user_data)
   op.bytes = bytes;
   op.b_o_s = b_o_s;
   op.e_o_s = 0;
-  op.granulepos = 0; /* frameno */
+  op.granulepos = fish_sound_get_frameno (fsound);
   op.packetno = -1;
 
   err = oggz_write_feed (oggz, &op, serialno, 0, NULL);
@@ -107,6 +109,8 @@ main (int argc, char ** argv)
   ext = strrchr (outfilename, '.');
   if (ext && !strncasecmp (ext, ".spx", 4))
     format = FISH_SOUND_SPEEX;
+  else if (ext && !strncasecmp (ext, ".flc", 4))
+    format = FISH_SOUND_FLAC;   
   else
     format = FISH_SOUND_VORBIS;
 
@@ -119,13 +123,13 @@ main (int argc, char ** argv)
 
   fish_sound_set_interleave (fsound, 1);
 
-  while (sf_readf_float (sndfile, pcm, 1024) > 0) {
-    fish_sound_encode (fsound, (float **)pcm, 1024);
-    while ((n = oggz_write (oggz, 1024)) > 0);
+  while (sf_readf_float (sndfile, pcm, ENCODE_BLOCK_SIZE) > 0) {
+    fish_sound_encode (fsound, (float **)pcm, ENCODE_BLOCK_SIZE);
+    oggz_run (oggz);
   }
 
   fish_sound_flush (fsound);
-  while ((n = oggz_write (oggz, 1024)) > 0);
+  oggz_run (oggz);
 
   oggz_close (oggz);
 

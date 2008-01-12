@@ -52,6 +52,7 @@ dump_identity (unsigned char * buf, long bytes)
   switch (format) {
   case FISH_SOUND_VORBIS: printf ("Vorbis\n"); break;
   case FISH_SOUND_SPEEX: printf ("Speex\n"); break;
+  case FISH_SOUND_FLAC: printf ("Flac\n"); break;
   default: printf ("Unknown\n");
   }
 

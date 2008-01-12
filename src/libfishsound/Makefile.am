@@ -22,7 +22,8 @@ libfishsound_la_SOURCES = \
 	comments.c \
 	speex.c \
 	vorbis.c \
+	flac.c \
 	fs_vector.c
 
 libfishsound_la_LDFLAGS = -version-info @SHARED_VERSION_INFO@ @SHLIB_VERSION_ARG@
-libfishsound_la_LIBADD = $(VORBIS_LIBS) $(SPEEX_LIBS)
+libfishsound_la_LIBADD = $(VORBIS_LIBS) $(SPEEX_LIBS) $(FLAC_LIBS)
