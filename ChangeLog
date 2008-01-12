@@ -1,4 +1,41 @@
-2005Ç¯  7·î 19Æü ²ÐÍËÆü 23:41:06 EST Conrad Parker <conrad@metadecks.org>
+Thu Nov  8 15:36:47 JST 2007 Conrad Parker <conrad@metadecks.org>
+
+	* Version 0.8.1
+
+	* This is a maintenance release, fixing a build error when
+	  libfishsound is configured with encoding disabled. For details, see:
+	  http://trac.annodex.net/log/libfishsound/branches/1.0-stable/
+
+Wed Jun  6 10:06:10 JST 2007 Conrad Parker <conrad@metadecks.org>
+
+	* Version 0.8.0
+
+	* Improved consistency of frame number reporting: for both Vorbis
+	  and Speex, the frame number is always updated before calling the
+	  user's callbacks for encoding or decoding.
+
+	* Added an internal finalizer for encoding the end of Vorbis streams,
+	  to ensure that all input samples are correctly encoded without
+	  requiring programmer intervention.
+
+	* Compatibility with SVN trunk, included new API functions:
+
+	        fish_sound_set_decoded_float;
+	        fish_sound_set_decoded_float_ilv;
+	        fish_sound_encode_float;
+	        fish_sound_encode_float_ilv;
+
+	* Added definitions for FISH_SOUND_CONTINUE, STOP_OK, STOP_ERR as
+	  documented in <fishsound/constants.h> (ticket:278)
+
+	* Documentation improvements for fish_sound_new() and
+	  fish_sound_decode() functions. (Ralph Giles)
+
+	* Updated Win32 build system (Marcin Lubonski)
+
+	* Updated shared version info to 3:0:2
+
+Tue Jul 19 23:41:06 EST 2005 Conrad Parker <conrad@metadecks.org>
 
 	* Version 0.7.0
 
