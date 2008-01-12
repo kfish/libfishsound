@@ -45,6 +45,13 @@ static int begun = 0;
 static FishSoundInfo fsinfo;
 static SNDFILE * sndfile;
 
+/* In general, an Ogg file may contain multiple audio tracks in parallel.
+ * To keep this example simple, we only decode the first track that we find.
+ * Tracks ("logical bitstreams" in the Ogg documentations) are identified by
+ * a serialno.
+ */
+static long decode_serialno = -1;
+
 static int
 open_output (int samplerate, int channels)
 {
@@ -79,8 +86,24 @@ read_packet (OGGZ * oggz, ogg_packet * op, long serialno, void * user_data)
 {
   FishSound * fsound = (FishSound *)user_data;
 
-  fish_sound_prepare_truncation (fsound, op->granulepos, op->e_o_s);
-  fish_sound_decode (fsound, op->packet, op->bytes);
+  /* If we have not yet selected an audio track to decode, then try
+   * to identify this one. If it is a known audio codec, then remember its
+   * serialno.
+   * NB. We only try this if we are processing a BOS (beginning of stream)
+   * packet, and it contains at least 8 bytes of data. If it contained less
+   * than 8 bytes of data, fish_sound_identify would simply return
+   * FISH_SOUND_ERR_SHORT_IDENTIFY.
+   */
+  if (decode_serialno == -1 && op->b_o_s && op->bytes >= 8) {
+    if (fish_sound_identify (op->packet, op->bytes) != FISH_SOUND_UNKNOWN)
+      decode_serialno = serialno;
+  }
+
+  /* If this is the track we are decoding, go ahead and decode it */
+  if (serialno == decode_serialno) {
+    fish_sound_prepare_truncation (fsound, op->granulepos, op->e_o_s);
+    fish_sound_decode (fsound, op->packet, op->bytes);
+  }
 
   return 0;
 }
