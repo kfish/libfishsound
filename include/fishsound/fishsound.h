@@ -440,8 +440,9 @@ extern "C" {
  * Identify a codec based on the first few bytes of data.
  * \param buf A pointer to the first few bytes of the data
  * \param bytes The count of bytes available at buf
- * \retval FISH_SOUND_xxxxxx FISH_SOUND_VORBIS, FISH_SOUND_SPEEX if
- * \a buf was identified as the initial bytes of a supported codec
+ * \retval FISH_SOUND_xxxxxx FISH_SOUND_VORBIS, FISH_SOUND_SPEEX or
+ * FISH_SOUND_FLAC if \a buf was identified as the initial bytes of a
+ * supported codec
  * \retval FISH_SOUND_UNKNOWN if the codec could not be identified
  * \retval FISH_SOUND_ERR_SHORT_IDENTIFY if \a bytes is less than 8
  * \note If \a bytes is exactly 8, then only a weak check is performed,
