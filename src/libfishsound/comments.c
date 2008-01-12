@@ -74,6 +74,8 @@ fs_index_len (const char * s, char c, int len)
     if (*s == c) return (char *)s;
   }
 
+  if (i < len) return (char *)s;
+
   return NULL;
 }
 
@@ -453,12 +455,19 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
    if (c+4>end) return -1;
 
    nb_fields=readint(c, 0);
+#ifdef DEBUG
+   printf ("fish_sound_comments_decode: %d comments\n", nb_fields);
+#endif
+
    c+=4;
    for (i=0;i<nb_fields;i++)
    {
       if (c+4>end) return -1;
 
       len=readint(c, 0);
+#ifdef DEBUG
+      printf ("fish_sound_comments_decode: [%d] len %d\n", i, len);
+#endif
 
       c+=4;
       if (c+len>end) return -1;
@@ -479,6 +488,10 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
 	_fs_comment_add (fsound, comment);
 	fs_free (nvalue);
       } else {
+#ifdef DEBUG
+        printf ("fish_sound_comments_decode: [%d] %s (no value)\n",
+                i, name, len);
+#endif
 	nvalue = fs_strdup_len (name, len);
 	comment = fs_comment_new (nvalue, NULL);
 	_fs_comment_add (fsound, comment);
