@@ -478,9 +478,9 @@ AC_MSG_RESULT([
 
   Library configuration (./src/libfishsound):
 
-    Vorbis support: .............. $VORBIS_SUPPORT
+    FLAC support: ................ $FLAC_SUPPORT
     Speex support: ............... $SPEEX_SUPPORT
-    Flac support: ................ $FLAC_SUPPORT
+    Vorbis support: .............. $VORBIS_SUPPORT
 
   Example programs (./src/examples):
 

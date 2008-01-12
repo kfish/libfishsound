@@ -82,10 +82,10 @@ typedef enum _FishSoundCommand {
   FISH_SOUND_GET_INFO                   = 0x1000,
 
   /** Query if multichannel audio should be interpreted as interleaved */
-  FISH_SOUND_GET_INTERLEAVE      = 0x2000,
+  FISH_SOUND_GET_INTERLEAVE             = 0x2000,
 
   /** Set to 1 to interleave, 0 to non-interleave */
-  FISH_SOUND_SET_INTERLEAVE      = 0x2001,
+  FISH_SOUND_SET_INTERLEAVE             = 0x2001,
 
   FISH_SOUND_SET_ENCODE_VBR             = 0x4000,
   
