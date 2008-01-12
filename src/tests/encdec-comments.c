@@ -213,6 +213,9 @@ fs_encdec_comments_test (int format, int blocksize)
 
   fish_sound_encode (ed->encoder, ed->pcm, blocksize);
 
+  fish_sound_flush (ed->encoder);
+  fish_sound_flush (ed->decoder);
+
   fs_encdec_delete (ed);
 
   return 0;
@@ -229,6 +232,11 @@ main (int argc, char * argv[])
 #if HAVE_SPEEX
   INFO ("Testing encode/decode pipeline for comments: SPEEX");
   fs_encdec_comments_test (FISH_SOUND_SPEEX, 2048);
+#endif
+
+#if HAVE_FLAC
+  INFO ("Testing encode/decode pipeline for comments: FLAC");
+  fs_encdec_comments_test (FISH_SOUND_FLAC, 2048);
 #endif
 
   exit (0);

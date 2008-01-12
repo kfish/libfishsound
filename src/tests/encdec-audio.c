@@ -217,6 +217,11 @@ fs_encdec_test (int samplerate, int channels, int format, int interleave,
   
   ed = fs_encdec_new (samplerate, channels, format, interleave, blocksize);
 
+#if 0
+  fish_sound_comment_add_byname (ed->encoder, "Encoder", "encdec-audio");
+  fish_sound_comment_add_byname (ed->encoder, "Format", msg);
+#endif
+
   for (i = 0; i < iter; i++) {
     ed->actual_frames_in += blocksize;
     fish_sound_prepare_truncation (ed->encoder, ed->actual_frames_in,

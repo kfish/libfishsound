@@ -66,8 +66,14 @@ typedef struct _FishSoundFlacInfo {
   } version;
   unsigned short header_packets;
   void * ipcm;
+#if FS_DECODE
   float * pcm_out[8]; /* non-interleaved pcm, output (decode only);
                        * FLAC does max 8 channels */
+#endif
+#if FS_ENCODE
+  FLAC__StreamMetadata * enc_vc_metadata; /* FLAC metadata structure for
+                                           * vorbiscomments (encode only) */
+#endif
 } FishSoundFlacInfo;
 
 int
@@ -359,6 +365,7 @@ fs_flac_enc_write_callback(const FLAC__StreamEncoder *encoder,
 	fi->buffer[8] = 1;    /* LSB(be): Nr. other non-audio header packets */
 	memcpy (fi->buffer+9, buffer, bytes); /* fLaC header ++ STREAMINFO */
         fi->bufferlength = bytes+9;
+
 	fi->header++;
       } else {
         /* Make a temporary copy of the metadata header to pass to the user
@@ -416,10 +423,118 @@ fs_flac_enc_meta_callback(const FLAC__StreamEncoder *encoder,
   return;
 }
 
+/* Create a local alias for an unwieldy type name */
+typedef FLAC__StreamMetadata_VorbisComment_Entry FLAC__VCEntry;
+
+static void
+fs_flac_metadata_free (FLAC__StreamMetadata * metadata)
+{
+  unsigned int i, length;
+  FLAC__VCEntry * comments;
+
+  if (metadata == NULL) return;
+
+  length = metadata->data.vorbis_comment.num_comments;
+  comments = metadata->data.vorbis_comment.comments;
+
+  for (i = 0; i < length; i++) {
+    fs_free (comments[i].entry);
+  }
+
+  fs_free (comments);
+  fs_free (metadata);
+
+  return;
+}
+
+static FLAC__byte *
+fs_flac_encode_vcentry (const FishSoundComment * comment)
+{
+  FLAC__byte * entry;
+  FLAC__uint32 length;
+  size_t name_len=0, value_len=0;
+
+  name_len = strlen(comment->name);
+  length = name_len + 1;
+
+  if (comment->value) {
+    value_len = strlen (comment->value);
+    length += value_len + 1;
+  }
+
+  entry = fs_malloc (length);
+
+  /* We assume that comment->name, value are NUL terminated, as they were
+   * produced by our own comments.c */
+  strcpy ((char *)entry, comment->name);
+
+  if (comment->value) {
+    entry[name_len] = '=';
+    strcpy ((char *)&entry[name_len+1], comment->value);
+  }
+
+  entry[length-1] = '\0';
+
+  return entry;
+}
+
+static FLAC__StreamMetadata *
+fs_flac_encode_vorbiscomments (FishSound * fsound)
+{
+  FishSoundFlacInfo * fi = fsound->codec_data;
+  FLAC__StreamMetadata * metadata;
+  const FishSoundComment * comment;
+  unsigned int i=0, length=0, total_length;
+  FLAC__VCEntry * comments;
+
+  /* libFLAC seems to require us to know the total length of the generated
+   * vorbiscomment packet, even though it will silently generate the
+   * vendor string. Hence, this value was determined by inspection for
+   * the version "reference libFLAC 1.1.2"
+   */
+  total_length = 40;
+
+  /* Count the number of comments */
+  for (comment = fish_sound_comment_first (fsound); comment;
+       comment = fish_sound_comment_next (fsound, comment)) {
+    length++;
+  }
+
+  if (length == 0) return NULL;
+
+  comments = (FLAC__VCEntry *)fs_malloc (sizeof(FLAC__VCEntry) * length);
+  
+  for (comment = fish_sound_comment_first (fsound); comment;
+       comment = fish_sound_comment_next (fsound, comment)) {
+    comments[i].entry = fs_flac_encode_vcentry (comment);
+    comments[i].length = strlen((char *)comments[i].entry);
+
+    /* In the generated vorbiscomment data, each entry is preceded by a
+     * 32bit length specifier. */
+    total_length += 4 + comments[i].length;
+    i++;
+  }
+
+  metadata = (FLAC__StreamMetadata *) fs_malloc (sizeof (*metadata));
+  metadata->type = FLAC__METADATA_TYPE_VORBIS_COMMENT;
+  metadata->is_last = true;
+  metadata->length = total_length;
+  /* Don't bother setting the vendor_string, as libFLAC ignores it */
+  metadata->data.vorbis_comment.num_comments = length;
+  metadata->data.vorbis_comment.comments = comments;
+
+  /* Remember the allocated metadata */
+  fi->enc_vc_metadata = metadata;
+
+  return metadata;
+}
+
 static FishSound *
 fs_flac_enc_headers (FishSound * fsound)
 {
-  FishSoundFlacInfo *fi = fsound->codec_data;
+  FishSoundFlacInfo * fi = fsound->codec_data;
+  FLAC__StreamMetadata * metadata;
+
   fi->fse = FLAC__stream_encoder_new();
   FLAC__stream_encoder_set_channels(fi->fse, fsound->info.channels);
   FLAC__stream_encoder_set_sample_rate(fi->fse, fsound->info.samplerate);
@@ -427,9 +542,15 @@ fs_flac_enc_headers (FishSound * fsound)
   FLAC__stream_encoder_set_write_callback(fi->fse, fs_flac_enc_write_callback);
   FLAC__stream_encoder_set_metadata_callback(fi->fse, fs_flac_enc_meta_callback);
   FLAC__stream_encoder_set_client_data(fi->fse, fsound);
+
+  metadata = fs_flac_encode_vorbiscomments (fsound);
+  if (metadata != NULL)
+    FLAC__stream_encoder_set_metadata (fi->fse, &metadata, 1);
+
   /* FLAC__stream_encoder_set_total_samples_estimate(fi->fse, ...);*/
   if (FLAC__stream_encoder_init(fi->fse) != FLAC__STREAM_ENCODER_OK)
     return NULL;
+
   return fsound;
 }
 
@@ -524,6 +645,12 @@ fs_flac_delete (FishSound * fsound)
   for (i = 0; i < 8; i++) {
     if (fi->pcm_out[i]) fs_free (fi->pcm_out[i]);
   }
+  
+#if FS_ENCODE
+  if (fi->enc_vc_metadata) {
+    fs_flac_metadata_free (fi->enc_vc_metadata);
+  }
+#endif
 
   fs_free (fi);
   fsound->codec_data = NULL;
@@ -587,6 +714,10 @@ fs_flac_init (FishSound * fsound)
   for (i = 0; i < 8; i++) {
     fi->pcm_out[i] = NULL;
   }
+
+#if FS_ENCODE
+  fi->enc_vc_metadata = NULL;
+#endif
 
   fsound->codec_data = fi;
 
