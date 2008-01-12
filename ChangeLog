@@ -1,3 +1,19 @@
+Sat Jan 12 19:11:09 JST 2008 Conrad Parker <conrad@metadecks.org>
+
+	* Version 0.9.0
+
+	* Encoding and decoding of the PCM audio and "Vorbiscomment" metadata
+	  packets is supported for FLAC streams in Ogg.
+
+	* The documentation and test suite have been updated for FLAC.
+
+	* The decoder example now handles Ogg files containing multiple
+	  logical bitstreams; it simply extracts the first audio track.
+	  This demonstrates how to decode audio from a video file, or
+	  one track of a multitrack audio file.
+
+	* Updated shared version info to 4:0:3
+
 Thu Nov  8 15:36:47 JST 2007 Conrad Parker <conrad@metadecks.org>
 
 	* Version 0.8.1
