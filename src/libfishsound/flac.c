@@ -46,6 +46,7 @@
 #include "convert.h"
 
 /*#define DEBUG*/
+/*#define DEBUG_VERBOSE*/
 
 #if HAVE_FLAC
 
@@ -104,7 +105,7 @@ fs_flac_read_callback(const FLAC__StreamDecoder *decoder,
 {
   FishSound* fsound = (FishSound*)client_data;
   FishSoundFlacInfo* fi = (FishSoundFlacInfo *)fsound->codec_data;
-#ifdef DEBUG
+#ifdef DEBUG_VERBOSE
   printf("fs_flac_read_callback: IN\n");
 #endif
   if (fi->bufferlength > *bytes) {
@@ -138,7 +139,7 @@ fs_flac_write_callback(const FLAC__StreamDecoder *decoder,
   channels = frame->header.channels;
   blocksize = frame->header.blocksize;
 
-#ifdef DEBUG
+#ifdef DEBUG_VERBOSE
   printf("fs_flac_write_callback: IN, blocksize %d\n", blocksize);
 #endif
 
@@ -262,7 +263,7 @@ fs_flac_decode (FishSound * fsound, unsigned char * buf, long bytes)
 {
   FishSoundFlacInfo *fi = fsound->codec_data;
 
-#ifdef DEBUG
+#ifdef DEBUG_VERBOSE
   printf("fs_flac_decode: IN, fi->packetno = %ld\n", fi->packetno);
 #endif
 
@@ -287,6 +288,14 @@ fs_flac_decode (FishSound * fsound, unsigned char * buf, long bytes)
 #if 0
     if (fi->packetno ==  1) fish_sound_comments_decode (fsound, buf, bytes);
 #endif
+
+    if ((buf[0] & 0x7) == 4) {
+      int len = (buf[1]<<16) + (buf[2]<<8) + buf[3];
+#ifdef DEBUG
+      printf ("fs_flac_decode: got vorbiscomments len %d\n", len);
+#endif
+      fish_sound_comments_decode (fsound, buf+4, len);
+    }
 
     memcpy(tmp, fi->buffer, fi->bufferlength);
     memcpy(tmp+fi->bufferlength, buf, bytes);
