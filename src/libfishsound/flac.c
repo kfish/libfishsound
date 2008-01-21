@@ -633,11 +633,15 @@ fs_flac_delete (FishSound * fsound)
 #endif
 
   if (fsound->mode == FISH_SOUND_DECODE) {
-    FLAC__stream_decoder_finish(fi->fsd);
-    FLAC__stream_decoder_delete(fi->fsd);
+    if (fi->fsd) {
+      FLAC__stream_decoder_finish(fi->fsd);
+      FLAC__stream_decoder_delete(fi->fsd);
+    }
   } else if (fsound->mode == FISH_SOUND_ENCODE) {
-    FLAC__stream_encoder_finish(fi->fse);
-    FLAC__stream_encoder_delete(fi->fse);
+    if (fi->fse) {
+      FLAC__stream_encoder_finish(fi->fse);
+      FLAC__stream_encoder_delete(fi->fse);
+    }
     if (fi->buffer) fs_free(fi->buffer);
   }
 

@@ -64,8 +64,10 @@ main (int argc, char * argv[])
    */
 #if HAVE_VORBIS
   fsinfo.format = FISH_SOUND_VORBIS;
-#else
+#elif HAVE_SPEEX
   fsinfo.format = FISH_SOUND_SPEEX;
+#else
+  fsinfo.format = FISH_SOUND_FLAC;
 #endif
 
 #if FS_ENCODE

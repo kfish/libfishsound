@@ -83,5 +83,10 @@ main (int argc, char * argv[])
   noop_test (FISH_SOUND_SPEEX);
 #endif
 
+#if HAVE_FLAC
+  INFO ("Testing new/delete for FLAC");
+  noop_test (FISH_SOUND_FLAC);
+#endif
+
   exit (0);
 }
