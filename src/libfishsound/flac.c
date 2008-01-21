@@ -252,6 +252,7 @@ fs_flac_decode_header (FishSound * fsound, unsigned char *buf, long bytes)
     return NULL;
   }
 
+#if defined (HAVE_FLAC_1_1_2)
   FLAC__stream_decoder_set_read_callback(fi->fsd, fs_flac_read_callback);
   FLAC__stream_decoder_set_write_callback(fi->fsd, fs_flac_write_callback);
   FLAC__stream_decoder_set_metadata_callback(fi->fsd, fs_flac_meta_callback);
@@ -260,6 +261,21 @@ fs_flac_decode_header (FishSound * fsound, unsigned char *buf, long bytes)
 
   if (FLAC__stream_decoder_init(fi->fsd) != FLAC__STREAM_DECODER_SEARCH_FOR_METADATA)
     return NULL;
+#elif defined (HAVE_FLAC_1_1_3)
+  if (FLAC__stream_decoder_init_stream
+      (fi->fsd,
+       fs_flac_read_callback,
+       NULL, /* seek callback */
+       NULL, /* tell callback */
+       NULL, /* length callback */
+       NULL, /* EOF callback */
+       fs_flac_write_callback,
+       fs_flac_meta_callback,
+       fs_flac_error_callback,
+       fsound
+       ) != FLAC__STREAM_DECODER_SEARCH_FOR_METADATA)
+     return NULL;
+#endif
 
   return fi->fsd;
 }
@@ -539,17 +555,34 @@ fs_flac_enc_headers (FishSound * fsound)
   FLAC__stream_encoder_set_channels(fi->fse, fsound->info.channels);
   FLAC__stream_encoder_set_sample_rate(fi->fse, fsound->info.samplerate);
   FLAC__stream_encoder_set_bits_per_sample(fi->fse, BITS_PER_SAMPLE);
+
+#if defined (HAVE_FLAC_1_1_2)
   FLAC__stream_encoder_set_write_callback(fi->fse, fs_flac_enc_write_callback);
   FLAC__stream_encoder_set_metadata_callback(fi->fse, fs_flac_enc_meta_callback);
   FLAC__stream_encoder_set_client_data(fi->fse, fsound);
+#endif
 
   metadata = fs_flac_encode_vorbiscomments (fsound);
   if (metadata != NULL)
     FLAC__stream_encoder_set_metadata (fi->fse, &metadata, 1);
 
   /* FLAC__stream_encoder_set_total_samples_estimate(fi->fse, ...);*/
+
+#if defined (HAVE_FLAC_1_1_2)
   if (FLAC__stream_encoder_init(fi->fse) != FLAC__STREAM_ENCODER_OK)
     return NULL;
+#elif defined (HAVE_FLAC_1_1_3)
+  if (FLAC__stream_encoder_init_stream
+      (fi->fse,
+       fs_flac_enc_write_callback,
+       NULL, /* seek callback */
+       NULL, /* tell callback */
+       fs_flac_enc_meta_callback,
+       fsound
+       ) != FLAC__STREAM_ENCODER_OK)
+     return NULL;
+
+#endif
 
   return fsound;
 }

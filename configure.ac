@@ -249,6 +249,7 @@ dnl
 
 HAVE_FLAC=no
 HAVE_FLAC_1_1_2=no
+HAVE_FLAC_1_1_3=no
 FLAC_SUPPORT=no
 
 ac_enable_flac=yes
@@ -274,12 +275,20 @@ if test "x${ac_enable_flac}" = xyes ; then
     saved_CFLAGS="$CFLAGS"
     CFLAGS="$CFLAGS $FLAC_CFLAGS"
 
-    dnl Test for libFLAC 1.1.2
-    AC_CHECK_LIB(FLAC, FLAC__stream_decoder_init, HAVE_FLAC_1_1_2="yes",
-        HAVE_FLAC_1_1_2="no", [$FLAC_LIBS])
-    if test "x$HAVE_FLAC_1_1_2" = xyes ; then
-      AC_DEFINE(HAVE_FLAC_1_1_2, [1], [Define to 1 if you have libFLAC 1.1.2])
-      FLAC_SUPPORT="yes (1.1.2)"
+    dnl Test for libFLAC 1.1.3
+    AC_CHECK_LIB(FLAC, FLAC__stream_decoder_init_stream, HAVE_FLAC_1_1_3="yes",
+        HAVE_FLAC_1_1_3="no", [$FLAC_LIBS])
+    if test "x$HAVE_FLAC_1_1_3" = xyes ; then
+      AC_DEFINE(HAVE_FLAC_1_1_3, [1], [Define to 1 if you have libFLAC 1.1.3])
+      FLAC_SUPPORT="yes (1.1.3)"
+    else
+      dnl Test for libFLAC 1.1.2
+      AC_CHECK_LIB(FLAC, FLAC__stream_decoder_init, HAVE_FLAC_1_1_2="yes",
+          HAVE_FLAC_1_1_2="no", [$FLAC_LIBS])
+      if test "x$HAVE_FLAC_1_1_2" = xyes ; then
+        AC_DEFINE(HAVE_FLAC_1_1_2, [1], [Define to 1 if you have libFLAC 1.1.2])
+        FLAC_SUPPORT="yes (1.1.2)"
+      fi
     fi
 
     CFLAGS="$saved_CFLAGS"
