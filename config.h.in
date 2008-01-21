@@ -15,6 +15,9 @@
 /* Define to 1 if you have libFLAC */
 #undef HAVE_FLAC
 
+/* Define to 1 if you have libFLAC 1.1.2 */
+#undef HAVE_FLAC_1_1_2
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 

@@ -248,6 +248,7 @@ dnl  Detect flac
 dnl
 
 HAVE_FLAC=no
+HAVE_FLAC_1_1_2=no
 FLAC_SUPPORT=no
 
 ac_enable_flac=yes
@@ -256,15 +257,38 @@ AC_ARG_ENABLE(flac,
      [ ac_enable_flac=no ], [ ac_enable_flac=yes] )
 
 if test "x${ac_enable_flac}" = xyes ; then
-   AC_CHECK_LIB(FLAC, FLAC__stream_decoder_init, HAVE_FLAC="maybe", , [-lm -logg])
-  if test "x$HAVE_FLAC" = xmaybe; then
-    AC_CHECK_HEADER(FLAC/all.h, HAVE_FLAC="yes", HAVE_FLAC="no")
+  PKG_CHECK_MODULES(FLAC, flac, HAVE_FLAC="yes", HAVE_FLAC="no")
+
+  if test "x$HAVE_FLAC" = "xno" ; then
+    AC_CHECK_LIB(FLAC, FLAC__stream_decoder_init, HAVE_FLAC="maybe", , [-lm -logg])
+    if test "x$HAVE_FLAC" = xmaybe; then
+      AC_CHECK_HEADER(FLAC/all.h, HAVE_FLAC="yes", HAVE_FLAC="no")
+    fi
+    if test "x$HAVE_FLAC" = "xyes" ; then
+      FLAC_CFLAGS=""
+      FLAC_LIBS="-lFLAC -logg -lm"
+    fi
   fi
+
   if test "x$HAVE_FLAC" = xyes ; then
+    saved_CFLAGS="$CFLAGS"
+    CFLAGS="$CFLAGS $FLAC_CFLAGS"
+
+    dnl Test for libFLAC 1.1.2
+    AC_CHECK_LIB(FLAC, FLAC__stream_decoder_init, HAVE_FLAC_1_1_2="yes",
+        HAVE_FLAC_1_1_2="no", [$FLAC_LIBS])
+    if test "x$HAVE_FLAC_1_1_2" = xyes ; then
+      AC_DEFINE(HAVE_FLAC_1_1_2, [1], [Define to 1 if you have libFLAC 1.1.2])
+      FLAC_SUPPORT="yes (1.1.2)"
+    fi
+
+    CFLAGS="$saved_CFLAGS"
+
     AC_DEFINE(HAVE_FLAC, [1], [Define to 1 if you have libFLAC])
-    FLAC_LIBS="-lFLAC -logg -lm"
+    AC_SUBST(FLAC_CFLAGS)
     AC_SUBST(FLAC_LIBS)
-    FLAC_SUPPORT="yes"
+
+    fishsound_pkgdeps="$fishsound_pkgdeps flac"
   else
     AC_DEFINE(HAVE_FLAC, [0], [Define to 1 if you have libFLAC])
   fi
