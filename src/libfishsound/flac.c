@@ -675,7 +675,10 @@ fs_flac_delete (FishSound * fsound)
       FLAC__stream_encoder_finish(fi->fse);
       FLAC__stream_encoder_delete(fi->fse);
     }
-    if (fi->buffer) fs_free(fi->buffer);
+    if (fi->buffer) {
+      fs_free(fi->buffer);
+      fi->buffer = NULL;
+    }
   }
 
   if (fi->ipcm) fs_free(fi->ipcm);
@@ -741,11 +744,12 @@ fs_flac_init (FishSound * fsound)
 
   fi = fs_malloc (sizeof (FishSoundFlacInfo));
   if (fi == NULL) return NULL;
+  fi->fsd = NULL;
+  fi->fse = NULL;
+  fi->buffer = NULL;
   fi->packetno = 0;
   fi->header = 0;
   fi->header_packets = 0;
-  fi->fsd = NULL;
-  fi->fse = NULL;
 
   fi->ipcm = NULL;
   for (i = 0; i < 8; i++) {
