@@ -277,10 +277,12 @@ AM_CONDITIONAL(HAVE_FLAC, [test "x$HAVE_FLAC" = "xyes"])
 dnl
 dnl  Check codec disabling sanity
 dnl
-if test "x${ac_enable_vorbis}" = xno && test "x${ac_enable_speex}" = xno ; then
+if test "x${ac_enable_vorbis}" = xno && test "x${ac_enable_speex}" = xno &&
+test "x${ac_enable_flac}" = xno ; then
   AC_MSG_ERROR([
 ***
-*** You have attempted to explicitly disable both Vorbis and Speex support.
+*** You have attempted to explicitly disable support for all codecs:
+*** FLAC, Speex and Vorbis.
 ***
 *** If you want a fish that does nothing, try kfishd:
 ***
@@ -292,9 +294,10 @@ if test "x${ac_enable_vorbis}" = xno && test "x${ac_enable_speex}" = xno ; then
 fi
 
 dnl
-dnl Set overall configuration success to no if neither vorbis or speex found
+dnl Set overall configuration success to no if none of FLAC, Vorbis or Speex
+dnl has been found.
 dnl
-if test "x$HAVE_VORBIS" = "xno" && test "x$HAVE_SPEEX" = "xno"; then
+if test "x$HAVE_VORBIS" = "xno" && test "x$HAVE_SPEEX" = "xno" && test "x$HAVE_FLAC" = "xno" ; then
   fishsound_config_ok=no
 fi
 
