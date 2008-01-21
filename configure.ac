@@ -135,7 +135,7 @@ VORBIS_SUPPORT=no
 
 ac_enable_vorbis=yes
 AC_ARG_ENABLE(vorbis,
-     [  --disable-vorbis        enable building of Vorbis codec support ],
+     [  --disable-vorbis        disable building of Vorbis codec support ],
      [ ac_enable_vorbis=no ], [ ac_enable_vorbis=yes] )
 
 if test "x${ac_enable_vorbis}" = xyes ; then
@@ -194,7 +194,7 @@ SPEEX_SUPPORT=no
 
 ac_enable_speex=yes
 AC_ARG_ENABLE(speex,
-     [  --disable-speex         enable building of Speex codec support ],
+     [  --disable-speex         disable building of Speex codec support ],
      [ ac_enable_speex=no ], [ ac_enable_speex=yes] )
 
 if test "x${ac_enable_speex}" = xyes ; then
@@ -252,7 +252,7 @@ FLAC_SUPPORT=no
 
 ac_enable_flac=yes
 AC_ARG_ENABLE(flac,
-     [  --disable-flac        enable building of Flac codec support ],
+     [  --disable-flac          disable building of Flac codec support ],
      [ ac_enable_flac=no ], [ ac_enable_flac=yes] )
 
 if test "x${ac_enable_flac}" = xyes ; then
