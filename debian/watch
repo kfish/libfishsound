@@ -1,0 +1,2 @@
+version=2
+http://annodex.net/software/libfishsound/download/ libfishsound-([\d\.]+)\.tar\.gz debian uupdate

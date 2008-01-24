@@ -1,0 +1,50 @@
+Source: libfishsound
+Section: unknown
+Priority: optional
+Maintainer: Jamie Wilkinson <jaq@debian.org>
+Build-Depends: debhelper (>> 4.0.0), libspeex-dev, libvorbis-dev
+Standards-Version: 3.6.2
+
+Package: libfishsound1
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: simple programming interface that wraps Xiph.Org audio codecs
+ libfishsound is a wrapper around the existing codec libraries and
+ provides a consistent, higher-level programming interface. It has been
+ designed for use in a wide variety of applications; it has no direct
+ dependencies on Annodex or Ogg encapsulation, though it is most commonly
+ used in conjunction with liboggz to decode or encode Ogg encapsulated
+ Vorbis or Speex files.
+
+Package: libfishsound1-dev
+Section: libdevel
+Architecture: any
+Depends: libfishsound1 (= ${Source-Version}), libc6-dev | libc-dev, libspeex-dev, libvorbis-dev
+Provides: libfishsound-dev
+Conflicts: libfishsound-dev
+Description: simple programming interface that wraps Xiph.Org audio codecs (development files)
+ libfishsound is a wrapper around the existing codec libraries and
+ provides a consistent, higher-level programming interface. It has been
+ designed for use in a wide variety of applications; it has no direct
+ dependencies on Annodex or Ogg encapsulation, though it is most commonly
+ used in conjunction with liboggz to decode or encode Ogg encapsulated
+ Vorbis or Speex files.
+ .
+ This package contains the header files and static libraries required for
+ developing applications that use libfishsound.
+
+Package: libfishsound1-dbg
+Section: libdevel
+Architecture: any
+Depends: libfishsound1 (= ${Source-Version})
+Description: simple programming interface that wraps Xiph.Org audio codecs (debugging information)
+ libfishsound is a wrapper around the existing codec libraries and
+ provides a consistent, higher-level programming interface. It has been
+ designed for use in a wide variety of applications; it has no direct
+ dependencies on Annodex or Ogg encapsulation, though it is most commonly
+ used in conjunction with liboggz to decode or encode Ogg encapsulated
+ Vorbis or Speex files.
+ .
+ This package contains debugging symbols useful for tracing bugs in the
+ libfishsound1 package.
