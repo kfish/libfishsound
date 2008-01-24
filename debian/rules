@@ -16,8 +16,10 @@ ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -g
 endif
 
-configure: configure-stamp
-configure-stamp:
+configure:
+	./autogen.sh
+
+config.status: configure
 	dh_testdir
 	CFLAGS="$(CFLAGS)" ./configure \
 		--host=$(DEB_HOST_GNU_TYPE) \
@@ -29,7 +31,7 @@ configure-stamp:
 	touch configure-stamp
 
 build: build-stamp
-build-stamp: configure-stamp
+build-stamp: config.status
 	dh_testdir
 	$(MAKE)
 	-$(MAKE) check
