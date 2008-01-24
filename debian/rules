@@ -7,6 +7,8 @@
 DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
+CFLAGS = -Wall -g
+
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
 else
@@ -28,20 +30,19 @@ config.status: configure
 		--mandir=\$${prefix}/share/man \
 		--infodir=\$${prefix}/share/info \
 		|| cat config.log
-	touch configure-stamp
 
 build: build-stamp
 build-stamp: config.status
 	dh_testdir
 	$(MAKE)
-	-$(MAKE) check
+	$(MAKE) check
 	touch build-stamp
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp configure-stamp
-	-$(MAKE) distclean
+	rm -f build-stamp
+	[ ! -f Makefile ] || $(MAKE) distclean
 	rm -f doc/manpage.refs doc/manpage.links
 	rm -f doc/libfishsound/html/*.html
 	rm -f doc/libfishsound/html/*.gif
@@ -49,10 +50,12 @@ clean:
 	rm -f doc/libfishsound/latex/doxygen.sty
 	rm -f doc/libfishsound/latex/*.tex
 	rm -f doc/fishsound-validate.1
-	-test -r /usr/share/misc/config.sub && \
-		cp -f /usr/share/misc/config.sub config.sub
-	-test -r /usr/share/misc/config.guess && \
-		cp -f /usr/share/misc/config.guess config.guess
+ifneq "$(wildcard /usr/share/misc/config.sub)" ""
+	cp -f /usr/share/misc/config.sub config.sub
+endif
+ifneq "$(wildcard /usr/share/misc/config.guess)" ""
+	cp -f /usr/share/misc/config.guess config.guess
+endif
 	dh_clean
 
 install: build
