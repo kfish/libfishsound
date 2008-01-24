@@ -2,7 +2,7 @@ Source: libfishsound
 Section: unknown
 Priority: optional
 Maintainer: Jamie Wilkinson <jaq@debian.org>
-Build-Depends: debhelper (>> 4.0.0), libspeex-dev, libvorbis-dev, automake
+Build-Depends: debhelper (>> 4.0.0), libspeex-dev, libvorbis-dev, automake, pkg-config, libtool (>= 1.4)
 Standards-Version: 3.6.2
 
 Package: libfishsound1
