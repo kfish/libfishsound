@@ -28,7 +28,7 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                                                                                ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = doc include src symbian
+SUBDIRS = doc include src
 
 EXTRA_DIST = fishsound.pc.in README.win32 \
 	win32/Makefile \
@@ -41,7 +41,11 @@ EXTRA_DIST = fishsound.pc.in README.win32 \
 	win32/encode.dsp \
 	win32/info.dsp \
 	win32/libfishsound/libfishsound.sln \
-	win32/libfishsound/libfishsound.vcproj
+	win32/libfishsound/libfishsound.vcproj \
+	symbian/bld.inf  \
+	symbian/config.h  \
+	symbian/libfishsound.mmp
+
 
 
 pkgconfigdir = $(libdir)/pkgconfig

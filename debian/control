@@ -3,13 +3,13 @@ Section: unknown
 Priority: optional
 Maintainer: John Ferlito <johnf@inodes.org>
 Build-Depends: debhelper (>> 4.0.0), libspeex-dev, libvorbis-dev
-Standards-Version: 3.7.2
+Standards-Version: 3.7.3
 
 Package: libfishsound1
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}
-Description: simple programming interface that wraps Xiph.Org audio codecs
+Description: simple API that wraps Xiph.Org audio codecs
  libfishsound is a wrapper around the existing codec libraries and
  provides a consistent, higher-level programming interface. It has been
  designed for use in a wide variety of applications; it has no direct
@@ -23,7 +23,7 @@ Architecture: any
 Depends: libfishsound1 (= ${binary:Version}), libc6-dev | libc-dev, libspeex-dev, libvorbis-dev
 Provides: libfishsound-dev
 Conflicts: libfishsound-dev
-Description: simple programming interface that wraps Xiph.Org audio codecs (development files)
+Description: simple API that wraps Xiph.Org audio codecs (development files)
  libfishsound is a wrapper around the existing codec libraries and
  provides a consistent, higher-level programming interface. It has been
  designed for use in a wide variety of applications; it has no direct
@@ -38,7 +38,8 @@ Package: libfishsound1-dbg
 Section: libdevel
 Architecture: any
 Depends: libfishsound1 (= ${binary:Version})
-Description: simple programming interface that wraps Xiph.Org audio codecs (debugging information)
+Priority: extra
+Description: simple API that wraps Xiph.Org audio codecs (debugging information)
  libfishsound is a wrapper around the existing codec libraries and
  provides a consistent, higher-level programming interface. It has been
  designed for use in a wide variety of applications; it has no direct
