@@ -41,7 +41,9 @@ EXTRA_DIST = fishsound.pc.in README.win32 \
 	win32/encode.dsp \
 	win32/info.dsp \
 	win32/libfishsound/libfishsound.sln \
-	win32/libfishsound/libfishsound.vcproj
+	win32/libfishsound/libfishsound.vcproj \
+	symbian
+
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = fishsound.pc
