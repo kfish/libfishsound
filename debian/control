@@ -1,9 +1,9 @@
 Source: libfishsound
 Section: unknown
 Priority: optional
-Maintainer: Jamie Wilkinson <jaq@debian.org>
-Build-Depends: debhelper (>> 4.0.0), libspeex-dev, libvorbis-dev, automake, pkg-config, libtool (>= 1.4)
-Standards-Version: 3.6.2
+Maintainer: John Ferlito <johnf@inodes.org>
+Build-Depends: debhelper (>> 4.0.0), libspeex-dev, libvorbis-dev
+Standards-Version: 3.7.2
 
 Package: libfishsound1
 Section: libs
@@ -20,7 +20,7 @@ Description: simple programming interface that wraps Xiph.Org audio codecs
 Package: libfishsound1-dev
 Section: libdevel
 Architecture: any
-Depends: libfishsound1 (= ${Source-Version}), libc6-dev | libc-dev, libspeex-dev, libvorbis-dev
+Depends: libfishsound1 (= ${binary:Version}), libc6-dev | libc-dev, libspeex-dev, libvorbis-dev
 Provides: libfishsound-dev
 Conflicts: libfishsound-dev
 Description: simple programming interface that wraps Xiph.Org audio codecs (development files)
@@ -37,7 +37,7 @@ Description: simple programming interface that wraps Xiph.Org audio codecs (deve
 Package: libfishsound1-dbg
 Section: libdevel
 Architecture: any
-Depends: libfishsound1 (= ${Source-Version})
+Depends: libfishsound1 (= ${binary:Version})
 Description: simple programming interface that wraps Xiph.Org audio codecs (debugging information)
  libfishsound is a wrapper around the existing codec libraries and
  provides a consistent, higher-level programming interface. It has been
