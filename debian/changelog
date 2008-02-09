@@ -3,8 +3,9 @@ libfishsound (0.9.0-1) unstable; urgency=low
   * New upstream.
   * Update for new standards vesion 3.7.3
   * Check debian/watch is up to date. closes: #450064
+  * Build with libflac support
 
- -- John Ferlito <johnf@inodes.org>  Thu, 24 Jan 2008 16:11:42 +1100
+ -- John Ferlito <johnf@inodes.org>  Sat, 09 Feb 2008 22:37:58 +1100
 
 libfishsound (0.7.0-2.1) unstable; urgency=low
 
