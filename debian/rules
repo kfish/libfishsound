@@ -26,6 +26,7 @@ config.status: configure
 		--prefix=/usr \
 		--mandir=\$${prefix}/share/man \
 		--infodir=\$${prefix}/share/info \
+		--disable-flac \
 		|| cat config.log
 
 build: build-stamp

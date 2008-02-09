@@ -58,6 +58,9 @@ decoded (FishSound * fsound, float ** pcm, long frames, void * user_data)
 {
   const FishSoundComment * comment;
 
+  if (fsound == NULL)
+    FAIL ("No Fish Found");
+
   INFO ("+ Retrieving first (expect ARTIST1)");
   comment = fish_sound_comment_first (fsound);
 
