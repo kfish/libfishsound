@@ -136,7 +136,7 @@ process_header(unsigned char * buf, long bytes, int enh_enabled,
     return NULL;
   }
 
-  if (header->mode >= SPEEX_NB_MODES) {
+  if (header->mode >= SPEEX_NB_MODES || header->mode < 0) {
     /*
     info_dialog_new ("Speex error", NULL,
 		     "Mode number %d does not (any longer) exist in this version\n",
