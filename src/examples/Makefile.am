@@ -2,11 +2,13 @@
 
 AM_CFLAGS = -Wall -pedantic -g
 
-INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/src/libfishsound \
-	$(VORBIS_CFLAGS) $(SPEEX_CFLAGS) $(OGGZ_CFLAGS)
+INCLUDES = -I$(top_builddir) \
+           -I$(top_srcdir)/include -I$(top_srcdir)/src/libfishsound \
+           $(VORBIS_CFLAGS) $(SPEEX_CFLAGS) $(FLAC_CFLAGS) $(OGGZ_CFLAGS)
 
 FISHSOUNDDIR = ../libfishsound
-FISHSOUND_LIBS = $(FISHSOUNDDIR)/libfishsound.la $(VORBIS_LIBS) $(SPEEX_LIBS)
+FISHSOUND_LIBS = $(FISHSOUNDDIR)/libfishsound.la \
+                 $(VORBIS_LIBS) $(SPEEX_LIBS) $(FLAC_LIBS)
 
 if HAVE_OGGZ
 oggz_examples = fishsound-identify fishsound-info fishsound-decenc
