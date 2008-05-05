@@ -99,6 +99,7 @@ decoded (FishSound * fsound, float ** pcm, long frames, void * user_data)
 {
   FS_DecEnc * ed = (FS_DecEnc *) user_data;
   FishSoundInfo fsinfo;
+  int i;
 
   if (!ed->begun) {
     fish_sound_command (fsound, FISH_SOUND_GET_INFO, &fsinfo,
@@ -143,7 +144,6 @@ fs_encdec_new (char * infilename, char * outfilename, int format,
 	       int interleave, int blocksize)
 {
   FS_DecEnc * ed;
-  int i;
 
   if (infilename == NULL || outfilename == NULL) return NULL;
 
