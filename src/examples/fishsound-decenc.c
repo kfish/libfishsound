@@ -48,6 +48,7 @@ typedef struct {
   FishSound * encoder;
   int format;
   int interleave;
+  int blocksize;
   int channels;
   float ** pcm;
   int begun;
@@ -108,6 +109,16 @@ decoded (FishSound * fsound, float ** pcm, long frames, void * user_data)
     fish_sound_set_interleave (ed->encoder, ed->interleave);
     fish_sound_set_encoded_callback (ed->encoder, encoded, ed);
 
+    ed->channels = fsinfo.channels;
+    if (ed->interleave) {
+      ed->pcm = (float **) malloc (sizeof (float) * ed->channels * ed->blocksize);
+    } else {
+      ed->pcm = (float **) malloc (sizeof (float *) * ed->channels);
+      for (i = 0; i < ed->channels; i++) {
+        ed->pcm[i] = (float *) malloc (sizeof (float) * ed->blocksize);
+      }
+    }
+
     ed->begun = 1;
   }
 
@@ -132,7 +143,6 @@ fs_encdec_new (char * infilename, char * outfilename, int format,
 	       int interleave, int blocksize)
 {
   FS_DecEnc * ed;
-  FishSoundInfo fsinfo;
   int i;
 
   if (infilename == NULL || outfilename == NULL) return NULL;
@@ -155,19 +165,15 @@ fs_encdec_new (char * infilename, char * outfilename, int format,
   fish_sound_set_decoded_float_ilv (ed->decoder, decoded, ed);
 
   ed->format = format;
+  ed->interleave = interleave;
+  ed->blocksize = blocksize;
   ed->begun = 0;
   ed->b_o_s = 1;
-  ed->channels = fsinfo.channels; /* FIXME: fsinfo is unitialized! */
-  ed->interleave = interleave;
 
-  if (interleave) {
-    ed->pcm = (float **) malloc (sizeof (float) * ed->channels * blocksize);
-  } else {
-    ed->pcm = (float **) malloc (sizeof (float *) * ed->channels);
-    for (i = 0; i < ed->channels; i++) {
-      ed->pcm[i] = (float *) malloc (sizeof (float) * blocksize);
-    }
-  }
+  /* Delay the setting of channels and allocation of PCM buffers until
+   * the number of channels is known from decoding the headers */
+  ed->channels = 0;
+  ed->pcm = NULL;
 
   ed->frames_in = 0;
   ed->frames_out = 0;
