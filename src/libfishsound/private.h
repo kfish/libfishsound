@@ -43,25 +43,6 @@
 #undef MIN
 #define MIN(a,b) (((a)<(b))?(a):(b))
 
-/** PCM type */
-typedef enum {
-  /** Undefined/Error */
-  FISH_SOUND_PCM_UNDEF = 0x00,
-
-  /** short */
-  FISH_SOUND_PCM_SHORT = 0x01,
-
-  /** int */
-  FISH_SOUND_PCM_INT = 0x02,
-
-  /** float */
-  FISH_SOUND_PCM_FLOAT = 0x03,
-
-  /** double */
-  FISH_SOUND_PCM_DOUBLE = 0x04
-
-} FishSoundPCM;
-
 typedef struct _FishSound FishSound;
 typedef struct _FishSoundInfo FishSoundInfo;
 typedef struct _FishSoundCodec FishSoundCodec;
@@ -72,30 +53,15 @@ typedef int         (*FSCodecIdentify) (unsigned char * buf, long bytes);
 typedef FishSound * (*FSCodecInit) (FishSound * fsound);
 typedef FishSound * (*FSCodecDelete) (FishSound * fsound);
 typedef int         (*FSCodecReset) (FishSound * fsound);
-typedef int         (*FSCodecUpdate) (FishSound * fsound, int interleave,
-				      FishSoundPCM pcm_type);
+typedef int         (*FSCodecUpdate) (FishSound * fsound, int interleave);
 typedef int         (*FSCodecCommand) (FishSound * fsound, int command,
 				       void * data, int datasize);
 typedef long        (*FSCodecDecode) (FishSound * fsound, unsigned char * buf,
 				      long bytes);
-
-typedef long        (*FSCodecEncode_Short) (FishSound * fsound, short * pcm[],
-					    long frames);
-typedef long        (*FSCodecEncode_ShortIlv) (FishSound * fsound,
-					       short ** pcm, long frames);
-typedef long        (*FSCodecEncode_Int) (FishSound * fsound, int * pcm[],
-					  long frames);
-typedef long        (*FSCodecEncode_IntIlv) (FishSound * fsound,
-					     int ** pcm, long frames);
 typedef long        (*FSCodecEncode_Float) (FishSound * fsound, float * pcm[],
 					    long frames);
 typedef long        (*FSCodecEncode_FloatIlv) (FishSound * fsound,
 					       float ** pcm, long frames);
-typedef long        (*FSCodecEncode_Double) (FishSound * fsound,
-					     double * pcm[], long frames);
-typedef long        (*FSCodecEncode_DoubleIlv) (FishSound * fsound,
-						double ** pcm, long frames);
-
 typedef long        (*FSCodecFlush) (FishSound * fsound);
 
 #include <fishsound/decode.h>
@@ -115,14 +81,8 @@ struct _FishSoundCodec {
   FSCodecUpdate update;
   FSCodecCommand command;
   FSCodecDecode decode;
-  FSCodecEncode_Short encode_s;
-  FSCodecEncode_ShortIlv encode_s_ilv;
-  FSCodecEncode_Int encode_i;
-  FSCodecEncode_IntIlv encode_i_ilv;
-  FSCodecEncode_Float encode_f;
   FSCodecEncode_FloatIlv encode_f_ilv;
-  FSCodecEncode_Double encode_d;
-  FSCodecEncode_DoubleIlv encode_d_ilv;
+  FSCodecEncode_Float encode_f;
   FSCodecFlush flush;
 };
 
@@ -138,15 +98,9 @@ struct _FishSoundComment {
 };
 
 union FishSoundCallback {
-  FishSoundDecoded_Short decoded_short;
-  FishSoundDecoded_ShortIlv decoded_short_ilv;
-  FishSoundDecoded_Int decoded_int;
-  FishSoundDecoded_IntIlv decoded_int_ilv;
   FishSoundDecoded_Float decoded_float;
   FishSoundDecoded_FloatIlv decoded_float_ilv;
-  FishSoundDecoded_Double decoded_double;
-  FishSoundDecoded_DoubleIlv decoded_double_ilv;
-  FishSoundEncoded * encoded;
+  FishSoundEncoded encoded;
 };
 
 struct _FishSound {
@@ -158,9 +112,6 @@ struct _FishSound {
 
   /** Interleave boolean */
   int interleave;
-
-  /** Decoded PCM type */
-  FishSoundPCM pcm_type;
 
   /**
    * Current frameno.
@@ -197,16 +148,10 @@ struct _FishSound {
   /** The comments */
   char * vendor;
   FishSoundVector * comments;
-
-  /** Whether or not it is allowed to set up parameters */
-  int finalized;
-
-  /** Encoding quality */
-  float encode_quality;
 };
 
 int fish_sound_identify (unsigned char * buf, long bytes);
-int fish_sound_set_format (FishSound * fsound, int format);
+int fish_sound_set_format (FishSound * fsound, int format);  
 
 /* Format specific interfaces */
 int fish_sound_vorbis_identify (unsigned char * buf, long bytes);
@@ -214,6 +159,9 @@ FishSoundCodec * fish_sound_vorbis_codec (void);
 
 int fish_sound_speex_identify (unsigned char * buf, long bytes);
 FishSoundCodec * fish_sound_speex_codec (void);
+
+int fish_sound_flac_identify (unsigned char * buf, long bytes);
+FishSoundCodec * fish_sound_flac_codec (void);
 
 /* comments */
 int fish_sound_comments_init (FishSound * fsound);

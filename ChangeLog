@@ -1,22 +1,87 @@
-2007-01-12  Thomas Vander Stichele  <thomas at apestaart dot org>
+Sat Jan 12 19:11:09 JST 2008 Conrad Parker <conrad@metadecks.org>
 
-	* Makefile.am:
-	  dist m4 macro
-	* include/fishsound/Makefile.am:
-	  fix include directory when overriding includedir
+	* Version 0.9.0
 
-2005-06-13  Thomas Vander Stichele  <thomas at apestaart dot org>
+	* Encoding and decoding of the PCM audio and "Vorbiscomment" metadata
+	  packets is supported for FLAC streams in Ogg.
 
-	* autogen.sh:
-	* m4/as-ac-expand.m4:
-	  add m4 dir and use it
-	  add an expand macro
-	* configure.ac:
-	  uniformize configure's output across the annodex stack
+	* The documentation and test suite have been updated for FLAC.
 
-Thu Jan 13 17:58:45 EST 2005 Conrad Parker <conrad@metadecks.org>
+	* The decoder example now handles Ogg files containing multiple
+	  logical bitstreams; it simply extracts the first audio track.
+	  This demonstrates how to decode audio from a video file, or
+	  one track of a multitrack audio file.
 
-	* added liboil support from David Schleef <ds@schleef.org>
+	* Updated shared version info to 4:0:3
+
+Thu Nov  8 15:36:47 JST 2007 Conrad Parker <conrad@metadecks.org>
+
+	* Version 0.8.1
+
+	* This is a maintenance release, fixing a build error when
+	  libfishsound is configured with encoding disabled. For details, see:
+	  http://trac.annodex.net/log/libfishsound/branches/1.0-stable/
+
+Wed Jun  6 10:06:10 JST 2007 Conrad Parker <conrad@metadecks.org>
+
+	* Version 0.8.0
+
+	* Improved consistency of frame number reporting: for both Vorbis
+	  and Speex, the frame number is always updated before calling the
+	  user's callbacks for encoding or decoding.
+
+	* Added an internal finalizer for encoding the end of Vorbis streams,
+	  to ensure that all input samples are correctly encoded without
+	  requiring programmer intervention.
+
+	* Compatibility with SVN trunk, included new API functions:
+
+	        fish_sound_set_decoded_float;
+	        fish_sound_set_decoded_float_ilv;
+	        fish_sound_encode_float;
+	        fish_sound_encode_float_ilv;
+
+	* Added definitions for FISH_SOUND_CONTINUE, STOP_OK, STOP_ERR as
+	  documented in <fishsound/constants.h> (ticket:278)
+
+	* Documentation improvements for fish_sound_new() and
+	  fish_sound_decode() functions. (Ralph Giles)
+
+	* Updated Win32 build system (Marcin Lubonski)
+
+	* Updated shared version info to 3:0:2
+
+Tue Jul 19 23:41:06 EST 2005 Conrad Parker <conrad@metadecks.org>
+
+	* Version 0.7.0
+
+	* Added typesafe encoding and decoding interfaces. Some existing
+	interfaces are marked as deprecated, but source and binary
+	compatibility with previous versions has been maintained.
+	(Backported from changesets 282, 283, 285, 289, 290, 304)
+
+	* Valgrind-clean: Removed memory leaks and other errors exposed by
+	running the entire suite of unit tests under valgrind.
+	(Changeset 1398, and Backported changesets:
+	285:322 src/libfishsound/comments.c
+	304:323 src/libfishsound/fishsound.c
+	332:328, 337:515, 568 src/libfishsound/vorbis.c
+	308, 316, 333:514 src/libfishsound/speex.c
+	274:516 src/tests/encdec-comments.c
+
+	* Added compatibility with and detection of Speex 1.1
+	(Changeset 1391, and Backported changesets 306, 307)
+
+	* Add support for compilation under MinGW (Erik de Castro Lopo)
+	(Backported changeset 602)
+
+	* Various build system improvements (Thomas Vander Stichele)
+	(Backported changesets 536, 1337, 1355)
+
+	* Various minor backports (Backported changesets 294, 300, 301, 
+	302, 303, 341, 511, 518, 532, 535, 568, 607, 666, 1356, 1396)
+
+	* Updated shared version info to 2:0:1
 
 Thu Jun 24 18:48:46 EST 2004 Conrad Parker <conrad@metadecks.org>
 
@@ -37,10 +102,10 @@ Fri May 21 14:32:41 EST 2004 Conrad Parker <conrad@metadecks.org>
 
 	Improved handling of first and last blocks of data (bos and eos
 	packets in Ogg):
-        * new fish_sound_prepare_truncation() API call
-        * improved encdec-audio test to keep track of frames in and out,
-          and warn if unequal. (Currently not set to FAIL on this condition
-          as it appears to be common for Speex)
+	* new fish_sound_prepare_truncation() API call
+	* improved encdec-audio test to keep track of frames in and out,
+	  and warn if unequal. (Currently not set to FAIL on this condition
+	  as it appears to be common for Speex)
 
 	Updates to Win32 nmake build files
 

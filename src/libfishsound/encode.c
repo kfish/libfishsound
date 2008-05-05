@@ -38,38 +38,6 @@
 #include "private.h"
 
 int
-fish_sound_set_encode_quality (FishSound * fsound, float quality)
-{
-  if (fsound == NULL) return -1;
-
-#if FS_ENCODE
-  if (fsound->finalized)
-    return FISH_SOUND_ERR_FINALIZED;
-
-  if (quality < 0.0 || quality > 1.0)
-    return FISH_SOUND_ERR_OUT_OF_RANGE;
-
-  fsound->encode_quality = quality;
-#else
-  return FISH_SOUND_ERR_DISABLED;
-#endif
-
-  return 0;
-}
-
-float
-fish_sound_get_encode_quality (FishSound * fsound)
-{
-  if (fsound == NULL) return FISH_SOUND_ERR_BAD;
-
-#if FS_ENCODE
-  return fsound->encode_quality;
-#else
-  return FISH_SOUND_ERR_DISABLED;
-#endif
-}
-
-int
 fish_sound_set_encoded_callback (FishSound * fsound,
 				 FishSoundEncoded encoded,
 				 void * user_data)
@@ -79,64 +47,6 @@ fish_sound_set_encoded_callback (FishSound * fsound,
 #if FS_ENCODE
   fsound->callback.encoded = (void *)encoded;
   fsound->user_data = user_data;
-#else
-  return FISH_SOUND_ERR_DISABLED;
-#endif
-
-  return 0;
-}
-
-long
-fish_sound_encode_short (FishSound * fsound, short * pcm[], long frames)
-{
-  if (fsound == NULL) return -1;
-
-#if FS_ENCODE
-  if (fsound->codec && fsound->codec->encode_s)
-    return fsound->codec->encode_s (fsound, pcm, frames);
-#else
-  return FISH_SOUND_ERR_DISABLED;
-#endif
-
-  return 0;
-}
-
-long fish_sound_encode_short_ilv (FishSound * fsound, short ** pcm,
-				  long frames)
-{
-  if (fsound == NULL) return -1;
-
-#if FS_ENCODE
-  if (fsound->codec && fsound->codec->encode_s_ilv)
-    return fsound->codec->encode_s_ilv (fsound, pcm, frames);
-#else
-  return FISH_SOUND_ERR_DISABLED;
-#endif
-
-  return 0;
-}
-
-long fish_sound_encode_int (FishSound * fsound, int * pcm[], long frames)
-{
-  if (fsound == NULL) return -1;
-
-#if FS_ENCODE
-  if (fsound->codec && fsound->codec->encode_i)
-    return fsound->codec->encode_i (fsound, pcm, frames);
-#else
-  return FISH_SOUND_ERR_DISABLED;
-#endif
-
-  return 0;
-}
-
-long fish_sound_encode_int_ilv (FishSound * fsound, int ** pcm, long frames)
-{
-  if (fsound == NULL) return -1;
-
-#if FS_ENCODE
-  if (fsound->codec && fsound->codec->encode_i_ilv)
-    return fsound->codec->encode_i_ilv (fsound, pcm, frames);
 #else
   return FISH_SOUND_ERR_DISABLED;
 #endif
@@ -166,36 +76,6 @@ long fish_sound_encode_float_ilv (FishSound * fsound, float ** pcm,
 #if FS_ENCODE
   if (fsound->codec && fsound->codec->encode_f_ilv)
     return fsound->codec->encode_f_ilv (fsound, pcm, frames);
-#else
-  return FISH_SOUND_ERR_DISABLED;
-#endif
-
-  return 0;
-}
-
-long fish_sound_encode_double (FishSound * fsound, double * pcm[],
-			       long frames)
-{
-  if (fsound == NULL) return -1;
-
-#if FS_ENCODE
-  if (fsound->codec && fsound->codec->encode_d)
-    return fsound->codec->encode_d (fsound, pcm, frames);
-#else
-  return FISH_SOUND_ERR_DISABLED;
-#endif
-
-  return 0;
-}
-
-long fish_sound_encode_double_ilv (FishSound * fsound, double ** pcm,
-				   long frames)
-{
-  if (fsound == NULL) return -1;
-
-#if FS_ENCODE
-  if (fsound->codec && fsound->codec->encode_d_ilv)
-    return fsound->codec->encode_d_ilv (fsound, pcm, frames);
 #else
   return FISH_SOUND_ERR_DISABLED;
 #endif

@@ -43,70 +43,6 @@ extern "C" {
 
 /**
  * Signature of a callback for libfishsound to call when it has decoded
- * PCM audio data, and you want this provided as non-interleaved shorts.
- * \param fsound The FishSound* handle
- * \param pcm The decoded audio
- * \param frames The count of frames decoded
- * \param user_data Arbitrary user data
- * \retval FISH_SOUND_CONTINUE Continue decoding
- * \retval FISH_SOUND_STOP_OK Stop decoding immediately and
- * return control to the fish_sound_decode() caller
- * \retval FISH_SOUND_STOP_ERR Stop decoding immediately, purge buffered
- * data, and return control to the fish_sound_decode() caller
- */
-typedef int (*FishSoundDecoded_Short) (FishSound * fsound, short * pcm[],
-				       long frames, void * user_data);
-
-/**
- * Signature of a callback for libfishsound to call when it has decoded
- * PCM audio data, and you want this provided as interleaved shorts.
- * \param fsound The FishSound* handle
- * \param pcm The decoded audio
- * \param frames The count of frames decoded
- * \param user_data Arbitrary user data
- * \retval FISH_SOUND_CONTINUE Continue decoding
- * \retval FISH_SOUND_STOP_OK Stop decoding immediately and
- * return control to the fish_sound_decode() caller
- * \retval FISH_SOUND_STOP_ERR Stop decoding immediately, purge buffered
- * data, and return control to the fish_sound_decode() caller
- */
-typedef int (*FishSoundDecoded_ShortIlv) (FishSound * fsound, short ** pcm,
-					  long frames, void * user_data);
-
-/**
- * Signature of a callback for libfishsound to call when it has decoded
- * PCM audio data, and you want this provided as non-interleaved ints.
- * \param fsound The FishSound* handle
- * \param pcm The decoded audio
- * \param frames The count of frames decoded
- * \param user_data Arbitrary user data
- * \retval FISH_SOUND_CONTINUE Continue decoding
- * \retval FISH_SOUND_STOP_OK Stop decoding immediately and
- * return control to the fish_sound_decode() caller
- * \retval FISH_SOUND_STOP_ERR Stop decoding immediately, purge buffered
- * data, and return control to the fish_sound_decode() caller
- */
-typedef int (*FishSoundDecoded_Int) (FishSound * fsound, int * pcm[],
-				     long frames, void * user_data);
-
-/**
- * Signature of a callback for libfishsound to call when it has decoded
- * PCM audio data, and you want this provided as interleaved ints.
- * \param fsound The FishSound* handle
- * \param pcm The decoded audio
- * \param frames The count of frames decoded
- * \param user_data Arbitrary user data
- * \retval FISH_SOUND_CONTINUE Continue decoding
- * \retval FISH_SOUND_STOP_OK Stop decoding immediately and
- * return control to the fish_sound_decode() caller
- * \retval FISH_SOUND_STOP_ERR Stop decoding immediately, purge buffered
- * data, and return control to the fish_sound_decode() caller
- */
-typedef int (*FishSoundDecoded_IntIlv) (FishSound * fsound, int ** pcm,
-					long frames, void * user_data);
-
-/**
- * Signature of a callback for libfishsound to call when it has decoded
  * PCM audio data, and you want this provided as non-interleaved floats.
  * \param fsound The FishSound* handle
  * \param pcm The decoded audio
@@ -138,86 +74,6 @@ typedef int (*FishSoundDecoded_FloatIlv) (FishSound * fsound, float ** pcm,
 					  long frames, void * user_data);
 
 /**
- * Signature of a callback for libfishsound to call when it has decoded
- * PCM audio data, and you want this provided as non-interleaved doubles.
- * \param fsound The FishSound* handle
- * \param pcm The decoded audio
- * \param frames The count of frames decoded
- * \param user_data Arbitrary user data
- * \retval FISH_SOUND_CONTINUE Continue decoding
- * \retval FISH_SOUND_STOP_OK Stop decoding immediately and
- * return control to the fish_sound_decode() caller
- * \retval FISH_SOUND_STOP_ERR Stop decoding immediately, purge buffered
- * data, and return control to the fish_sound_decode() caller
- */
-typedef int (*FishSoundDecoded_Double) (FishSound * fsound, double * pcm[],
-					long frames, void * user_data);
-
-/**
- * Signature of a callback for libfishsound to call when it has decoded
- * PCM audio data, and you want this provided as interleaved doubles.
- * \param fsound The FishSound* handle
- * \param pcm The decoded audio
- * \param frames The count of frames decoded
- * \param user_data Arbitrary user data
- * \retval FISH_SOUND_CONTINUE Continue decoding
- * \retval FISH_SOUND_STOP_OK Stop decoding immediately and
- * return control to the fish_sound_decode() caller
- * \retval FISH_SOUND_STOP_ERR Stop decoding immediately, purge buffered
- * data, and return control to the fish_sound_decode() caller
- */
-typedef int (*FishSoundDecoded_DoubleIlv) (FishSound * fsound, double ** pcm,
-					   long frames, void * user_data);
-
-/**
- * Set the callback for libfishsound to call when it has a block of decoded
- * PCM audio ready, and you want this provided as non-interleaved shorts.
- * \param fsound A FishSound* handle (created with mode FISH_SOUND_DECODE)
- * \param decoded The callback to call
- * \param user_data Arbitrary user data to pass to the callback
- * \returns 0 on success, -1 on failure
- */
-int fish_sound_set_decoded_short (FishSound * fsound,
-				  FishSoundDecoded_Short decoded,
-				  void * user_data);
-
-/**
- * Set the callback for libfishsound to call when it has a block of decoded
- * PCM audio ready, and you want this provided as interleaved shorts.
- * \param fsound A FishSound* handle (created with mode FISH_SOUND_DECODE)
- * \param decoded The callback to call
- * \param user_data Arbitrary user data to pass to the callback
- * \returns 0 on success, -1 on failure
- */
-int fish_sound_set_decoded_short_ilv (FishSound * fsound,
-				      FishSoundDecoded_ShortIlv decoded,
-				      void * user_data);
-
-/**
- * Set the callback for libfishsound to call when it has a block of decoded
- * PCM audio ready, and you want this provided as non-interleaved ints.
- * \param fsound A FishSound* handle (created with mode FISH_SOUND_DECODE)
- * \param decoded The callback to call
- * \param user_data Arbitrary user data to pass to the callback
- * \returns 0 on success, -1 on failure
- */
-int fish_sound_set_decoded_int (FishSound * fsound,
-				FishSoundDecoded_Int decoded,
-				void * user_data);
-
-/**
- * Set the callback for libfishsound to call when it has a block of decoded
- * PCM audio ready, and you want this provided as interleaved ints.
- * \param fsound A FishSound* handle (created with mode FISH_SOUND_DECODE)
- * \param decoded The callback to call
- * \param user_data Arbitrary user data to pass to the callback
- * \returns 0 on success, -1 on failure
- */
-int fish_sound_set_decoded_int_ilv (FishSound * fsound,
-				    FishSoundDecoded_IntIlv decoded,
-				    void * user_data);
-
-/**
  * Set the callback for libfishsound to call when it has a block of decoded
  * PCM audio ready, and you want this provided as non-interleaved floats.
  * \param fsound A FishSound* handle (created with mode FISH_SOUND_DECODE)
@@ -242,31 +98,7 @@ int fish_sound_set_decoded_float_ilv (FishSound * fsound,
 				      void * user_data);
 
 /**
- * Set the callback for libfishsound to call when it has a block of decoded
- * PCM audio ready, and you want this provided as non-interleaved doubles.
- * \param fsound A FishSound* handle (created with mode FISH_SOUND_DECODE)
- * \param decoded The callback to call
- * \param user_data Arbitrary user data to pass to the callback
- * \returns 0 on success, -1 on failure
- */
-int fish_sound_set_decoded_double (FishSound * fsound,
-				   FishSoundDecoded_Double decoded,
-				   void * user_data);
-
-/**
- * Set the callback for libfishsound to call when it has a block of decoded
- * PCM audio ready, and you want this provided as interleaved doubles.
- * \param fsound A FishSound* handle (created with mode FISH_SOUND_DECODE)
- * \param decoded The callback to call
- * \param user_data Arbitrary user data to pass to the callback
- * \returns 0 on success, -1 on failure
- */
-int fish_sound_set_decoded_double_ilv (FishSound * fsound,
-				       FishSoundDecoded_DoubleIlv decoded,
-				       void * user_data);
-
-/**
- * Decode a block of data.
+ * Decode a block of compressed data.
  * No internal buffering is done, so a complete compressed audio packet
  * must be passed each time.
  * \param fsound A FishSound* handle (created with mode FISH_SOUND_DECODE)

@@ -48,6 +48,12 @@ clean:
 	rm -f doc/libfishsound/latex/doxygen.sty
 	rm -f doc/libfishsound/latex/*.tex
 	rm -f doc/fishsound-validate.1
+ifneq "$(wildcard /usr/share/misc/config.sub)" ""
+	cp -f /usr/share/misc/config.sub config.sub
+endif
+ifneq "$(wildcard /usr/share/misc/config.guess)" ""
+	cp -f /usr/share/misc/config.guess config.guess
+endif
 	dh_clean
 
 install: build
@@ -95,4 +101,3 @@ binary-arch: build install
 binary: binary-arch
 
 .PHONY: build clean binary-indep binary-arch binary install configure
-

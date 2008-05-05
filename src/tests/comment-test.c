@@ -43,7 +43,7 @@
 #define ARTIST1 "Trout Junkies"
 #define ARTIST2 "DJ Fugu"
 #define COPYRIGHT "Copyright (C) 2004. Some Rights Reserved."
-#define LICENSE "Creative Commons Attribute Share-Alike v1.0"
+#define LICENSE "Creative Commons Attribution-ShareAlike"
 #define COMMENT "Unstructured comments are evil."
 
 static FishSound * fsound;
@@ -64,8 +64,10 @@ main (int argc, char * argv[])
    */
 #if HAVE_VORBIS
   fsinfo.format = FISH_SOUND_VORBIS;
-#else
+#elif HAVE_SPEEX
   fsinfo.format = FISH_SOUND_SPEEX;
+#else
+  fsinfo.format = FISH_SOUND_FLAC;
 #endif
 
 #if FS_ENCODE

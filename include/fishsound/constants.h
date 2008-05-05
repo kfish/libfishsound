@@ -55,17 +55,20 @@ typedef enum _FishSoundCodecID {
   FISH_SOUND_VORBIS  = 0x01,
 
   /** Speex */
-  FISH_SOUND_SPEEX   = 0x02
+  FISH_SOUND_SPEEX   = 0x02,
+
+  /** Flac */
+  FISH_SOUND_FLAC    = 0x03
 } FishSoundCodecID;
 
 /** Decode callback return values */
 typedef enum _FishSoundStopCtl {
   /** Continue calling decode callbacks */
   FISH_SOUND_CONTINUE = 0,
-
+  
   /** Stop calling callbacks, but retain buffered data */
   FISH_SOUND_STOP_OK  = 1,
-
+  
   /** Stop calling callbacks, and purge buffered data */
   FISH_SOUND_STOP_ERR = -1
 } FishSoundStopCtl;
@@ -79,10 +82,10 @@ typedef enum _FishSoundCommand {
   FISH_SOUND_GET_INFO                   = 0x1000,
 
   /** Query if multichannel audio should be interpreted as interleaved */
-  FISH_SOUND_GET_INTERLEAVE      = 0x2000,
+  FISH_SOUND_GET_INTERLEAVE             = 0x2000,
 
   /** Set to 1 to interleave, 0 to non-interleave */
-  FISH_SOUND_SET_INTERLEAVE      = 0x2001,
+  FISH_SOUND_SET_INTERLEAVE             = 0x2001,
 
   FISH_SOUND_SET_ENCODE_VBR             = 0x4000,
   
@@ -103,25 +106,8 @@ typedef enum _FishSoundError {
   /** The requested operation is not suitable for this FishSound* handle */
   FISH_SOUND_ERR_INVALID                = -3,
 
-  /** Out of memory */
-  FISH_SOUND_ERR_OUT_OF_MEMORY          = -4,
-
-  /** Parameters have been finalized */
-  FISH_SOUND_ERR_FINALIZED              = -5,
-
-  /** Parameter passed to _set() function is out of range */
-  FISH_SOUND_ERR_OUT_OF_RANGE           = -6,
-
   /** Functionality disabled at build time */
   FISH_SOUND_ERR_DISABLED               = -10,
-
-  /** Decoding was stopped by a FishSoundDecode* callback returning
-   * FISH_SOUND_STOP_OK before any input bytes were consumed */
-  FISH_SOUND_ERR_STOP_OK                = -14,
-
-  /** Decoding was stopped by a FishSoundDecode* callback returning
-   * FISH_SOUND_STOP_ERR before any input bytes were consumed */
-  FISH_SOUND_ERR_STOP_ERR               = -15,
 
   /** Too few bytes passed to fish_sound_identify() */
   FISH_SOUND_ERR_SHORT_IDENTIFY         = -20,

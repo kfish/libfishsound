@@ -52,6 +52,7 @@ dump_identity (unsigned char * buf, long bytes)
   switch (format) {
   case FISH_SOUND_VORBIS: printf ("Vorbis\n"); break;
   case FISH_SOUND_SPEEX: printf ("Speex\n"); break;
+  case FISH_SOUND_FLAC: printf ("FLAC\n"); break;
   default: printf ("Unknown\n");
   }
 
@@ -85,7 +86,8 @@ main (int argc, char ** argv)
 
   if (argc < 2) {
     printf ("usage: %s filename\n", argv[0]);
-    printf ("Checks whether a file is a speex or a vorbis file.\n");
+    printf ("*** FishSound example program. ***\n");
+    printf ("Checks whether a file is an Ogg FLAC, Speex or Ogg Vorbis file.\n");
     exit (1);
   }
 

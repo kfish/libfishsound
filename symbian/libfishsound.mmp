@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2004 Commonwealth Scientific and Industrial Research
+   Copyright (C) 2003 Commonwealth Scientific and Industrial Research
    Organisation (CSIRO) Australia
 
    Redistribution and use in source and binary forms, with or without
@@ -34,8 +34,7 @@ TARGET        libfishsound.lib
 TARGETTYPE    lib
 UID           0
 SOURCEPATH    ..\src\libfishsound
-SOURCE        comments.c decode.c fishsound.c fs_vector.c speex.c vorbis.c
-
-USERINCLUDE   . ..\..\tremor ..\..\ogg\include\ogg
-SYSTEMINCLUDE \epoc32\include \epoc32\include\libc ..\include ..\..\tremor
+SOURCE        comments.c fishsound.c fs_vector.c speex.c vorbis.c
+USERINCLUDE   .
+SYSTEMINCLUDE \epoc32\include \epoc32\include\libc ..\include ..\..\speex\libspeex
 SYSTEMINCLUDE ..\..\ogg\include ..\..\ogg\symbian

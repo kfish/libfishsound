@@ -41,13 +41,13 @@
  *
  * This is the documentation for the FishSound C API. FishSound provides
  * a simple programming interface for decoding and encoding audio data
- * using Xiph.Org codecs (Vorbis and Speex).
+ * using Xiph.Org codecs (FLAC, Speex and Vorbis).
  *
  * libfishsound by itself is designed to handle raw codec streams from
  * a lower level layer such as UDP datagrams.
  * When these codecs are used in files, they are commonly encapsulated in
  * <a href="http://www.xiph.org/ogg/">Ogg</a> to produce
- * <em>Ogg Vorbis</em> and <em>Speex</em> files.
+ * <em>Ogg FLAC</em>, <em>Speex</em> and <em>Ogg Vorbis</em> files.
  * Example C programs using
  * <a href="http://www.annodex.net/software/liboggz/">liboggz</a> to
  * read and write these files are provided in the libfishsound sources.
@@ -68,11 +68,11 @@
  *
  * - \link decode Decoding audio data \endlink:
  * How to decode audio data with FishSound, including source for a fully
- * working Ogg Vorbis and Ogg Speex decoder.
+ * working Ogg FLAC, Speex and Ogg Vorbis decoder.
  *
  * - \link encode Encoding audio data \endlink:
  * How to encode audio data with FishSound, including source for a fully
- * working Ogg Vorbis and Ogg Speex encoder.
+ * working Ogg FLAC, Speex and Ogg Vorbis encoder.
  *
  * - \link configuration Configuration \endlink:
  * Customizing libfishsound to only decode or encode,
@@ -103,7 +103,7 @@
  * a lower level layer such as UDP datagrams.
  * When these codecs are used in files, they are commonly encapsulated in
  * <a href="http://www.xiph.org/ogg/">Ogg</a> to produce
- * <em>Ogg Vorbis</em> and <em>Speex</em> files.
+ * <em>Ogg FLAC</em>, <em>Speex</em> and <em>Ogg Vorbis</em> files.
  * Example C programs using
  * <a href="http://www.annodex.net/software/liboggz/">liboggz</a> to
  * read and write these files are provided in the libfishsound sources.
@@ -196,13 +196,13 @@
  * - Any attempt to call fish_sound_decode() will return 
  *   FISH_SOUND_ERR_DISABLED
  *
- * \subsection no_vorbis Removing Vorbis support
+ * \subsection no_flac Removing FLAC support
  *
- * Configuring with \a --disable-vorbis will remove all support for Vorbis:
- * - All internal Vorbis related functions will not be built
+ * Configuring with \a --disable-flac will remove all support for FLAC:
+ * - All internal FLAC related functions will not be built
  * - Any attempt to call fish_sound_new() with \a mode == FISH_SOUND_ENCODE
- *   and \a fsinfo->format == FISH_SOUND_VORBIS will fail, returning NULL
- * - The resulting library will not be linked against libvorbis or libvorbisenc
+ *   and \a fsinfo->format == FISH_SOUND_FLAC will fail, returning NULL
+ * - The resulting library will not be linked against libFLAC
  *
  * \subsection no_speex Removing Speex support
  *
@@ -212,12 +212,20 @@
  *   and \a fsinfo->format == FISH_SOUND_SPEEX will fail, returning NULL
  * - The resulting library will not be linked against libspeex
  *
+ * \subsection no_vorbis Removing Vorbis support
+ *
+ * Configuring with \a --disable-vorbis will remove all support for Vorbis:
+ * - All internal Vorbis related functions will not be built
+ * - Any attempt to call fish_sound_new() with \a mode == FISH_SOUND_ENCODE
+ *   and \a fsinfo->format == FISH_SOUND_VORBIS will fail, returning NULL
+ * - The resulting library will not be linked against libvorbis or libvorbisenc
+ *
  * \subsection summary Configuration summary
  * 
  * Upon successful configuration, you should see something like this:
 <pre>
 ------------------------------------------------------------------------
-  libfishsound 0.6.0:  Automatic configuration OK.
+  libfishsound 0.9.0:  Automatic configuration OK.
 
   General configuration:
 
@@ -227,18 +235,27 @@
 
   Library configuration (./src/libfishsound):
 
+    FLAC support: ................ yes
+    Speex support: ............... yes (1.1.x)
     Vorbis support: .............. yes
-    Speex support: ............... yes
 
   Example programs (./src/examples):
 
-    identify decode encode
+    fishsound-identify fishsound-decode fishsound-encode
 
   Installation paths:
 
     libfishsound: ................ /usr/local/lib
     C header files: .............. /usr/local/include/fishsound
     Documentation: ............... /usr/local/share/doc/libfishsound
+
+  Building:
+
+    Type 'make' to compile libfishsound.
+
+    Type 'make install' to install libfishsound.
+
+    Type 'make check' to run test suite (Valgrind testing not enabled)
 
   Example programs will be built but not installed.
 ------------------------------------------------------------------------
@@ -274,6 +291,8 @@
    AC_SUBST(FISHSOUND_LIBS)
  fi
  </pre>
+ * (Note that if your application requires FLAC support, you should check
+ * for a version of fishsound >= 0.9.0).
  *
  * If libfishsound is found, HAVE_FISHSOUND will be set to "yes", and
  * the autoconf variables FISHSOUND_CFLAGS and FISHSOUND_LIBS will
@@ -307,15 +326,15 @@
  *
  * libfishsound provides callback based decoding: you feed it encoded audio
  * data, and it will call your callback with decoded PCM. A more detailed
- * explanation and a full example of decoding Ogg Vorbis and Speex files is
- * provided in the \link decode Decoding audio data \endlink section.
+ * explanation and a full example of decoding Ogg FLAC, Speex and Ogg Vorbis
+ * files is provided in the \link decode Decoding audio data \endlink section.
  *
  * \section encoding Encoding
  *
  * libfishsound provides callback based encoding: you feed it PCM audio,
  * and it will call your callback with encoded audio data. A more detailed
- * explanation and a full example of encoding Ogg Vorbis and Speex files is
- * provided in the \link encode Encoding audio data \endlink section.
+ * explanation and a full example of encoding Ogg FLAC, Speex and Ogg Vorbis
+ * files is provided in the \link encode Encoding audio data \endlink section.
  */
 
 /** \defgroup decode Decoding audio data
@@ -327,6 +346,9 @@
  * FishSoundInfo structure will be cleared.
  * - provide a FishSoundDecoded_* callback for libfishsound to call when it has
  * decoded audio.
+ * - (optionally) specify whether you want to receive interleaved or
+ * per-channel PCM data, using a fish_sound_set_interleave().
+ * The default is for per-channel (non-interleaved) PCM.
  * - feed encoded audio data to libfishsound via fish_sound_decode().
  * libfishsound will decode the audio for you, calling the FishSoundDecoded_*
  * callback you provided earlier each time it has a block of audio ready.
@@ -335,14 +357,14 @@
  * This procedure is illustrated in src/examples/fishsound-decode.c.
  * Note that this example additionally:
  * - uses <a href="http://www.annodex.net/software/liboggz/">liboggz</a> to
- * demultiplex audio data from an Ogg encapsulated Vorbis or Speex stream.
- * Hence, the step of feeding encoded data to libfishsound is done within
+ * demultiplex audio data from an Ogg encapsulated FLAC, Speex or Vorbis
+ * stream. The step of feeding encoded data to libfishsound is done within
  * the OggzReadPacket callback.
  * - uses <a href="http://www.mega-nerd.com/libsndfile/">libsndfile</a> to
  * write the decoded audio to a WAV file.
  *
- * Hence this example code demonstrates all that is needed to decode both
- * Ogg Vorbis and Ogg Speex files:
+ * Hence this example code demonstrates all that is needed to decode
+ * Ogg FLAC, Speex or Ogg Vorbis files:
  *
  * \include fishsound-decode.c
  */
@@ -357,9 +379,6 @@
  * encoding.
  * - provide a FishSoundEncoded callback for libfishsound to call when it
  * has a block of encoded audio
- * - (optionally) specify whether you will be providing interleaved or
- * per-channel PCM data, using a fish_sound_set_interleave().
- * The default is for per-channel (non-interleaved) PCM.
  * - feed raw PCM audio data to libfishsound via fish_sound_encode_*().
  * libfishsound will encode the audio for you, calling the FishSoundEncoded
  * callback you provided earlier each time it has a block of encoded audio
@@ -371,10 +390,10 @@
  * - uses <a href="http://www.mega-nerd.com/libsndfile/">libsndfile</a> to
  * read input from a PCM audio file (WAV, AIFF, etc.)
  * - uses <a href="http://www.annodex.net/software/liboggz/">liboggz</a> to
- * encapsulate the encoded Vorbis or Speex data in an Ogg stream.
+ * encapsulate the encoded FLAC, Speex or Vorbis data in an Ogg stream.
  *
  * Hence this example code demonstrates all that is needed to encode
- * Ogg Vorbis and Ogg Speex files:
+ * Ogg FLAC, Speex and Ogg Vorbis files:
  *
  * \include fishsound-encode.c
  */
@@ -389,7 +408,7 @@ typedef struct {
   /** Count of channels */
   int channels;
 
-  /** FISH_SOUND_VORBIS, FISH_SOUND_SPEEX etc. */
+  /** FISH_SOUND_VORBIS, FISH_SOUND_SPEEX, FISH_SOUND_FLAC etc. */
   int format;
 } FishSoundInfo;
 
@@ -397,7 +416,7 @@ typedef struct {
  * Info about a particular sound format
  */
 typedef struct {
-  /** FISH_SOUND_VORBIS, FISH_SOUND_SPEEX etc. */
+  /** FISH_SOUND_VORBIS, FISH_SOUND_SPEEX, FISH_SOUND_FLAC etc. */
   int format;
 
   /** Printable name */
@@ -421,8 +440,9 @@ extern "C" {
  * Identify a codec based on the first few bytes of data.
  * \param buf A pointer to the first few bytes of the data
  * \param bytes The count of bytes available at buf
- * \retval FISH_SOUND_xxxxxx FISH_SOUND_VORBIS, FISH_SOUND_SPEEX if
- * \a buf was identified as the initial bytes of a supported codec
+ * \retval FISH_SOUND_xxxxxx FISH_SOUND_VORBIS, FISH_SOUND_SPEEX or
+ * FISH_SOUND_FLAC if \a buf was identified as the initial bytes of a
+ * supported codec
  * \retval FISH_SOUND_UNKNOWN if the codec could not be identified
  * \retval FISH_SOUND_ERR_SHORT_IDENTIFY if \a bytes is less than 8
  * \note If \a bytes is exactly 8, then only a weak check is performed,

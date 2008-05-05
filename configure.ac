@@ -6,10 +6,10 @@ AC_PREREQ(2.53)
 
 AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE(libfishsound, 0.7.1.svn)
+AM_INIT_AUTOMAKE(libfishsound, 0.9.0)
 AM_CONFIG_HEADER(config.h)
 
-SHARED_VERSION_INFO="1:0:0"
+SHARED_VERSION_INFO="4:0:3"
 SHLIB_VERSION_ARG=""
 
 # Checks for programs.
@@ -35,8 +35,7 @@ fi
 VALGRIND_ENVIRONMENT=""
 ac_enable_valgrind=no
 AC_ARG_ENABLE(valgrind-testing,
-     [  --enable-valgrind-testing     enable running of tests inside Valgrind ],
-     [ ac_enable_valgrind=yes ], [ ac_enable_valgrind=no] )
+     [  --enable-valgrind-testing     enable running of tests inside Valgrind ],     [ ac_enable_valgrind=yes ], [ ac_enable_valgrind=no] )
 
 if test "x${ac_enable_valgrind}" = xyes ; then
   if test "x${enable_shared}" = xyes ; then
@@ -47,19 +46,22 @@ if test "x${ac_enable_valgrind}" = xyes ; then
   if test "x$HAVE_VALGRIND" = xyes ; then
     VALGRIND_ENVIRONMENT="$VALGRIND_ENVIRONMENT valgrind -q --leak-check=yes --show-reachable=yes --num-callers=100"
     AC_SUBST(VALGRIND_ENVIRONMENT)
-    TESTS_INFO="'make check' test suite will be run under:
+    TESTS_INFO="Type 'make check' to run test suite. Tests will be run under:
   ${VALGRIND_ENVIRONMENT}"
   else
-    TESTS_INFO="'make check' to run test suite (Valgrind not found)"
+    TESTS_INFO="Type 'make check' to run test suite (Valgrind not found)"
   fi
 else
-  TESTS_INFO="'make check' to run test suite (Valgrind testing not enabled)"
+  TESTS_INFO="Type 'make check' to run test suite (Valgrind testing not enabled)"
 fi
 
 dnl Overall configuration success flag
 fishsound_config_ok=yes
 
 fishsound_examples=""
+
+dnl Optional requirements to report via pkg-config (in fishsound.pc)
+fishsound_pkgdeps=""
 
 dnl
 dnl  Configuration option for building of experimental code.
@@ -73,22 +75,6 @@ AC_ARG_ENABLE(experimental,
 if test "x${ac_enable_experimental}" = xyes ; then
     AC_DEFINE(FS_EXPERIMENTAL, [], [Define to build experimental code])
 fi
-
-dnl
-dnl  Configuration option for floating point support.
-dnl
-
-ac_enable_float=yes
-AC_ARG_ENABLE(float,
-     [  --disable-float         disable building of floating point code ],
-     [ ac_enable_float=no ], [ ac_enable_float=yes] )
-
-if test "x${ac_enable_float}" = xyes ; then
-    AC_DEFINE(FS_FLOAT, [1], [Build code that requires floating point])
-else
-    AC_DEFINE(FS_FLOAT, [0], [Do not build code that requires floating point])
-fi
-AM_CONDITIONAL(FS_FLOAT, [test "x${ac_enable_float}" = "xyes"])
 
 dnl
 dnl  Configuration option for building of decoding support.
@@ -115,12 +101,6 @@ AC_ARG_ENABLE(encode,
      [  --disable-encode        disable building of encoding support ],
      [ ac_enable_encode=no ], [ ac_enable_encode=yes] )
 
-if test "x${ac_enable_float}" = xno ; then
-  AC_MSG_WARN([Encoding support disabled:
-*** This version of libfishsound does not support integer-only encoding ])
-  ac_enable_encode=no
-fi
-
 if test "x${ac_enable_encode}" = xyes ; then
     AC_DEFINE(FS_ENCODE, [1], [Build encoding support])
 else
@@ -146,38 +126,6 @@ if test "x${ac_enable_decode}" = xno && test "x${ac_enable_encode}" = xno ; then
 fi
 
 dnl
-dnl  Detect liboil
-dnl
-
-HAVE_LIBOIL=no
-LIBOIL_SUPPORT=no
-
-ac_enable_liboil=yes
-AC_ARG_ENABLE(liboil,
-     [  --disable-liboil        enable use of liboil CPU optimizations],
-     [ ac_enable_liboil=no ], [ ac_enable_liboil=yes] )
-
-if test "x${ac_enable_liboil}" = xyes ; then
-  PKG_CHECK_MODULES(LIBOIL, liboil-0.3 >= 0.3.0, HAVE_LIBOIL=yes, HAVE_LIBOIL=no)
-  AC_SUBST(LIBOIL_LIBS)
-  AC_SUBST(LIBOIL_CFLAGS)
-  if test "$HAVE_LIBOIL" = "no"; then
-    AC_DEFINE(HAVE_LIBOIL, [0], [Define to 1 if you have liboil])
-    LIBOIL_SUPPORT="no"
-    AC_MSG_WARN([
-*** liboil not found, falling back to inline C conversions.
-*** liboil provides optimized routines for Altivec, MMX and SSE etc.
-*** liboil is available from http://www.schleef.org/liboil/])
-  else
-    AC_DEFINE(HAVE_LIBOIL, [1], [Define to 1 if you have liboil])
-    LIBOIL_SUPPORT="yes"
-  fi
-else
-  AC_DEFINE(HAVE_LIBOIL, [0], [Define to 1 if you have liboil])
-  LIBOIL_SUPPORT="disabled"
-fi
-
-dnl
 dnl  Detect vorbis
 dnl
 
@@ -187,14 +135,8 @@ VORBIS_SUPPORT=no
 
 ac_enable_vorbis=yes
 AC_ARG_ENABLE(vorbis,
-     [  --disable-vorbis        enable building of Vorbis codec support ],
+     [  --disable-vorbis        disable building of Vorbis codec support ],
      [ ac_enable_vorbis=no ], [ ac_enable_vorbis=yes] )
-
-if test "x${ac_enable_float}" = xno ; then
-  AC_MSG_WARN([Vorbis support disabled:
-*** This version of libfishsound does not support integer-only Vorbis ])
-  ac_enable_vorbis=no
-fi
 
 if test "x${ac_enable_vorbis}" = xyes ; then
   AC_CHECK_LIB(vorbis, vorbis_info_init, HAVE_VORBIS="maybe", , [-lm -logg])
@@ -203,6 +145,7 @@ if test "x${ac_enable_vorbis}" = xyes ; then
   fi
   if test "x$HAVE_VORBIS" = xyes ; then
     AC_DEFINE(HAVE_VORBIS, [1], [Define to 1 if you have libvorbis])
+    fishsound_pkgdeps="$fishsound_pkgdeps vorbis"
   else
     AC_DEFINE(HAVE_VORBIS, [0], [Define to 1 if you have libvorbis])
   fi
@@ -216,6 +159,7 @@ if test "x${ac_enable_vorbis}" = xyes ; then
     fi
     if test "x$HAVE_VORBISENC" = xyes ; then
       AC_DEFINE(HAVE_VORBISENC, [1], [Define to 1 if you have libvorbisenc])
+      fishsound_pkgdeps="$fishsound_pkgdeps vorbisenc"
     else
       AC_DEFINE(HAVE_VORBISENC, [0], [Define to 1 if you have libvorbisenc])
     fi
@@ -250,7 +194,7 @@ SPEEX_SUPPORT=no
 
 ac_enable_speex=yes
 AC_ARG_ENABLE(speex,
-     [  --disable-speex         enable building of Speex codec support ],
+     [  --disable-speex         disable building of Speex codec support ],
      [ ac_enable_speex=no ], [ ac_enable_speex=yes] )
 
 if test "x${ac_enable_speex}" = xyes ; then
@@ -278,47 +222,9 @@ if test "x${ac_enable_speex}" = xyes ; then
     if test "x$HAVE_SPEEX_1_1" = xyes ; then
       AC_DEFINE(HAVE_SPEEX_1_1, [1], [Define to 1 if you have libspeex 1.1.x])
       SPEEX_SUPPORT="yes (1.1.x)"
-
-      dnl Test for speex_lib_get_mode() in libspeex 1.1
-      AC_CHECK_LIB(speex, speex_lib_get_mode, HAVE_SPEEX_LIB_GET_MODE="yes",
-        HAVE_SPEEX_LIB_GET_MODE="no", [$SPEEX_LIBS])
-      if test "x$HAVE_SPEEX_LIB_GET_MODE" = xyes ; then
-        AC_DEFINE(HAVE_SPEEX_LIB_GET_MODE, [1],
-         [Define to 1 if speex_lib_get_mode() exists in libspeex])
-      else
-        AC_DEFINE(HAVE_SPEEX_LIB_GET_MODE, [0],
-         [Define to 1 if speex_lib_get_mode() exists in libspeex])
-      fi
-
     else
-      AC_DEFINE(HAVE_SPEEX_1_1, [0], [Define to 1 if you have libspeex 1.1.x])
+      AC_DEFINE(HAVE_SPEEX_1_1, [0], [Define to 1 if you have libspeex 1.1.x]) 
       SPEEX_SUPPORT="yes (1.0.x)"
-    fi
-
-    dnl Test for speex_free() in libspeex
-    AC_CHECK_LIB(speex, speex_free, HAVE_SPEEX_FREE="yes",
-      HAVE_SPEEX_FREE="no", [$SPEEX_LIBS])
-    if test "x$HAVE_SPEEX_FREE" = xyes ; then
-      AC_DEFINE(HAVE_SPEEX_FREE, [1],
-       [Define to 1 if speex_free() exists in libspeex])
-    else
-      AC_DEFINE(HAVE_SPEEX_FREE, [0],
-       [Define to 1 if speex_free() exists in libspeex])
-    fi
-
-    dnl Test for libspeex SPEEX_DISABLE_GLOBAL_POINTERS API
-    dnl If so, we need to use a different API to access available modes,
-    dnl and free them after use.
-    AC_CHECK_LIB(speex, speex_mode_new, DISABLE_GLOBAL_POINTERS="maybe",
-      DISABLE_GLOBAL_POINTERS="no", [$SPEEX_LIBS])
-    if test "x$DISABLE_GLOBAL_POINTERS" = "xmaybe"; then
-      AC_CHECK_HEADER([speex/speex_noglobals.h], DISABLE_GLOBAL_POINTERS="yes",
-        DISABLE_GLOBAL_POINTERS="no", [#include <speex/speex.h>])
-    fi
-    if test "x$DISABLE_GLOBAL_POINTERS" = xyes ; then
-      AC_DEFINE(SPEEX_DISABLE_GLOBAL_POINTERS, ,
-       [Define if libspeex uses SPEEX_DISABLE_GLOBAL_POINTERS API])
-      SPEEX_SUPPORT="$SPEEX_SUPPORT (SPEEX_DISABLE_GLOBAL_POINTERS)"
     fi
 
     CFLAGS="$saved_CFLAGS"
@@ -326,6 +232,8 @@ if test "x${ac_enable_speex}" = xyes ; then
     AC_DEFINE(HAVE_SPEEX, [1], [Define to 1 if you have libspeex])
     AC_SUBST(SPEEX_CFLAGS)
     AC_SUBST(SPEEX_LIBS)
+
+    fishsound_pkgdeps="$fishsound_pkgdeps speex"
   else
     AC_DEFINE(HAVE_SPEEX, [0], [Define to 1 if you have libspeex])
   fi
@@ -336,12 +244,78 @@ fi
 AM_CONDITIONAL(HAVE_SPEEX, [test "x$HAVE_SPEEX" = "xyes"])
 
 dnl
+dnl  Detect flac
+dnl
+
+HAVE_FLAC=no
+HAVE_FLAC_1_1_2=no
+HAVE_FLAC_1_1_3=no
+FLAC_SUPPORT=no
+
+ac_enable_flac=yes
+AC_ARG_ENABLE(flac,
+     [  --disable-flac          disable building of Flac codec support ],
+     [ ac_enable_flac=no ], [ ac_enable_flac=yes] )
+
+if test "x${ac_enable_flac}" = xyes ; then
+  PKG_CHECK_MODULES(FLAC, flac, HAVE_FLAC="yes", HAVE_FLAC="no")
+
+  if test "x$HAVE_FLAC" = "xno" ; then
+    AC_CHECK_LIB(FLAC, FLAC__stream_decoder_init, HAVE_FLAC="maybe", , [-lm -logg])
+    if test "x$HAVE_FLAC" = xmaybe; then
+      AC_CHECK_HEADER(FLAC/all.h, HAVE_FLAC="yes", HAVE_FLAC="no")
+    fi
+    if test "x$HAVE_FLAC" = "xyes" ; then
+      FLAC_CFLAGS=""
+      FLAC_LIBS="-lFLAC -logg -lm"
+    fi
+  fi
+
+  if test "x$HAVE_FLAC" = xyes ; then
+    saved_CFLAGS="$CFLAGS"
+    CFLAGS="$CFLAGS $FLAC_CFLAGS"
+
+    dnl Test for libFLAC 1.1.3
+    AC_CHECK_LIB(FLAC, FLAC__stream_decoder_init_stream, HAVE_FLAC_1_1_3="yes",
+        HAVE_FLAC_1_1_3="no", [$FLAC_LIBS])
+    if test "x$HAVE_FLAC_1_1_3" = xyes ; then
+      AC_DEFINE(HAVE_FLAC_1_1_3, [1], [Define to 1 if you have libFLAC 1.1.3])
+      FLAC_SUPPORT="yes (1.1.3)"
+    else
+      dnl Test for libFLAC 1.1.2
+      AC_CHECK_LIB(FLAC, FLAC__stream_decoder_init, HAVE_FLAC_1_1_2="yes",
+          HAVE_FLAC_1_1_2="no", [$FLAC_LIBS])
+      if test "x$HAVE_FLAC_1_1_2" = xyes ; then
+        AC_DEFINE(HAVE_FLAC_1_1_2, [1], [Define to 1 if you have libFLAC 1.1.2])
+        FLAC_SUPPORT="yes (1.1.2)"
+      fi
+    fi
+
+    CFLAGS="$saved_CFLAGS"
+
+    AC_DEFINE(HAVE_FLAC, [1], [Define to 1 if you have libFLAC])
+    AC_SUBST(FLAC_CFLAGS)
+    AC_SUBST(FLAC_LIBS)
+
+    fishsound_pkgdeps="$fishsound_pkgdeps flac"
+  else
+    AC_DEFINE(HAVE_FLAC, [0], [Define to 1 if you have libFLAC])
+  fi
+else
+  AC_DEFINE(HAVE_FLAC, [0], [Define to 1 if you have libFLAC])
+  FLAC_SUPPORT="disabled"
+fi
+AM_CONDITIONAL(HAVE_FLAC, [test "x$HAVE_FLAC" = "xyes"])
+
+dnl
 dnl  Check codec disabling sanity
 dnl
-if test "x${ac_enable_vorbis}" = xno && test "x${ac_enable_speex}" = xno ; then
+if test "x${ac_enable_vorbis}" = xno && test "x${ac_enable_speex}" = xno &&
+test "x${ac_enable_flac}" = xno ; then
   AC_MSG_ERROR([
 ***
-*** You have attempted to explicitly disable both Vorbis and Speex support.
+*** You have attempted to explicitly disable support for all codecs:
+*** FLAC, Speex and Vorbis.
 ***
 *** If you want a fish that does nothing, try kfishd:
 ***
@@ -353,9 +327,10 @@ if test "x${ac_enable_vorbis}" = xno && test "x${ac_enable_speex}" = xno ; then
 fi
 
 dnl
-dnl Set overall configuration success to no if neither vorbis or speex found
+dnl Set overall configuration success to no if none of FLAC, Vorbis or Speex
+dnl has been found.
 dnl
-if test "x$HAVE_VORBIS" = "xno" && test "x$HAVE_SPEEX" = "xno"; then
+if test "x$HAVE_VORBIS" = "xno" && test "x$HAVE_SPEEX" = "xno" && test "x$HAVE_FLAC" = "xno" ; then
   fishsound_config_ok=no
 fi
 
@@ -411,29 +386,6 @@ fi
 AM_CONDITIONAL(HAVE_LIBSNDFILE1, [test "x$HAVE_LIBSNDFILE1" = "xyes"])
 
 
-# Checks for typedefs, structures, and compiler characteristics.
-
-dnl Use -Wall if we have gcc.
-dnl changequote(,)dnl
-if test "x$ac_cv_prog_gcc" = xyes ; then
-  CFLAGS="$CFLAGS -Wall -g"
-fi
-dnl changequote([,])dnl
-
-case "$target_os" in
-  darwin* | rhapsody*)
-    dnl Disable -Wall and -pedantic for Apple Darwin/Rhapsody.
-    dnl System headers on these systems are broken.
-    temp_CFLAGS=`echo $CFLAGS | sed "s/-Wall -pedantic//"`
-    CFLAGS=$temp_CFLAGS
-    ;;
-  linux* | solaris*)
-    SHLIB_VERSION_ARG="-Wl,--version-script=Version_script"
-    ;;
-  *)
-    ;;
-esac
-
 dnl
 dnl  Configuration tests complete -- provide summary of results.
 dnl
@@ -473,6 +425,17 @@ if test "x$HAVE_SPEEX" = xmaybe ; then
 ])
 fi
 
+if test "x$HAVE_FLAC" != xyes ; then
+    AC_MSG_RESULT(
+[*** libFLAC, available from  http://flac.sourceforge.net/])
+fi
+if test "x$HAVE_FLAC" = xmaybe ; then
+    AC_MSG_RESULT(
+[      Development files missing: The libFLAC library binary seems to be
+      installed, but building of a test program failed.
+])
+fi
+
 AC_MSG_RESULT(
 [*** If you install the required libraries from source, you
 *** need to inform the dynamic linker of their location. If
@@ -500,6 +463,8 @@ else
 
 AC_SUBST(SHLIB_VERSION_ARG)
 AC_SUBST(SHARED_VERSION_INFO)
+
+AC_SUBST(fishsound_pkgdeps)
 
 if test "x$HAVE_OGGZ" = xyes ; then
   fishsound_examples="fishsound-identify"
@@ -541,18 +506,17 @@ AC_MSG_RESULT([
 ------------------------------------------------------------------------
   $PACKAGE $VERSION:  Automatic configuration OK.
 
-  General build configuration:
+  General configuration:
 
     Experimental code: ........... ${ac_enable_experimental}
-    Floating point code: ......... ${ac_enable_float}
     Decoding support: ............ ${ac_enable_decode}
     Encoding support: ............ ${ac_enable_encode}
 
   Library configuration (./src/libfishsound):
 
-    CPU optimizations (liboil): .. $LIBOIL_SUPPORT
-    Vorbis support: .............. $VORBIS_SUPPORT
+    FLAC support: ................ $FLAC_SUPPORT
     Speex support: ............... $SPEEX_SUPPORT
+    Vorbis support: .............. $VORBIS_SUPPORT
 
   Example programs (./src/examples):
 
@@ -570,8 +534,6 @@ AC_MSG_RESULT([
 
     Type 'make install' to install $PACKAGE.
 
-    Type 'make check' to test $PACKAGE using the unit tests
-    contained in the src/tests directory.
     ${TESTS_INFO}
 
   Example programs will be built but not installed.

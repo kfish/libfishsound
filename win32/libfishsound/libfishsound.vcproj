@@ -157,6 +157,21 @@
 				RelativePath=".\libfishsound.def">
 			</File>
 			<File
+				RelativePath="..\..\src\libfishsound\comments.c">
+			</File>
+			<File
+				RelativePath="..\..\src\libfishsound\decode.c">
+			</File>
+			<File
+				RelativePath="..\..\src\libfishsound\encode.c">
+			</File>
+			<File
+				RelativePath="..\..\src\libfishsound\flac.c">
+			</File>
+			<File
+				RelativePath="..\..\src\libfishsound\fs_vector.c">
+			</File>
+			<File
 				RelativePath="..\..\src\libfishsound\speex.c">
 			</File>
 			<File
@@ -173,10 +188,16 @@
 				RelativePath="..\..\include\fishsound\constants.h">
 			</File>
 			<File
+				RelativePath="..\..\src\libfishsound\convert.h">
+			</File>
+			<File
 				RelativePath="..\..\include\fishsound\fishsound.h">
 			</File>
 			<File
 				RelativePath="..\..\src\libfishsound\fs_compat.h">
+			</File>
+			<File
+				RelativePath="..\..\src\libfishsound\fs_vector.h">
 			</File>
 			<File
 				RelativePath="..\..\src\libfishsound\private.h">

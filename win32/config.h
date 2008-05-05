@@ -16,9 +16,6 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
 
-/* Define to 1 if you have liboil */
-#define HAVE_LIBOIL 0
-
 /* Define if have libsndfile */
 #define HAVE_LIBSNDFILE1 
 
@@ -81,12 +78,6 @@
 
 /* Version number of package */
 #define VERSION "0.5.41"
-
-/* Define if you have recent version of speex */
-#define HAVE_SPEEX_1_1 1
-
-/* Define FS_FLOAT for recent versions of vorbis */
-#define FS_FLOAT 1
 
 /* Define to 1 if your processor stores words with the most significant byte
    first (like Motorola and SPARC, unlike Intel and VAX). */

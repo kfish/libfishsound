@@ -8,12 +8,12 @@ FishSound, the sound of fish!
   http://www.annodex.net/software/libfishsound/
 
 libfishsound provides a simple programming interface for decoding and
-encoding audio data using Xiph.Org codecs (Vorbis and Speex).
+encoding audio data using Xiph.Org codecs (FLAC, Speex and Vorbis).
 
 libfishsound by itself is designed to handle raw codec streams from a
 lower level layer such as UDP datagrams. When these codecs are used in
-files, they are commonly encapsulated in Ogg to produce Ogg Vorbis
-and Speex files.
+files, they are commonly encapsulated in Ogg to produce Ogg FLAC, Speex
+and Ogg Vorbis files.
 
 This source tarball
 -------------------

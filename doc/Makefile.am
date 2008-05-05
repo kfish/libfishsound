@@ -1,4 +1,4 @@
-docdir=$(prefix)/share/doc/@PACKAGE@
+docdir=$(DESTDIR)$(prefix)/share/doc/@PACKAGE@
 
 EXTRA_DIST = Doxyfile.in white-xifish.png
 

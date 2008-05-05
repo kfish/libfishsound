@@ -42,11 +42,10 @@
 #include <fishsound/fishsound.h>
 #include <sndfile.h>
 
-static long serialno;
-static int b_o_s = 1;
+#define ENCODE_BLOCK_SIZE (1152)
 
-static SF_INFO sfinfo;
-static long last_flush_frameno = 0;
+long serialno;
+int b_o_s = 1;
 
 static int
 encoded (FishSound * fsound, unsigned char * buf, long bytes, void * user_data)
@@ -54,24 +53,15 @@ encoded (FishSound * fsound, unsigned char * buf, long bytes, void * user_data)
   OGGZ * oggz = (OGGZ *)user_data;
   ogg_packet op;
   int err;
-  int flush = 0;
-  long frameno;
-
-  frameno =  fish_sound_get_frameno (fsound);
 
   op.packet = buf;
   op.bytes = bytes;
   op.b_o_s = b_o_s;
   op.e_o_s = 0;
-  op.granulepos = frameno;
+  op.granulepos = fish_sound_get_frameno (fsound);
   op.packetno = -1;
 
-  if (frameno - last_flush_frameno > sfinfo.samplerate / 10) {
-    flush = OGGZ_FLUSH_AFTER;
-    last_flush_frameno = frameno;
-  }
-
-  err = oggz_write_feed (oggz, &op, serialno, flush, NULL);
+  err = oggz_write_feed (oggz, &op, serialno, 0, NULL);
   if (err) printf ("err: %d\n", err);
 
   b_o_s = 0;
@@ -86,18 +76,18 @@ main (int argc, char ** argv)
   FishSound * fsound;
   FishSoundInfo fsinfo;
   SNDFILE * sndfile;
+  SF_INFO sfinfo;
 
   char * infilename, * outfilename;
   char * ext = NULL;
   int format = FISH_SOUND_VORBIS;
 
   float pcm[2048];
-  long n;
 
   if (argc < 3) {
     printf ("usage: %s infile outfile\n", argv[0]);
     printf ("*** FishSound example program. ***\n");
-    printf ("Opens a pcm audio file and encodes it to an Ogg Vorbis or Speex file.\n");
+    printf ("Opens a PCM audio file and encodes it to an Ogg FLAC, Speex or Ogg Vorbis file.\n");
     exit (1);
   }
 
@@ -118,6 +108,8 @@ main (int argc, char ** argv)
   ext = strrchr (outfilename, '.');
   if (ext && !strncasecmp (ext, ".spx", 4))
     format = FISH_SOUND_SPEEX;
+  else if (ext && !strncasecmp (ext, ".oga", 4))
+    format = FISH_SOUND_FLAC;   
   else
     format = FISH_SOUND_VORBIS;
 
@@ -130,13 +122,15 @@ main (int argc, char ** argv)
 
   fish_sound_set_interleave (fsound, 1);
 
-  while (sf_readf_float (sndfile, pcm, 1024) > 0) {
-    fish_sound_encode (fsound, (float **)pcm, 1024);
-    while ((n = oggz_write (oggz, 1024)) > 0);
+  fish_sound_comment_add_byname (fsound, "Encoder", "fishsound-encode");
+
+  while (sf_readf_float (sndfile, pcm, ENCODE_BLOCK_SIZE) > 0) {
+    fish_sound_encode (fsound, (float **)pcm, ENCODE_BLOCK_SIZE);
+    oggz_run (oggz);
   }
 
   fish_sound_flush (fsound);
-  while ((n = oggz_write (oggz, 1024)) > 0);
+  oggz_run (oggz);
 
   oggz_close (oggz);
 

@@ -37,20 +37,21 @@
 
 #include "private.h"
 
-#if HAVE_LIBOIL
-#include <liboil/liboil.h>
-#endif
-
 int
 fish_sound_identify (unsigned char * buf, long bytes)
 {
   if (bytes < 8) return FISH_SOUND_ERR_SHORT_IDENTIFY;
 
-  if (fish_sound_vorbis_identify (buf, bytes) != FISH_SOUND_UNKNOWN)
+  if (HAVE_VORBIS &&
+      fish_sound_vorbis_identify (buf, bytes) != FISH_SOUND_UNKNOWN)
     return FISH_SOUND_VORBIS;
 
-  if (fish_sound_speex_identify (buf, bytes) != FISH_SOUND_UNKNOWN)
+  if (HAVE_SPEEX &&
+      fish_sound_speex_identify (buf, bytes) != FISH_SOUND_UNKNOWN)
     return FISH_SOUND_SPEEX;
+
+  if (fish_sound_flac_identify (buf, bytes) != FISH_SOUND_UNKNOWN)
+    return FISH_SOUND_FLAC;
 
   return FISH_SOUND_UNKNOWN;
 }
@@ -62,7 +63,9 @@ fish_sound_set_format (FishSound * fsound, int format)
     fsound->codec = fish_sound_vorbis_codec ();
   } else if (format == FISH_SOUND_SPEEX) {
     fsound->codec = fish_sound_speex_codec ();
-  } else {
+  } else if (format == FISH_SOUND_FLAC) {
+    fsound->codec = fish_sound_flac_codec ();
+   } else {
     return -1;
   }
 
@@ -88,25 +91,23 @@ fish_sound_new (int mode, FishSoundInfo * fsinfo)
       return NULL;
     } else {
       if (!(HAVE_VORBIS && HAVE_VORBISENC)) {
-        if (fsinfo->format == FISH_SOUND_VORBIS) return NULL;
+	if (fsinfo->format == FISH_SOUND_VORBIS) return NULL;
       }
       if (!HAVE_SPEEX) {
-        if (fsinfo->format == FISH_SOUND_SPEEX) return NULL;
+	if (fsinfo->format == FISH_SOUND_SPEEX) return NULL;
+      }
+      if (!HAVE_FLAC) {
+        if (fsinfo->format == FISH_SOUND_FLAC) return NULL;
       }
     }
   } else if (mode != FISH_SOUND_DECODE) {
     return NULL;
   }
 
-#if HAVE_LIBOIL
-  oil_init();
-#endif
-
   fsound = fs_malloc (sizeof (FishSound));
 
   fsound->mode = mode;
   fsound->interleave = 0;
-  fsound->pcm_type = FISH_SOUND_PCM_FLOAT;
   fsound->frameno = 0;
   fsound->next_granulepos = -1;
   fsound->next_eos = 0;
@@ -114,7 +115,6 @@ fish_sound_new (int mode, FishSoundInfo * fsinfo)
   fsound->codec_data = NULL;
   fsound->callback.encoded = NULL;
   fsound->user_data = NULL;
-  fsound->finalized = 0;
 
   fish_sound_comments_init (fsound);
 

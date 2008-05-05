@@ -38,105 +38,16 @@
 #include "private.h"
 
 static int
-fs_decode_update (FishSound * fsound, int interleave, FishSoundPCM pcm_type)
+fs_decode_update (FishSound * fsound, int interleave)
 {
   int ret = 0;
 
   if (fsound->codec && fsound->codec->update)
-    ret = fsound->codec->update (fsound, interleave, pcm_type);
+    ret = fsound->codec->update (fsound, interleave);
 
   if (ret >= 0) {
     fsound->interleave = interleave;
-    fsound->pcm_type = pcm_type;
   }
-
-  return ret;
-}
-
-int fish_sound_set_decoded_short (FishSound * fsound,
-				  FishSoundDecoded_Short decoded,
-				  void * user_data)
-{
-  int ret = 0;
-
-  if (fsound == NULL) return -1;
-
-#if FS_DECODE
-  ret = fs_decode_update (fsound, 0, FISH_SOUND_PCM_SHORT);
-
-  if (ret >= 0) {
-    fsound->callback.decoded_short = decoded;
-    fsound->user_data = user_data;
-  }
-#else
-  return FISH_SOUND_ERR_DISABLED;
-#endif
-
-  return ret;
-}
-
-int fish_sound_set_decoded_short_ilv (FishSound * fsound,
-				      FishSoundDecoded_ShortIlv decoded,
-				      void * user_data)
-{
-  int ret = 0;
-
-  if (fsound == NULL) return -1;
-
-#if FS_DECODE
-  ret = fs_decode_update (fsound, 1, FISH_SOUND_PCM_SHORT);
-
-  if (ret >= 0) {
-    fsound->callback.decoded_short_ilv = decoded;
-    fsound->user_data = user_data;
-  }
-#else
-  return FISH_SOUND_ERR_DISABLED;
-#endif
-
-  return ret;
-}
-
-int fish_sound_set_decoded_int (FishSound * fsound,
-				FishSoundDecoded_Int decoded,
-				void * user_data)
-{
-  int ret = 0;
-
-  if (fsound == NULL) return -1;
-
-#if FS_DECODE
-  ret = fs_decode_update (fsound, 0, FISH_SOUND_PCM_INT);
-
-  if (ret >= 0) {
-    fsound->callback.decoded_int = decoded;
-    fsound->user_data = user_data;
-  }
-#else
-  return FISH_SOUND_ERR_DISABLED;
-#endif
-
-  return ret;
-}
-
-int fish_sound_set_decoded_int_ilv (FishSound * fsound,
-				    FishSoundDecoded_IntIlv decoded,
-				    void * user_data)
-{
-  int ret = 0;
-
-  if (fsound == NULL) return -1;
-
-#if FS_DECODE
-  ret = fs_decode_update (fsound, 1, FISH_SOUND_PCM_INT);
-
-  if (ret >= 0) {
-    fsound->callback.decoded_int_ilv = decoded;
-    fsound->user_data = user_data;
-  }
-#else
-  return FISH_SOUND_ERR_DISABLED;
-#endif
 
   return ret;
 }
@@ -149,8 +60,8 @@ int fish_sound_set_decoded_float (FishSound * fsound,
 
   if (fsound == NULL) return -1;
 
-#if (FS_DECODE && FS_FLOAT)
-  ret = fs_decode_update (fsound, 0, FISH_SOUND_PCM_FLOAT);
+#if FS_DECODE
+  ret = fs_decode_update (fsound, 0);
 
   if (ret >= 0) {
     fsound->callback.decoded_float = decoded;
@@ -171,55 +82,11 @@ int fish_sound_set_decoded_float_ilv (FishSound * fsound,
 
   if (fsound == NULL) return -1;
 
-#if (FS_DECODE && FS_FLOAT)
-  ret = fs_decode_update (fsound, 1, FISH_SOUND_PCM_FLOAT);
+#if FS_DECODE
+  ret = fs_decode_update (fsound, 1);
 
   if (ret >= 0) {
     fsound->callback.decoded_float_ilv = decoded;
-    fsound->user_data = user_data;
-  }
-#else
-  return FISH_SOUND_ERR_DISABLED;
-#endif
-
-  return ret;
-}
-
-int fish_sound_set_decoded_double (FishSound * fsound,
-				   FishSoundDecoded_Double decoded,
-				   void * user_data)
-{
-  int ret = 0;
-
-  if (fsound == NULL) return -1;
-
-#if (FS_DECODE && FS_FLOAT)
-  ret = fs_decode_update (fsound, 0, FISH_SOUND_PCM_DOUBLE);
-  
-  if (ret >= 0) {
-    fsound->callback.decoded_double = decoded;
-    fsound->user_data = user_data;
-  }
-#else
-  return FISH_SOUND_ERR_DISABLED;
-#endif
-
-  return ret;
-}
-
-int fish_sound_set_decoded_double_ilv (FishSound * fsound,
-				       FishSoundDecoded_DoubleIlv decoded,
-				       void * user_data)
-{
-  int ret = 0;
-
-  if (fsound == NULL) return -1;
-
-#if (FS_DECODE && FS_FLOAT)
-  ret = fs_decode_update (fsound, 1, FISH_SOUND_PCM_DOUBLE);
-
-  if (ret >= 0) {
-    fsound->callback.decoded_double_ilv = decoded;
     fsound->user_data = user_data;
   }
 #else

@@ -59,8 +59,9 @@ usage (char * progname)
   printf ("Duplicates a PCM sound file by encoding and decoding\n");
   printf ("Usage: %s [options] infile outfile\n\n", progname);
   printf ("Options:\n");
-  printf ("  --vorbis                  Use Vorbis as intermediate codec\n");
+  printf ("  --flac                    Use FLAC as intermediate codec\n");
   printf ("  --speex                   Use Speex as intermediate codec\n");
+  printf ("  --vorbis                  Use Vorbis as intermediate codec\n");
   exit (1);
 }
 
@@ -160,13 +161,16 @@ main (int argc, char ** argv)
   }
 
   /* Set the default intermediate format based on what's available */
-  format = HAVE_VORBIS ? FISH_SOUND_VORBIS : FISH_SOUND_SPEEX;
+  format = HAVE_VORBIS ? FISH_SOUND_VORBIS :
+           HAVE_FLAC ? FISH_SOUND_FLAC : FISH_SOUND_SPEEX;
 
   for (i = 1; i < argc; i++) {
     if (!strcmp (argv[i], "--vorbis")) {
       format = FISH_SOUND_VORBIS;
     } else if (!strcmp (argv[i], "--speex")) {
       format = FISH_SOUND_SPEEX;
+    } else if (!strcmp (argv[i], "--flac")) {
+      format = FISH_SOUND_FLAC;
     } else if (!strcmp (argv[i], "--help") || !strcmp (argv[i], "-h")) {
       usage(argv[0]);
     } else if (argv[i] && argv[i][0] != '-') {
@@ -192,6 +196,15 @@ main (int argc, char ** argv)
       printf ("Using Speex as the intermediate codec\n");
     } else {
       fprintf (stderr, "Error: Speex support disabled\n");
+      exit (1);
+    }
+  }
+
+  if (format == FISH_SOUND_FLAC) {
+    if (HAVE_FLAC) {
+      printf ("Using FLAC as the intermediate codec\n");
+    } else {
+      fprintf (stderr, "Error: FLAC support disabled\n");
       exit (1);
     }
   }

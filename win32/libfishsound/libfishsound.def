@@ -5,7 +5,11 @@ EXPORTS
 		fish_sound_set_decoded_callback
 		fish_sound_set_encoded_callback
 		fish_sound_decode
+		fish_sound_set_decoded_float 
+		fish_sound_set_decoded_float_ilv
 		fish_sound_encode
+		fish_sound_encode_float
+		fish_sound_encode_float_ilv
 		fish_sound_reset
 		fish_sound_flush
 		fish_sound_delete 
@@ -24,5 +28,3 @@ EXPORTS
 		fish_sound_comment_add_byname
 		fish_sound_comment_remove
 		fish_sound_comment_remove_byname
-		fish_sound_get_encode_quality
-		fish_sound_set_encode_quality

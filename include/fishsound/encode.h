@@ -68,51 +68,6 @@ int fish_sound_set_encoded_callback (FishSound * fsound,
 				     void * user_data);
 
 /**
- * Encode a block of PCM audio given as non-interleaved shorts.
- * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
- * \param pcm The audio data to encode
- * \param frames A count of frames to encode
- * \returns The number of frames encoded
- * \note For multichannel audio, the audio data is interpreted according
- * to the current PCM style
- */
-long fish_sound_encode_short (FishSound * fsound, short * pcm[], long frames);
-
-/**
- * Encode a block of PCM audio given as interleaved shorts.
- * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
- * \param pcm The audio data to encode
- * \param frames A count of frames to encode
- * \returns The number of frames encoded
- * \note For multichannel audio, the audio data is interpreted according
- * to the current PCM style
- */
-long fish_sound_encode_short_ilv (FishSound * fsound, short ** pcm,
-				  long frames);
-
-/**
- * Encode a block of PCM audio given as non-interleaved ints.
- * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
- * \param pcm The audio data to encode
- * \param frames A count of frames to encode
- * \returns The number of frames encoded
- * \note For multichannel audio, the audio data is interpreted according
- * to the current PCM style
- */
-long fish_sound_encode_int (FishSound * fsound, int * pcm[], long frames);
-
-/**
- * Encode a block of PCM audio given as interleaved ints.
- * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
- * \param pcm The audio data to encode
- * \param frames A count of frames to encode
- * \returns The number of frames encoded
- * \note For multichannel audio, the audio data is interpreted according
- * to the current PCM style
- */
-long fish_sound_encode_int_ilv (FishSound * fsound, int ** pcm, long frames);
-
-/**
  * Encode a block of PCM audio given as non-interleaved floats.
  * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
  * \param pcm The audio data to encode
@@ -134,59 +89,6 @@ long fish_sound_encode_float (FishSound * fsound, float * pcm[], long frames);
  */
 long fish_sound_encode_float_ilv (FishSound * fsound, float ** pcm,
 				  long frames);
-
-/**
- * Encode a block of PCM audio given as non-interleaved doubles.
- * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
- * \param pcm The audio data to encode
- * \param frames A count of frames to encode
- * \returns The number of frames encoded
- * \note For multichannel audio, the audio data is interpreted according
- * to the current PCM style
- */
-long fish_sound_encode_double (FishSound * fsound, double * pcm[],
-			       long frames);
-
-/**
- * Encode a block of PCM audio given as interleaved doubles.
- * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
- * \param pcm The audio data to encode
- * \param frames A count of frames to encode
- * \returns The number of frames encoded
- * \note For multichannel audio, the audio data is interpreted according
- * to the current PCM style
- */
-long fish_sound_encode_double_ilv (FishSound * fsound, double ** pcm,
-				   long frames);
-
-/**
- * Set the encoding quality for an encoder
- * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
- * \param quality A quality setting in the range [0.0 ... 1.0]
- * \note This function must be called before attempting to encode any PCM
- * audio.
- * \retval 0 Success
- * \retval FISH_SOUND_ERR_OUT_OF_RANGE \a quality is not in the allowed range
- * \retval FISH_SOUND_ERR_FINALIZED The encoding parameters have already been
- * finalized. This occurs if an attempt is made to set the quality after some
- * PCM audio has alread been encoded.
- * \retval FISH_SOUND_ERR_BAD \a fsound is not a valid FishSound* handle
- * \retval FISH_SOUND_ERR_DISABLED Encoding support has been disabled in this
- * build of libfishsound
- *
- */
-int fish_sound_set_encode_quality (FishSound * fsound, float quality);
-
-/**
- * Get the encoding quality for an encoder
- * \param fsound A FishSound* handle (created with mode FISH_SOUND_ENCODE)
- * \returns The encoding quality
- * \retval FISH_SOUND_ERR_BAD \a fsound is not a valid FishSound* handle
- * \retval FISH_SOUND_ERR_DISABLED Encoding support has been disabled in this
- * build of libfishsound
- *
- */
-float fish_sound_get_encode_quality (FishSound * fsound);
 
 #ifdef __cplusplus
 }

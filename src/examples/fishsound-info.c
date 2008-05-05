@@ -41,6 +41,7 @@
 
 static char * infilename;
 static int begun = 0;
+static long actual_frames_decoded = 0;
 
 static void
 read_comments (FishSound * fsound)
@@ -69,6 +70,8 @@ decoded (FishSound * fsound, float ** pcm, long frames, void * user_data)
     begun = 1;
   }
 
+  actual_frames_decoded += frames;
+
   return 0;
 }
 
@@ -77,9 +80,13 @@ read_packet (OGGZ * oggz, ogg_packet * op, long serialno, void * user_data)
 {
   FishSound * fsound = (FishSound *)user_data;
 
+  if (op->e_o_s) {
+    fish_sound_prepare_truncation (fsound, op->e_o_s, op->granulepos);
+  }
+
   fish_sound_decode (fsound, op->packet, op->bytes);
 
-  return 0;
+  return OGGZ_CONTINUE;
 }
 
 int
@@ -92,7 +99,7 @@ main (int argc, char ** argv)
   if (argc < 2) {
     printf ("usage: %s infilename\n", argv[0]);
     printf ("*** FishSound example program. ***\n");
-    printf ("Read comments from an Ogg Speex or Ogg Vorbis file.\n");
+    printf ("Display information about an Ogg FLAC, Speex or Ogg Vorbis file.\n");
     exit (1);
   }
 
@@ -112,6 +119,9 @@ main (int argc, char ** argv)
   while ((n = oggz_read (oggz, 1024)) > 0);
 
   oggz_close (oggz);
+
+  printf ("%ld frames decoded\n", actual_frames_decoded);
+  printf ("%ld frames reported\n", fish_sound_get_frameno (fsound));
 
   fish_sound_delete (fsound);
   

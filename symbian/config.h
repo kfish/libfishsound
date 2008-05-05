@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2004 Commonwealth Scientific and Industrial Research
+   Copyright (C) 2003 Commonwealth Scientific and Industrial Research
    Organisation (CSIRO) Australia
 
    Redistribution and use in source and binary forms, with or without
@@ -34,46 +34,21 @@
 #define CONFIG_H
 
 /* Build decoding support */
-
 #define FS_DECODE 1
 
 /* Do not build encoding support */
-
 #define FS_ENCODE 0
 
-/* We do not have liboil */
-
-#define HAVE_LIBOIL 0
-
-/* We have libvorbis */
-
-#define HAVE_VORBIS 1
-
-/* Use only fixed point arithmetic */
-
-#define FS_FLOAT 0
-
 /* We have liboggz */
-
 #define HAVE_OGGZ 1
 
-/* We do not have libspeex */
-
+/* We have libspeex */
 #define HAVE_SPEEX 0
 
+/* We have libvorbis */
+#define HAVE_VORBIS 0
+
 /* We do not have libvorbisenc */
-
 #define HAVE_VORBISENC 0
-
-#ifdef __WINS__
-
-/* Disable some pointless warnings */
-
-#pragma warning(disable : 4100) /* unreferenced formal parameter */
-#pragma warning(disable : 4127) /* conditional expression is constant */
-#pragma warning(disable : 4514) /* unreferenced inline function has been removed */
-#pragma warning(disable : 4702) /* unreachable code */
-
-#endif /* __WINS__ */
 
 #endif /* ! CONFIG_H */

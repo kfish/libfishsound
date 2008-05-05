@@ -56,7 +56,6 @@ fs_strdup_len (const char * s, int len)
   if (s == NULL) return NULL;
   if (len == 0) return NULL;
   ret = fs_malloc (len + 1);
-  if (!ret) return NULL;
   if (strncpy (ret, s, len) == NULL) {
     fs_free (ret);
     return NULL;
@@ -75,6 +74,8 @@ fs_index_len (const char * s, char c, int len)
     if (*s == c) return (char *)s;
   }
 
+  if (i < len) return (char *)s;
+
   return NULL;
 }
 
@@ -83,8 +84,8 @@ static void comment_init(char **comments, int* length, char *vendor_string);
 static void comment_add(char **comments, int* length, char *tag, char *val);
 #endif
 
-/*
- Comments will be stored in the Vorbis style.
+/*                 
+ Comments will be stored in the Vorbis style.            
  It is describled in the "Structure" section of
     http://www.xiph.org/ogg/vorbis/doc/v-comment.html
 
@@ -107,10 +108,11 @@ The comment header is decoded as follows:
                            ((buf[base+2]<<16)&0xff0000)| \
                            ((buf[base+1]<<8)&0xff00)| \
   	           	    (buf[base]&0xff))
-#define writeint(buf, base, val) buf[base+3]=(char)(((val)>>24)&0xff); \
-                                 buf[base+2]=(char)(((val)>>16)&0xff); \
-                                 buf[base+1]=(char)(((val)>>8)&0xff); \
-                                 buf[base]=(char)((val)&0xff);
+#define writeint(buf, base, val) do{ buf[base+3]=((val)>>24)&0xff; \
+                                     buf[base+2]=((val)>>16)&0xff; \
+                                     buf[base+1]=((val)>>8)&0xff; \
+                                     buf[base]=(val)&0xff; \
+                                 }while(0)
 
 #if 0
 static void
@@ -251,7 +253,7 @@ fish_sound_comment_first_byname (FishSound * fsound, char * name)
 
   if (!fs_comment_validate_byname (name, ""))
     return NULL;
-
+  
   for (i = 0; i < fs_vector_size (fsound->comments); i++) {
     comment = (FishSoundComment *) fs_vector_nth (fsound->comments, i);
     if (comment->name && !strcasecmp (name, comment->name))
@@ -298,9 +300,7 @@ fish_sound_comment_next_byname (FishSound * fsound,
 int
 fish_sound_comment_add (FishSound * fsound, FishSoundComment * comment)
 {
-#if FS_ENCODE
   FishSoundComment * new_comment;
-#endif
 
   if (fsound == NULL) return FISH_SOUND_ERR_BAD;
 
@@ -325,9 +325,7 @@ int
 fish_sound_comment_add_byname (FishSound * fsound, const char * name,
 			       const char * value)
 {
-#if FS_ENCODE
   FishSoundComment * comment;
-#endif
 
   if (fsound == NULL) return FISH_SOUND_ERR_BAD;
 
@@ -352,9 +350,7 @@ fish_sound_comment_add_byname (FishSound * fsound, const char * name,
 int
 fish_sound_comment_remove (FishSound * fsound, FishSoundComment * comment)
 {
-#if FS_ENCODE
   FishSoundComment * v_comment;
-#endif
 
   if (fsound == NULL) return FISH_SOUND_ERR_BAD;
 
@@ -380,10 +376,8 @@ fish_sound_comment_remove (FishSound * fsound, FishSoundComment * comment)
 int
 fish_sound_comment_remove_byname (FishSound * fsound, char * name)
 {
-#if FS_ENCODE
   FishSoundComment * comment;
   int i, ret = 0;
-#endif
 
   if (fsound == NULL) return FISH_SOUND_ERR_BAD;
 
@@ -439,7 +433,7 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
    char *end;
    char * name, * value, * nvalue = NULL;
    FishSoundComment * comment;
-
+   
    if (length<8)
       return -1;
 
@@ -451,7 +445,6 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
 
    /* Vendor */
    nvalue = fs_strdup_len (c, len);
-   if (!nvalue) return -1;
    fish_sound_comment_set_vendor (fsound, nvalue);
    if (nvalue) fs_free (nvalue);
 #ifdef DEBUG
@@ -462,11 +455,19 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
    if (c+4>end) return -1;
 
    nb_fields=readint(c, 0);
+#ifdef DEBUG
+   printf ("fish_sound_comments_decode: %d comments\n", nb_fields);
+#endif
+
    c+=4;
-   for (i=0;i<nb_fields;i++) {
+   for (i=0;i<nb_fields;i++)
+   {
       if (c+4>end) return -1;
 
       len=readint(c, 0);
+#ifdef DEBUG
+      printf ("fish_sound_comments_decode: [%d] len %d\n", i, len);
+#endif
 
       c+=4;
       if (c+len>end) return -1;
@@ -474,23 +475,27 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
       name = c;
       value = fs_index_len (c, '=', len);
       if (value) {
-         *value = '\0';
-         value++;
+	*value = '\0';
+	value++;
 
-         n = c+len - value;
-         nvalue = fs_strdup_len (value, n);
+	n = c+len - value;
+	nvalue = fs_strdup_len (value, n);
 #ifdef DEBUG
-         printf ("fish_sound_comments_decode: %s -> %s (length %d)\n",
-         name, nvalue, n);
+	printf ("fish_sound_comments_decode: %s -> %s (length %d)\n",
+		name, nvalue, n);
 #endif
-         comment = fs_comment_new (name, nvalue);
-         _fs_comment_add (fsound, comment);
-         fs_free (nvalue);
+	comment = fs_comment_new (name, nvalue);
+	_fs_comment_add (fsound, comment);
+	fs_free (nvalue);
       } else {
-         nvalue = fs_strdup_len (name, len);
-         comment = fs_comment_new (nvalue, NULL);
-         _fs_comment_add (fsound, comment);
-         fs_free (nvalue);
+#ifdef DEBUG
+        printf ("fish_sound_comments_decode: [%d] %s (no value)\n",
+                i, name, len);
+#endif
+	nvalue = fs_strdup_len (name, len);
+	comment = fs_comment_new (nvalue, NULL);
+	_fs_comment_add (fsound, comment);
+	fs_free (nvalue);
       }
 
       c+=len;

@@ -66,6 +66,7 @@ usage (char * progname)
   printf ("Options:\n");
   printf ("  --vorbis                  Use Vorbis as the output codec\n");
   printf ("  --speex                   Use Speex as the output codec\n");
+  printf ("  --flac                    Use Flac as the output codec\n");
   printf ("  --interleave              Use interleaved PCM internally\n");
   exit (1);
 }
@@ -224,6 +225,8 @@ main (int argc, char ** argv)
       format = FISH_SOUND_VORBIS;
     } else if (!strcmp (argv[i], "--speex")) {
       format = FISH_SOUND_SPEEX;
+    } else if (!strcmp (argv[i], "--flac")) {
+      format = FISH_SOUND_FLAC;
     } else if (!strcmp (argv[i], "--interleave")) {
       interleave = 1;
     } else if (!strcmp (argv[i], "--help") || !strcmp (argv[i], "-h")) {
@@ -251,6 +254,15 @@ main (int argc, char ** argv)
       printf ("Using Speex as the output codec\n");
     } else {
       fprintf (stderr, "Error: Speex support disabled\n");
+      exit (1);
+    }
+  }
+
+  if (format == FISH_SOUND_FLAC) {
+    if (HAVE_FLAC) {
+      printf ("Using Flac as the output codec\n");
+    } else {
+      fprintf (stderr, "Error: Flac support disabled\n");
       exit (1);
     }
   }
