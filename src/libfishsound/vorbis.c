@@ -202,12 +202,14 @@ fs_vorbis_enc_headers (FishSound * fsound)
   ogg_packet header_comm;
   ogg_packet header_code;
 
-  /* Vorbis streams begin with three headers; the initial header (with
-     most of the codec setup parameters) which is mandated by the Ogg
-     bitstream spec.  The second header holds any comment fields.  The
-     third header holds the bitstream codebook.  We merely need to
-     make the headers, then pass them to libvorbis one at a time;
-     libvorbis handles the additional Ogg bitstream constraints */
+  /* Vorbis streams begin with three headers:
+   *   1. The initial header (with most of the codec setup parameters),
+   *      which is mandated by the Ogg bitstream spec,
+   *   2. The second header which holds any comment fields,
+   *   3. The third header which contains the bitstream codebook.
+   * We merely need to make the headers, then pass them to libvorbis one at
+   * a time; libvorbis handles the additional Ogg bitstream constraints.
+   */
 
   /* Update the comments */
   for (comment = fish_sound_comment_first (fsound); comment;
