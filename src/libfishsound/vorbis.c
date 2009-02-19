@@ -113,6 +113,7 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
   FishSoundVorbisInfo * fsv = (FishSoundVorbisInfo *)fsound->codec_data;
   ogg_packet op;
   long samples;
+  float ** pcm_new;
   int ret;
 
   /* Make an ogg_packet structure to pass the data to libvorbis */
@@ -160,9 +161,15 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
 
       if (fsound->interleave) {
 	if (samples > fsv->max_pcm) {
-	  fsv->ipcm = realloc (fsv->ipcm, sizeof(float) * samples *
-			       fsound->info.channels);
-	  fsv->max_pcm = samples;
+          pcm_new = realloc (fsv->ipcm, sizeof(float) * samples *
+			     fsound->info.channels);
+          if (pcm_new == NULL) {
+            /* Allocation failure; just truncate here, fail gracefully elsewhere */
+            samples = fsv->max_pcm;
+          } else {
+	    fsv->ipcm = pcm_new;
+	    fsv->max_pcm = samples;
+          }
 	}
 	_fs_interleave (fsv->pcm, (float **)fsv->ipcm, samples,
 			fsound->info.channels, 1.0);
@@ -473,6 +480,7 @@ fish_sound_vorbis_codec (void)
   FishSoundCodec * codec;
 
   codec = (FishSoundCodec *) fs_malloc (sizeof (FishSoundCodec));
+  if (codec == NULL) return NULL;
 
   codec->format.format = FISH_SOUND_VORBIS;
   codec->format.name = "Vorbis (Xiph.Org)";

@@ -369,7 +369,7 @@ fs_flac_enc_write_callback(const FLAC__StreamEncoder *encoder,
         printf("fs_flac_enc_write_callback: generating FLAC header packet: "
                "%c%c%c%c\n", buffer[0], buffer[1], buffer[2], buffer[3]);
 #endif
-	fi->buffer = (unsigned char*)malloc(sizeof(unsigned char)*(bytes+9));
+	fi->buffer = (unsigned char*)fs_malloc(sizeof(unsigned char)*(bytes+9));
 	fi->buffer[0] = 0x7f;
 	fi->buffer[1] = 0x46; /* 'F' */
 	fi->buffer[2] = 0x4c; /* 'L' */
@@ -387,7 +387,7 @@ fs_flac_enc_write_callback(const FLAC__StreamEncoder *encoder,
         /* Make a temporary copy of the metadata header to pass to the user
          * callback.
          */
-	unsigned char* tmp = (unsigned char*)malloc(sizeof(unsigned char)*(bytes+fi->bufferlength));
+	unsigned char* tmp = (unsigned char*)fs_malloc(sizeof(unsigned char)*(bytes+fi->bufferlength));
 	memcpy (tmp, fi->buffer, fi->bufferlength);
 	memcpy (tmp+fi->bufferlength, buffer, bytes);
 	fs_free(fi->buffer);
@@ -771,6 +771,7 @@ fish_sound_flac_codec (void)
   FishSoundCodec * codec;
 
   codec = (FishSoundCodec *) fs_malloc (sizeof (FishSoundCodec));
+  if (codec == NULL) return NULL;
 
   codec->format.format = FISH_SOUND_FLAC;
   codec->format.name = "Flac (Xiph.Org)";

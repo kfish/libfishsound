@@ -371,8 +371,8 @@ fs_speex_enc_headers (FishSound * fsound)
   int modeID;
   SpeexMode * mode = NULL;
   SpeexHeader header;
-  unsigned char * buf;
-  int bytes;
+  unsigned char * header_buf = NULL, * comments_buf = NULL;
+  int header_bytes, comments_bytes;
   size_t buflen;
 
   modeID = 1;
@@ -392,24 +392,23 @@ fs_speex_enc_headers (FishSound * fsound)
   fss->st = speex_encoder_init (mode);
 
   if (fsound->callback.encoded) {
-    FishSoundEncoded encoded = (FishSoundEncoded)fsound->callback.encoded;
     char vendor_string[128];
 
-    /* header */
-    buf = (unsigned char *) speex_header_to_packet (&header, &bytes);
-    encoded (fsound, buf, (long)bytes, fsound->user_data);
-    fss->packetno++;
-    fs_free (buf);
+    /* Allocate and create header */
+    header_buf = (unsigned char *) speex_header_to_packet (&header, &header_bytes);
+    if (header_buf == NULL) {
+      return NULL;
+    }
 
-    /* comments */
+    /* Allocate and create comments */
     snprintf (vendor_string, 128, VENDOR_FORMAT, header.speex_version);
     fish_sound_comment_set_vendor (fsound, vendor_string);
-    bytes = fish_sound_comments_encode (fsound, NULL, 0);
-    buf = fs_malloc (bytes);
-    bytes = fish_sound_comments_encode (fsound, buf, bytes);
-    encoded (fsound, buf, (long)bytes, fsound->user_data);
-    fss->packetno++;
-    fs_free (buf);
+    comments_bytes = fish_sound_comments_encode (fsound, NULL, 0);
+    comments_buf = fs_malloc (comments_bytes);
+    if (comments_buf == NULL) {
+      fs_free (header_buf);
+      return NULL;
+    }
   }
 
   speex_encoder_ctl (fss->st, SPEEX_SET_SAMPLING_RATE,
@@ -421,11 +420,32 @@ fs_speex_enc_headers (FishSound * fsound)
   printf ("got frame size %d\n", fss->frame_size);
 #endif
 
-  /* XXX: blah blah blah ... set VBR etc. */
+  /* XXX: set VBR etc. */
 
   buflen = fss->frame_size * fsound->info.channels * sizeof (float);
   fss->ipcm = fs_malloc (buflen);
+  if (fss->ipcm == NULL) {
+    if (comments_buf) fs_free (comments_buf);
+    if (header_buf) fs_free (header_buf);
+    return NULL;
+  }
   memset (fss->ipcm, 0, buflen);
+
+  /* Allocations succeeded, actually call encoded callback for headers */
+  if (fsound->callback.encoded) {
+    FishSoundEncoded encoded = (FishSoundEncoded)fsound->callback.encoded;
+
+    /* header */
+    encoded (fsound, header_buf, (long)header_bytes, fsound->user_data);
+    fss->packetno++;
+    fs_free (header_buf);
+
+    /* comments */
+    comments_bytes = fish_sound_comments_encode (fsound, comments_buf, comments_bytes);
+    encoded (fsound, comments_buf, (long)comments_bytes, fsound->user_data);
+    fss->packetno++;
+    fs_free (comments_buf);
+  }
 
   return fsound;
 }
@@ -604,10 +624,13 @@ fs_speex_update (FishSound * fsound, int interleave)
 {
   FishSoundSpeexInfo * fss = (FishSoundSpeexInfo *)fsound->codec_data;
   size_t pcm_size = sizeof (float);
+  float *ipcm_new, *pcm0, *pcm1;
 
-  fss->ipcm = (float *)
-    fs_realloc (fss->ipcm,
-		pcm_size * fss->frame_size * fsound->info.channels);
+  ipcm_new = (float *)fs_realloc (fss->ipcm,
+		  pcm_size * fss->frame_size * fsound->info.channels);
+  if (ipcm_new == NULL) return -1;
+
+  fss->ipcm = ipcm_new;
 
   if (interleave) {
     /* if transitioning from non-interleave to interleave,
@@ -622,8 +645,19 @@ fs_speex_update (FishSound * fsound, int interleave)
     if (fsound->info.channels == 1) {
       fss->pcm[0] = (float *) fss->ipcm;
     } else if (fsound->info.channels == 2) {
-      fss->pcm[0] = fs_realloc (fss->pcm[0], pcm_size * fss->frame_size);
-      fss->pcm[1] = fs_realloc (fss->pcm[1], pcm_size * fss->frame_size);
+      pcm0 = fs_realloc (fss->pcm[0], pcm_size * fss->frame_size);
+      if (pcm0 == NULL) {
+        return -1;
+      }
+
+      pcm1 = fs_realloc (fss->pcm[1], pcm_size * fss->frame_size);
+      if (pcm1 == NULL) {
+        fs_free (pcm0);
+        return -1;
+      }
+
+      fss->pcm[0] = pcm0;
+      fss->pcm[1] = pcm1;
     }
   }
 
@@ -705,6 +739,7 @@ fish_sound_speex_codec (void)
   FishSoundCodec * codec;
 
   codec = (FishSoundCodec *) fs_malloc (sizeof (FishSoundCodec));
+  if (codec == NULL) return NULL;
 
   codec->format.format = FISH_SOUND_SPEEX;
   codec->format.name = "Speex (Xiph.Org)";

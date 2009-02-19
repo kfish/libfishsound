@@ -46,6 +46,7 @@ fs_strdup (const char * s)
   char * ret;
   if (s == NULL) return NULL;
   ret = fs_malloc (strlen(s) + 1);
+  if (ret == NULL) return NULL;
   return strcpy (ret, s);
 }
 
@@ -56,6 +57,7 @@ fs_strdup_len (const char * s, int len)
   if (s == NULL) return NULL;
   if (len == 0) return NULL;
   ret = fs_malloc (len + 1);
+  if (ret == NULL) return NULL;
   if (strncpy (ret, s, len) == NULL) {
     fs_free (ret);
     return NULL;
@@ -78,11 +80,6 @@ fs_index_len (const char * s, char c, int len)
 
   return NULL;
 }
-
-#if 0
-static void comment_init(char **comments, int* length, char *vendor_string);
-static void comment_add(char **comments, int* length, char *tag, char *val);
-#endif
 
 /*                 
  Comments will be stored in the Vorbis style.            
@@ -114,47 +111,6 @@ The comment header is decoded as follows:
                                      buf[base]=(val)&0xff; \
                                  }while(0)
 
-#if 0
-static void
-comment_init(char **comments, int* length, char *vendor_string)
-{
-  int vendor_length=strlen(vendor_string);
-  int user_comment_list_length=0;
-  int len=4+vendor_length+4;
-  char *p=(char*)fs_malloc(len);
-  if(p==NULL){
-  }
-  writeint(p, 0, vendor_length);
-  memcpy(p+4, vendor_string, vendor_length);
-  writeint(p, 4+vendor_length, user_comment_list_length);
-  *length=len;
-  *comments=p;
-}
-
-static void
-comment_add(char **comments, int* length, char *tag, char *val)
-{
-  char* p=*comments;
-  int vendor_length=readint(p, 0);
-  int user_comment_list_length=readint(p, 4+vendor_length);
-  int tag_len=(tag?strlen(tag):0);
-  int val_len=strlen(val);
-  int len=(*length)+4+tag_len+val_len;
-
-  p=(char*)fs_realloc(p, len);
-  if(p==NULL){
-  }
-
-  writeint(p, *length, tag_len+val_len);      /* length of comment */
-  if(tag) memcpy(p+*length+4, tag, tag_len);  /* comment */
-  memcpy(p+*length+4+tag_len, val, val_len);  /* comment */
-  writeint(p, 4+vendor_length, user_comment_list_length+1);
-
-  *comments=p;
-  *length=len;
-}
-#endif
-
 static int
 fs_comment_validate_byname (const char * name, const char * value)
 {
@@ -184,6 +140,8 @@ fs_comment_new (const char * name, const char * value)
   if (!fs_comment_validate_byname (name, value)) return NULL;
 
   comment = fs_malloc (sizeof (FishSoundComment));
+  if (comment == NULL) return NULL;
+
   comment->name = fs_strdup (name);
   comment->value = fs_strdup (value);
 
