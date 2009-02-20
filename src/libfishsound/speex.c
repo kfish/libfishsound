@@ -291,12 +291,24 @@ fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
     fsound->info.channels = channels;
 
     fss->ipcm = fs_malloc (sizeof (float) * fss->frame_size * channels);
+    if (fss->ipcm == NULL) {
+      return FISH_SOUND_ERR_OUT_OF_MEMORY;
+    }
 
     if (channels == 1) {
       fss->pcm[0] = fss->ipcm;
     } else if (channels == 2) {
       fss->pcm[0] = fs_malloc (sizeof (float) * fss->frame_size);
+      if (fss->pcm[0] == NULL) {
+        fs_free (fss->ipcm);
+        return FISH_SOUND_ERR_OUT_OF_MEMORY;
+      }
       fss->pcm[1] = fs_malloc (sizeof (float) * fss->frame_size);
+      if (fss->pcm[1] == NULL) {
+        fs_free (fss->pcm[0]);
+        fs_free (fss->ipcm);
+        return FISH_SOUND_ERR_OUT_OF_MEMORY;
+      }
     }
 
     if (fss->nframes == 0) fss->nframes = 1;
@@ -617,7 +629,7 @@ fs_speex_update (FishSound * fsound, int interleave)
 
   ipcm_new = (float *)fs_realloc (fss->ipcm,
 		  pcm_size * fss->frame_size * fsound->info.channels);
-  if (ipcm_new == NULL) return -1;
+  if (ipcm_new == NULL) return FISH_SOUND_ERR_OUT_OF_MEMORY;
 
   fss->ipcm = ipcm_new;
 
@@ -636,13 +648,13 @@ fs_speex_update (FishSound * fsound, int interleave)
     } else if (fsound->info.channels == 2) {
       pcm0 = fs_realloc (fss->pcm[0], pcm_size * fss->frame_size);
       if (pcm0 == NULL) {
-        return -1;
+        return FISH_SOUND_ERR_OUT_OF_MEMORY;
       }
 
       pcm1 = fs_realloc (fss->pcm[1], pcm_size * fss->frame_size);
       if (pcm1 == NULL) {
         fs_free (pcm0);
-        return -1;
+        return FISH_SOUND_ERR_OUT_OF_MEMORY;
       }
 
       fss->pcm[0] = pcm0;
