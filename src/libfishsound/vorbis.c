@@ -141,7 +141,10 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
      * start of vorbiscomment packet. */
     if (fsv->packetno == 1 && bytes > 7 && buf[0] == 0x03 &&
 	!strncmp ((char *)&buf[1], "vorbis", 6)) {
-      fish_sound_comments_decode (fsound, buf+7, bytes-7);
+      if (fish_sound_comments_decode (fsound, buf+7, bytes-7) == FISH_SOUND_ERR_OUT_OF_MEMORY) {
+        fsv->packetno++;
+        return FISH_SOUND_ERR_OUT_OF_MEMORY;
+      }
     } else if (fsv->packetno == 2) {
       vorbis_synthesis_init (&fsv->vd, &fsv->vi);
       vorbis_block_init (&fsv->vd, &fsv->vb);

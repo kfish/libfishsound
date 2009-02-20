@@ -113,6 +113,7 @@ int fish_sound_set_decoded_float_ilv (FishSound * fsound,
  * callback returning FISH_SOUND_STOP_ERR before any input bytes were consumed.
  * This will occur when PCM is decoded from previously buffered input, and
  * stopping is immediately requested.
+ * \retval FISH_SOUND_ERR_OUT_OF_MEMORY Out of memory
  */
 long fish_sound_decode (FishSound * fsound, unsigned char * buf, long bytes);
 

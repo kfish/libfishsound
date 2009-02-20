@@ -320,7 +320,10 @@ fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
 
   } else if (fss->packetno == 1) {
     /* Comments */
-    fish_sound_comments_decode (fsound, buf, bytes);
+    if (fish_sound_comments_decode (fsound, buf, bytes) == FISH_SOUND_ERR_OUT_OF_MEMORY) {
+      fss->packetno++;
+      return FISH_SOUND_ERR_OUT_OF_MEMORY;
+    }
   } else if (fss->packetno <= 1+fss->extra_headers) {
     /* Unknown extra headers */
   } else {
@@ -402,7 +405,10 @@ fs_speex_enc_headers (FishSound * fsound)
 
     /* Allocate and create comments */
     snprintf (vendor_string, 128, VENDOR_FORMAT, header.speex_version);
-    fish_sound_comment_set_vendor (fsound, vendor_string);
+    if (fish_sound_comment_set_vendor (fsound, vendor_string) == FISH_SOUND_ERR_OUT_OF_MEMORY) {
+      fs_free (header_buf);
+      return NULL;
+    }
     comments_bytes = fish_sound_comments_encode (fsound, NULL, 0);
     comments_buf = fs_malloc (comments_bytes);
     if (comments_buf == NULL) {

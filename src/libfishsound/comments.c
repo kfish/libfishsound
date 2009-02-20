@@ -138,12 +138,23 @@ fs_comment_new (const char * name, const char * value)
   FishSoundComment * comment;
 
   if (!fs_comment_validate_byname (name, value)) return NULL;
+  /* Ensures that name != NULL, value != NULL, and validates strings */
 
   comment = fs_malloc (sizeof (FishSoundComment));
   if (comment == NULL) return NULL;
 
   comment->name = fs_strdup (name);
+  if (comment->name == NULL) {
+    fs_free (comment);
+    return NULL;
+  }
+
   comment->value = fs_strdup (value);
+  if (comment->value == NULL) {
+    fs_free (comment->name);
+    fs_free (comment);
+    return NULL;
+  }
 
   return comment;
 }
@@ -169,6 +180,19 @@ fs_comment_cmp (const FishSoundComment * comment1, const FishSoundComment * comm
   return 1;
 }
 
+int
+fish_sound_comment_set_vendor (FishSound * fsound, const char * vendor_string)
+{
+  if (fsound == NULL) return FISH_SOUND_ERR_BAD;
+
+  if (fsound->vendor) fs_free (fsound->vendor);
+
+  if ((fsound->vendor = fs_strdup (vendor_string)) == NULL)
+    return FISH_SOUND_ERR_OUT_OF_MEMORY;
+
+  return 0;
+}
+
 /* Public API */
 
 const char *
@@ -177,18 +201,6 @@ fish_sound_comment_get_vendor (FishSound * fsound)
   if (fsound == NULL) return NULL;
 
   return fsound->vendor;
-}
-
-int
-fish_sound_comment_set_vendor (FishSound * fsound, const char * vendor_string)
-{
-  if (fsound == NULL) return FISH_SOUND_ERR_BAD;
-
-  if (fsound->vendor) fs_free (fsound->vendor);
-
-  fsound->vendor = fs_strdup (vendor_string);
-
-  return 0;
 }
 
 const FishSoundComment *
@@ -269,11 +281,13 @@ fish_sound_comment_add (FishSound * fsound, FishSoundComment * comment)
   if (!fs_comment_validate_byname (comment->name, comment->value))
     return FISH_SOUND_ERR_COMMENT_INVALID;
 
-  new_comment = fs_comment_new (comment->name, comment->value);
+  if ((new_comment = fs_comment_new (comment->name, comment->value)) == NULL)
+    return FISH_SOUND_ERR_OUT_OF_MEMORY;
 
-  _fs_comment_add (fsound, new_comment);
+  if (_fs_comment_add (fsound, new_comment) == NULL)
+    return FISH_SOUND_ERR_OUT_OF_MEMORY;
 
-  return 0;
+  return FISH_SOUND_OK;
 #else
   return FISH_SOUND_ERR_DISABLED;
 #endif
@@ -294,9 +308,13 @@ fish_sound_comment_add_byname (FishSound * fsound, const char * name,
   if (!fs_comment_validate_byname (name, value))
     return FISH_SOUND_ERR_COMMENT_INVALID;
 
-  comment = fs_comment_new (name, value);
+  if ((comment = fs_comment_new (name, value)) == NULL)
+    return FISH_SOUND_ERR_OUT_OF_MEMORY;
 
-  _fs_comment_add (fsound, comment);
+  if (_fs_comment_add (fsound, comment) == NULL)
+    return FISH_SOUND_ERR_OUT_OF_MEMORY;
+
+  return FISH_SOUND_OK;
 
   return 0;
 
@@ -402,9 +420,14 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
    if (c+len>end) return -1;
 
    /* Vendor */
-   nvalue = fs_strdup_len (c, len);
-   fish_sound_comment_set_vendor (fsound, nvalue);
-   if (nvalue) fs_free (nvalue);
+   if (len > 0) {
+     if ((nvalue = fs_strdup_len (c, len)) == NULL)
+       return FISH_SOUND_ERR_OUT_OF_MEMORY;
+     if (fish_sound_comment_set_vendor (fsound, nvalue) == FISH_SOUND_ERR_OUT_OF_MEMORY)
+       return FISH_SOUND_ERR_OUT_OF_MEMORY;
+
+     fs_free (nvalue);
+   }
 #ifdef DEBUG
    fwrite(c, 1, len, stderr); fputc ('\n', stderr);
 #endif
@@ -437,22 +460,33 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
 	value++;
 
 	n = c+len - value;
-	nvalue = fs_strdup_len (value, n);
+	if ((nvalue = fs_strdup_len (value, n)) == NULL)
+          return FISH_SOUND_ERR_OUT_OF_MEMORY;
 #ifdef DEBUG
 	printf ("fish_sound_comments_decode: %s -> %s (length %d)\n",
 		name, nvalue, n);
 #endif
-	comment = fs_comment_new (name, nvalue);
-	_fs_comment_add (fsound, comment);
+	if ((comment = fs_comment_new (name, nvalue)) == NULL)
+          return FISH_SOUND_ERR_OUT_OF_MEMORY;
+
+	if (_fs_comment_add (fsound, comment) == NULL)
+          return FISH_SOUND_ERR_OUT_OF_MEMORY;
+
 	fs_free (nvalue);
       } else {
 #ifdef DEBUG
         printf ("fish_sound_comments_decode: [%d] %s (no value)\n",
                 i, name, len);
 #endif
-	nvalue = fs_strdup_len (name, len);
-	comment = fs_comment_new (nvalue, NULL);
-	_fs_comment_add (fsound, comment);
+	if ((nvalue = fs_strdup_len (name, len)) == NULL)
+          return FISH_SOUND_ERR_OUT_OF_MEMORY;
+
+	if ((comment = fs_comment_new (nvalue, NULL)) == NULL)
+          return FISH_SOUND_ERR_OUT_OF_MEMORY;
+
+	if (_fs_comment_add (fsound, comment) == NULL)
+          return FISH_SOUND_ERR_OUT_OF_MEMORY;
+
 	fs_free (nvalue);
       }
 
@@ -463,7 +497,7 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
    printf ("fish_sound_comments_decode: done\n");
 #endif
 
-   return 0;
+   return FISH_SOUND_OK;
 }
 
 long

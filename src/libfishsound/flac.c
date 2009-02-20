@@ -316,7 +316,10 @@ fs_flac_decode (FishSound * fsound, unsigned char * buf, long bytes)
 #ifdef DEBUG
       printf ("fs_flac_decode: got vorbiscomments len %d\n", len);
 #endif
-      fish_sound_comments_decode (fsound, buf+4, len);
+      if (fish_sound_comments_decode (fsound, buf+4, len) == FISH_SOUND_ERR_OUT_OF_MEMORY) {
+        fi->packetno++;
+        return FISH_SOUND_ERR_OUT_OF_MEMORY;
+      }
     }
 
     memcpy(tmp, fi->buffer, fi->bufferlength);
