@@ -132,16 +132,12 @@ process_header(unsigned char * buf, long bytes, int enh_enabled,
 
   header = speex_packet_to_header((char*)buf, (int)bytes);
   if (!header) {
-    /*info_dialog_new ("Speex error", NULL, "Speex: cannot read header");*/
+    /* cannot read header */
     return NULL;
   }
 
   if (header->mode >= SPEEX_NB_MODES || header->mode < 0) {
-    /*
-    info_dialog_new ("Speex error", NULL,
-		     "Mode number %d does not (any longer) exist in this version\n",
-		     header->mode);
-    */
+    /* Mode number does not (any longer) exist in this version */
     return NULL;
   }
 
@@ -157,39 +153,25 @@ process_header(unsigned char * buf, long bytes, int enh_enabled,
 #endif
 
   if (header->speex_version_id > 1) {
-    /*
-    info_dialog_new ("Speex error", NULL,
-		     "This file was encoded with Speex bit-stream version %d, "
-		     "which I don't know how to decode\n",
-		     header->speex_version_id);
-    */
+    /* Unknown bitstream version */
     return NULL;
   }
 
   if (mode->bitstream_version < header->mode_bitstream_version) {
-    /*
-    info_dialog_new ("Speex error", NULL,
-		     "The file was encoded with a newer version of Speex. "
-		     "You need to upgrade in order to play it.\n");
-    */
+    /* The file was encoded with a newer version of Speex,
+     * need to upgrade in order to play it */
     return NULL;
   }
 
   if (mode->bitstream_version > header->mode_bitstream_version) {
-    /*
-    info_dialog_new ("Speex error", NULL,
-		     "The file was encoded with an older version of Speex. "
-		     "You would need to downgrade the version in order to play it.\n");
-    */
+    /* The file was encoded with an older version of Speex.
+     * You would need to downgrade the version in order to play it */
     return NULL;
   }
 
   st = speex_decoder_init(mode);
   if (!st) {
-    /*
-      info_dialog_new ("Speex error", NULL,
-      "Decoder initialization failed.\n");
-    */
+    /* Decoder initialization failed */
     return NULL;
   }
 
@@ -297,7 +279,8 @@ fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
 			      &fss->extra_headers);
 
     if (fss->st == NULL) {
-      /* XXX: error */
+      /* TODO: Return more specific error identifiers for invalid header fields */
+      return FISH_SOUND_ERR_GENERIC;
     }
 
 #ifdef DEBUG
