@@ -35,7 +35,8 @@ fi
 VALGRIND_ENVIRONMENT=""
 ac_enable_valgrind=no
 AC_ARG_ENABLE(valgrind-testing,
-     [  --enable-valgrind-testing     enable running of tests inside Valgrind ],     [ ac_enable_valgrind=yes ], [ ac_enable_valgrind=no] )
+     AC_HELP_STRING([--enable-valgrind-testing], [enable running of tests inside Valgrind]),
+     [ ac_enable_valgrind=yes ], [ ac_enable_valgrind=no ])
 
 if test "x${ac_enable_valgrind}" = xyes ; then
   if test "x${enable_shared}" = xyes ; then
@@ -69,7 +70,7 @@ dnl
   
 ac_enable_experimental=no
 AC_ARG_ENABLE(experimental,
-     [  --enable-experimental   enable building of experimental code ],
+     AC_HELP_STRING([--enable-experimental], [enable building of experimental code]),
      [ ac_enable_experimental=yes ])
 
 if test "x${ac_enable_experimental}" = xyes ; then
@@ -82,7 +83,7 @@ dnl
   
 ac_enable_decode=yes
 AC_ARG_ENABLE(decode,
-     [  --disable-decode        disable building of decoding support ],
+     AC_HELP_STRING([--disable-decode], [disable building of decoding support]),
      [ ac_enable_decode=no ], [ ac_enable_decode=yes] )
 
 if test "x${ac_enable_decode}" = xyes ; then
@@ -98,7 +99,7 @@ dnl
   
 ac_enable_encode=yes
 AC_ARG_ENABLE(encode,
-     [  --disable-encode        disable building of encoding support ],
+     AC_HELP_STRING([--disable-encode], [disable building of encoding support]),
      [ ac_enable_encode=no ], [ ac_enable_encode=yes] )
 
 if test "x${ac_enable_encode}" = xyes ; then
@@ -135,7 +136,7 @@ VORBIS_SUPPORT=no
 
 ac_enable_vorbis=yes
 AC_ARG_ENABLE(vorbis,
-     [  --disable-vorbis        disable building of Vorbis codec support ],
+     AC_HELP_STRING([--disable-vorbis], [disable building of Vorbis codec support]),
      [ ac_enable_vorbis=no ], [ ac_enable_vorbis=yes] )
 
 if test "x${ac_enable_vorbis}" = xyes ; then
@@ -194,7 +195,7 @@ SPEEX_SUPPORT=no
 
 ac_enable_speex=yes
 AC_ARG_ENABLE(speex,
-     [  --disable-speex         disable building of Speex codec support ],
+     AC_HELP_STRING([--disable-speex], [disable building of Speex codec support]),
      [ ac_enable_speex=no ], [ ac_enable_speex=yes] )
 
 if test "x${ac_enable_speex}" = xyes ; then
@@ -266,7 +267,7 @@ FLAC_SUPPORT=no
 
 ac_enable_flac=yes
 AC_ARG_ENABLE(flac,
-     [  --disable-flac          disable building of Flac codec support ],
+     AC_HELP_STRING([--disable-flac], [disable building of Flac codec support]),
      [ ac_enable_flac=no ], [ ac_enable_flac=yes] )
 
 if test "x${ac_enable_flac}" = xyes ; then
