@@ -35,17 +35,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h> /* ULONG_MAX */
+#ifndef WIN32
+#include <strings.h>
+#endif
 
 #include "private.h"
 
 /*#define DEBUG*/
+
+/* Ensure comment vector length can be expressed in 32 bits */
+static unsigned long
+fs_comment_len (const char * s)
+{
+  size_t len;
+
+  if (s == NULL) return 0;
+
+  len = strlen (s);
+  return (unsigned long) MIN(len, 0xFFFFFFFF);
+}
 
 static char *
 fs_strdup (const char * s)
 {
   char * ret;
   if (s == NULL) return NULL;
-  ret = fs_malloc (strlen(s) + 1);
+  ret = fs_malloc (fs_comment_len(s) + 1);
   if (ret == NULL) return NULL;
   return strcpy (ret, s);
 }
@@ -504,27 +520,56 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
    return FISH_SOUND_OK;
 }
 
+/*
+ * Pre-condition: at least one of accum, delta are non-zero,
+ * ie. don't call accum_length (0, 0);
+ * \retval 0 Failure: integer overflow
+ */
+static unsigned long
+accum_length (unsigned long * accum, unsigned long delta)
+{
+  /* Pre-condition: don't call accum_length (0, 0) */
+  if (*accum == 0 && delta == 0)
+    return 0;
+
+  /* Check for integer overflow */
+  if (delta > ULONG_MAX - (*accum))
+    return 0;
+
+  *accum += delta;
+
+  return *accum;
+}
+
 long
 fish_sound_comments_encode (FishSound * fsound, unsigned char * buf,
 			    long length)
 {
   char * c = (char *)buf;
   const FishSoundComment * comment;
-  int nb_fields = 0, vendor_length, field_length;
-  long actual_length, remaining = length;
+  int nb_fields = 0, vendor_length = 0;
+  unsigned long actual_length = 0, remaining = length, field_length;
 
   /* Vendor string */
-  vendor_length = strlen (fsound->vendor);
-  actual_length = 4 + vendor_length;
+  if (fsound->vendor)
+    vendor_length = fs_comment_len (fsound->vendor);
+  if (accum_length (&actual_length, 4 + vendor_length) == 0)
+    return 0;
 
   /* user comment list length */
-  actual_length += 4;
+  if (accum_length (&actual_length, 4) == 0)
+    return 0;
 
   for (comment = fish_sound_comment_first (fsound); comment;
        comment = fish_sound_comment_next (fsound, comment)) {
-    actual_length += 4 + strlen (comment->name);    /* [size]"name" */
-    if (comment->value)
-      actual_length += 1 + strlen (comment->value); /* "=value" */
+    /* [size]"name" */
+    if (accum_length (&actual_length, 4 + fs_comment_len (comment->name)) == 0)
+      return 0;
+    if (comment->value) {
+      /* "=value" */
+      if (accum_length (&actual_length, 1 + fs_comment_len (comment->value)) == 0)
+        return 0;
+    }
 
 #ifdef DEBUG
     printf ("fish_sound_comments_encode: %s = %s\n",
@@ -534,7 +579,11 @@ fish_sound_comments_encode (FishSound * fsound, unsigned char * buf,
     nb_fields++;
   }
 
-  actual_length++; /* framing bit */
+  /* framing bit */
+  if (accum_length (&actual_length, 1) == 0)
+    return 0;
+
+  /* NB. actual_length is not modified from here onwards */
 
   if (buf == NULL) return actual_length;
 
@@ -543,10 +592,12 @@ fish_sound_comments_encode (FishSound * fsound, unsigned char * buf,
   writeint (c, 0, vendor_length);
   c += 4;
 
-  field_length = strlen (fsound->vendor);
-  memcpy (c, fsound->vendor, MIN (field_length, remaining));
-  c += field_length; remaining -= field_length;
-  if (remaining <= 0 ) return actual_length;
+  if (fsound->vendor) {
+    field_length = fs_comment_len (fsound->vendor);
+    memcpy (c, fsound->vendor, MIN (field_length, remaining));
+    c += field_length; remaining -= field_length;
+    if (remaining <= 0) return actual_length;
+  }
 
   remaining -= 4;
   if (remaining <= 0) return actual_length;
@@ -556,16 +607,16 @@ fish_sound_comments_encode (FishSound * fsound, unsigned char * buf,
   for (comment = fish_sound_comment_first (fsound); comment;
        comment = fish_sound_comment_next (fsound, comment)) {
 
-    field_length = strlen (comment->name);     /* [size]"name" */
+    field_length = fs_comment_len (comment->name);     /* [size]"name" */
     if (comment->value)
-      field_length += 1 + strlen (comment->value); /* "=value" */
+      field_length += 1 + fs_comment_len (comment->value); /* "=value" */
 
     remaining -= 4;
     if (remaining <= 0) return actual_length;
     writeint (c, 0, field_length);
     c += 4;
 
-    field_length = strlen (comment->name);
+    field_length = fs_comment_len (comment->name);
     memcpy (c, comment->name, MIN (field_length, remaining));
     c += field_length; remaining -= field_length;
     if (remaining <= 0) return actual_length;
@@ -576,7 +627,7 @@ fish_sound_comments_encode (FishSound * fsound, unsigned char * buf,
       *c = '=';
       c++;
 
-      field_length = strlen (comment->value);
+      field_length = fs_comment_len (comment->value);
       memcpy (c, comment->value, MIN (field_length, remaining));
       c += field_length; remaining -= field_length;
       if (remaining <= 0) return actual_length;
