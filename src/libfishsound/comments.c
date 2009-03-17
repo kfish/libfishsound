@@ -415,9 +415,10 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
 
    end = c+length;
    len=readint(c, 0);
+   if (len<0) return -1; 
 
    c+=4;
-   if (c+len>end) return -1;
+   if (len>end-c) return -1;
 
    /* Vendor */
    if (len > 0) {
@@ -435,6 +436,8 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
 
    if (c+4>end) return -1;
 
+   /* This value gets checked effectively by the 'for' condition
+      and the checks within the loop for c running off the end.  */
    nb_fields=readint(c, 0);
 #ifdef DEBUG
    printf ("fish_sound_comments_decode: %d comments\n", nb_fields);
@@ -449,9 +452,10 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
 #ifdef DEBUG
       printf ("fish_sound_comments_decode: [%d] len %d\n", i, len);
 #endif
+      if (len<0) return -1;
 
       c+=4;
-      if (c+len>end) return -1;
+      if (len>end-c) return -1;
 
       name = c;
       value = fs_index_len (c, '=', len);
