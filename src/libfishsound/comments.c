@@ -44,8 +44,12 @@
 
 /*#define DEBUG*/
 
-/* Ensure comment vector length can be expressed in 32 bits */
-static unsigned long
+/* Ensure comment vector length can be expressed in 32 bits
+ * including space for the trailing NUL */
+#define MAX_COMMENT_LENGTH 0xFFFFFFFE
+#define fs_comment_clamp(c) MIN((c),MAX_COMMENT_LENGTH)
+
+static size_t
 fs_comment_len (const char * s)
 {
   size_t len;
@@ -53,7 +57,7 @@ fs_comment_len (const char * s)
   if (s == NULL) return 0;
 
   len = strlen (s);
-  return (unsigned long) MIN(len, 0xFFFFFFFF);
+  return fs_comment_clamp(len);
 }
 
 static char *
@@ -67,11 +71,12 @@ fs_strdup (const char * s)
 }
 
 static char *
-fs_strdup_len (const char * s, int len)
+fs_strdup_len (const char * s, size_t len)
 {
   char * ret;
   if (s == NULL) return NULL;
   if (len == 0) return NULL;
+  len = fs_comment_clamp(len);
   ret = fs_malloc (len + 1);
   if (ret == NULL) return NULL;
   if (strncpy (ret, s, len) == NULL) {
@@ -421,7 +426,8 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
 			    long length)
 {
    char *c= (char *)comments;
-   int len, i, nb_fields, n;
+   int i, nb_fields, n;
+   size_t len;
    char *end;
    char * name, * value, * nvalue = NULL;
    FishSoundComment * comment;
