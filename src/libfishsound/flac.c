@@ -237,6 +237,8 @@ static void*
 fs_flac_decode_header (FishSound * fsound, unsigned char *buf, long bytes)
 {
   FishSoundFlacInfo *fi = fsound->codec_data;
+
+  if (bytes < 9) return NULL;
   if (buf[0] != 0x7f) return NULL;
   if (strncmp((char *)buf+1, "FLAC", 4) != 0) return NULL;
   fi->version.major = buf[5];
