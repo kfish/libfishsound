@@ -140,10 +140,18 @@ AC_ARG_ENABLE(vorbis,
      [ ac_enable_vorbis=no ], [ ac_enable_vorbis=yes] )
 
 if test "x${ac_enable_vorbis}" = xyes ; then
-  AC_CHECK_LIB(vorbis, vorbis_info_init, HAVE_VORBIS="maybe", , [-lm -logg])
-  if test "x$HAVE_VORBIS" = xmaybe; then
-    AC_CHECK_HEADER(vorbis/codec.h, HAVE_VORBIS="yes", HAVE_VORBIS="no")
+  PKG_CHECK_MODULES(VORBIS, vorbis, HAVE_VORBIS="yes", HAVE_VORBIS="no")
+
+  if test "x$HAVE_VORBIS" = "xno" ; then
+    AC_CHECK_LIB(vorbis, vorbis_info_init, HAVE_VORBIS="maybe", , [-lm -logg])
+    if test "x$HAVE_VORBIS" = xmaybe; then
+      AC_CHECK_HEADER(vorbis/codec.h, HAVE_VORBIS="yes", HAVE_VORBIS="no")
+    fi
+    if test "x$HAVE_VORBIS" = xyes ; then
+      VORBIS_LIBS="-lvorbis -logg -lm"
+    fi
   fi
+
   if test "x$HAVE_VORBIS" = xyes ; then
     AC_DEFINE(HAVE_VORBIS, [1], [Define to 1 if you have libvorbis])
     fishsound_pkgdeps="$fishsound_pkgdeps vorbis"
@@ -152,28 +160,35 @@ if test "x${ac_enable_vorbis}" = xyes ; then
   fi
 
   if test "x${ac_enable_encode}" = xyes ; then
-    AC_CHECK_LIB(vorbisenc, vorbis_encode_init, HAVE_VORBISENC="maybe", ,
-                 [-lm -logg -lvorbis])
-    if test "x$HAVE_VORBISENC" = xmaybe ; then
-      AC_CHECK_HEADER(vorbis/vorbisenc.h, HAVE_VORBISENC="yes",
-                      HAVE_VORBISENC="no")
+    PKG_CHECK_MODULES(VORBISENC, vorbisenc, HAVE_VORBISENC="yes", HAVE_VORBISENC="no")
+
+    if test "x$HAVE_VORBISENC" = "xno" ; then
+      AC_CHECK_LIB(vorbisenc, vorbis_encode_init, HAVE_VORBISENC="maybe", ,
+                   [-lm -logg -lvorbis])
+      if test "x$HAVE_VORBISENC" = xmaybe ; then
+        AC_CHECK_HEADER(vorbis/vorbisenc.h, HAVE_VORBISENC="yes",
+                        HAVE_VORBISENC="no")
+      fi
+      if test "x$HAVE_VORBISENC" = xyes ; then
+        VORBIS_LIBS="-lvorbisenc $VORBIS_LIBS"
+      fi
     fi
+
     if test "x$HAVE_VORBISENC" = xyes ; then
       AC_DEFINE(HAVE_VORBISENC, [1], [Define to 1 if you have libvorbisenc])
       fishsound_pkgdeps="$fishsound_pkgdeps vorbisenc"
     else
       AC_DEFINE(HAVE_VORBISENC, [0], [Define to 1 if you have libvorbisenc])
     fi
+
   else
     AC_DEFINE(HAVE_VORBISENC, [0], [Define to 1 if you have libvorbisenc])
   fi
 
   if test "x$HAVE_VORBIS" = "xyes" && test "x$HAVE_VORBISENC" = "xyes" ; then
-    VORBIS_LIBS="-lvorbisenc -lvorbis -logg -lm"
     AC_SUBST(VORBIS_LIBS)
     VORBIS_SUPPORT="yes"
   elif test "x$HAVE_VORBIS" = xyes ; then
-    VORBIS_LIBS="-lvorbis -logg -lm"
     AC_SUBST(VORBIS_LIBS)
     VORBIS_SUPPORT="decode only"
   fi
