@@ -113,7 +113,7 @@ fs_vorbis_decode (FishSound * fsound, unsigned char * buf, long bytes)
   FishSoundVorbisInfo * fsv = (FishSoundVorbisInfo *)fsound->codec_data;
   ogg_packet op;
   long samples;
-  float ** pcm_new;
+  float * pcm_new;
   int ret;
 
   /* Make an ogg_packet structure to pass the data to libvorbis */
@@ -343,7 +343,6 @@ fs_vorbis_encode_f (FishSound * fsound, float * pcm[], long frames)
   float ** vpcm;
   long len, remaining = frames;
   int i;
-  float ** ppcm = alloca (sizeof (float *) * fsound->info.channels);
 
   if (fsv->packetno == 0) {
     fs_vorbis_enc_headers (fsound);
@@ -352,10 +351,6 @@ fs_vorbis_encode_f (FishSound * fsound, float * pcm[], long frames)
   if (frames == 0) {
     fs_vorbis_finish (fsound);
     return 0;
-  }
-
-  for (i = 0; i < fsound->info.channels; i++) {
-    ppcm[i] = pcm[i];
   }
 
   while (remaining > 0) {
@@ -369,7 +364,7 @@ fs_vorbis_encode_f (FishSound * fsound, float * pcm[], long frames)
     vpcm = vorbis_analysis_buffer (&fsv->vd, 1024);
 
     for (i = 0; i < fsound->info.channels; i++) {
-      memcpy (vpcm[i], ppcm[i], sizeof (float) * len);
+      memcpy (vpcm[i], pcm[i], sizeof (float) * len);
     }
 
     fs_vorbis_encode_write (fsound, len);

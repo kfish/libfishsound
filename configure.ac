@@ -20,6 +20,8 @@ AC_PROG_MAKE_SET
 
 AC_C_CONST
 AC_C_BIGENDIAN
+AC_CHECK_HEADERS([stdint.h])
+AC_CHECK_TYPES([uintptr_t])
 
 dnl Add parameters for aclocal
 AC_SUBST(ACLOCAL_AMFLAGS, "-I m4")

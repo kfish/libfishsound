@@ -36,6 +36,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#if HAVE_STDINT_H
+#include <stdint.h>
+#endif
+
 #include <ctype.h>
 
 #include "private.h"
@@ -289,6 +293,21 @@ fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
 
     fsound->info.samplerate = rate;
     fsound->info.channels = channels;
+
+    /* Sanity check the channels value, as we will use it to determine buffer
+       sizes below.
+     */
+    if (channels < 1 || channels > 2)
+      return FISH_SOUND_ERR_GENERIC;
+
+#if HAVE_UINTPTR_T
+    /* Sanity check: frame_size is not so large that the buffer size calculations
+     * would wrap. In reality, frame_size is set by libspeex according to the
+     * mode index specified in the file header, and is usually equal to 320.
+     */
+    if (fss->frame_size > UINTPTR_MAX / (sizeof(float) * channels))
+      return FISH_SOUND_ERR_GENERIC;
+#endif
 
     fss->ipcm = fs_malloc (sizeof (float) * fss->frame_size * channels);
     if (fss->ipcm == NULL) {
@@ -646,6 +665,15 @@ fs_speex_update (FishSound * fsound, int interleave)
     if (fsound->info.channels == 1) {
       fss->pcm[0] = (float *) fss->ipcm;
     } else if (fsound->info.channels == 2) {
+#if HAVE_UINTPTR_T
+      /* Sanity check: frame_size is not so large that the buffer size calculations
+       * would wrap. In reality, frame_size is set by libspeex according to the
+       * mode index specified in the file header, and is usually equal to 320.
+       */
+      if (fss->frame_size > UINTPTR_MAX / pcm_size)
+        return FISH_SOUND_ERR_GENERIC;
+#endif
+
       pcm0 = fs_realloc (fss->pcm[0], pcm_size * fss->frame_size);
       if (pcm0 == NULL) {
         return FISH_SOUND_ERR_OUT_OF_MEMORY;
