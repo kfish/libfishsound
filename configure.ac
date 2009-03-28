@@ -170,7 +170,7 @@ if test "x${ac_enable_vorbis}" = xyes ; then
                         HAVE_VORBISENC="no")
       fi
       if test "x$HAVE_VORBISENC" = xyes ; then
-        VORBIS_LIBS="-lvorbisenc $VORBIS_LIBS"
+        VORBISENC_LIBS="-lvorbisenc"
       fi
     fi
 
@@ -186,6 +186,7 @@ if test "x${ac_enable_vorbis}" = xyes ; then
   fi
 
   if test "x$HAVE_VORBIS" = "xyes" && test "x$HAVE_VORBISENC" = "xyes" ; then
+    VORBIS_LIBS="$VORBISENC_LIBS $VORBIS_LIBS"
     AC_SUBST(VORBIS_LIBS)
     VORBIS_SUPPORT="yes"
   elif test "x$HAVE_VORBIS" = xyes ; then
