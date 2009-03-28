@@ -4,7 +4,7 @@ AM_CFLAGS = -Wall -pedantic -g
 
 INCLUDES = -I$(top_builddir) \
            -I$(top_srcdir)/include -I$(top_srcdir)/src/libfishsound \
-           $(VORBIS_CFLAGS) $(SPEEX_CFLAGS) $(FLAC_CFLAGS) $(OGGZ_CFLAGS)
+           $(SNDFILE_CFLAGS) $(VORBIS_CFLAGS) $(SPEEX_CFLAGS) $(FLAC_CFLAGS) $(OGGZ_CFLAGS)
 
 FISHSOUNDDIR = ../libfishsound
 FISHSOUND_LIBS = $(FISHSOUNDDIR)/libfishsound.la \
