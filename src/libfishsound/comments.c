@@ -437,10 +437,9 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
 
    end = c+length;
    len=readint(c, 0);
-   if (len<0) return -1; 
 
    c+=4;
-   if (len>end-c) return -1;
+   if (len > (unsigned long) length - 4) return -1;
 
    /* Vendor */
    if (len > 0) {
@@ -474,10 +473,9 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
 #ifdef DEBUG
       printf ("fish_sound_comments_decode: [%d] len %d\n", i, len);
 #endif
-      if (len<0) return -1;
 
       c+=4;
-      if (len>end-c) return -1;
+      if (len > (unsigned long) (end-c)) return -1;
 
       name = c;
       value = fs_index_len (c, '=', len);
