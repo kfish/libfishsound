@@ -13,6 +13,7 @@ EXTRA_DIST = Version_script.in
 lib_LTLIBRARIES = libfishsound.la
 
 noinst_HEADERS = \
+	debug.h \
 	private.h \
 	convert.h \
 	fs_compat.h \
