@@ -27,6 +27,11 @@
 #endif
 #endif
 
+/* MSVC can't handle C99 */
+#if (defined (_MSCVER) || defined (_MSC_VER))
+#define DEBUG_LEVEL 0
+#endif
+
 #if (DEBUG_LEVEL > 0)
 
 #define DEBUG_MAXLINE 4096
