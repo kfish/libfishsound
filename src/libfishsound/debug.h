@@ -9,7 +9,7 @@
  * #include "debug.h"
  *
  * ...
- *     debug_print (2, "Something went wrong");
+ *     debug_printf (2, "Something went wrong");
  * ...
  *
  * The macro print_debug(level, fmt) prints a formatted debugging message
@@ -21,15 +21,15 @@
 #ifndef __DEBUG_H__
 #define __DEBUG_H__
 
+/* MSVC can't handle C99 */
+#if (defined (_MSCVER) || defined (_MSC_VER))
+#define debug_printf //
+#else
+
 #ifdef DEBUG
 #ifndef DEBUG_LEVEL
 #define DEBUG_LEVEL 1
 #endif
-#endif
-
-/* MSVC can't handle C99 */
-#if (defined (_MSCVER) || defined (_MSC_VER))
-#define DEBUG_LEVEL 0
 #endif
 
 #if (DEBUG_LEVEL > 0)
@@ -86,5 +86,7 @@ debug_print_err (const char * func, int line, const char * fmt, ...)
 #else
 #define debug_printf(x,y...)
 #endif
+
+#endif /* non-C99 */
 
 #endif /* __DEBUG_H__ */
