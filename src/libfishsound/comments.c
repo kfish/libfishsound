@@ -444,8 +444,10 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
    if (len > 0) {
      if ((nvalue = fs_strdup_len (c, len)) == NULL)
        return FISH_SOUND_ERR_OUT_OF_MEMORY;
-     if (fish_sound_comment_set_vendor (fsound, nvalue) == FISH_SOUND_ERR_OUT_OF_MEMORY)
+     if (fish_sound_comment_set_vendor (fsound, nvalue) == FISH_SOUND_ERR_OUT_OF_MEMORY) {
+       fs_free (nvalue);
        return FISH_SOUND_ERR_OUT_OF_MEMORY;
+     }
 
      fs_free (nvalue);
    }
@@ -484,11 +486,15 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
 
 	debug_printf (1, "%s -> %s (length %d)", name, nvalue, n);
 
-	if ((comment = fs_comment_new (name, nvalue)) == NULL)
+	if ((comment = fs_comment_new (name, nvalue)) == NULL) {
+	  fs_free (nvalue);
           return FISH_SOUND_ERR_OUT_OF_MEMORY;
+	}
 
-	if (_fs_comment_add (fsound, comment) == NULL)
+	if (_fs_comment_add (fsound, comment) == NULL) {
+	  fs_free (nvalue);
           return FISH_SOUND_ERR_OUT_OF_MEMORY;
+	}
 
 	fs_free (nvalue);
       } else {
@@ -497,11 +503,15 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
 	if ((nvalue = fs_strdup_len (name, len)) == NULL)
           return FISH_SOUND_ERR_OUT_OF_MEMORY;
 
-	if ((comment = fs_comment_new (nvalue, NULL)) == NULL)
+	if ((comment = fs_comment_new (nvalue, NULL)) == NULL) {
+	  fs_free (nvalue);
           return FISH_SOUND_ERR_OUT_OF_MEMORY;
+	}
 
-	if (_fs_comment_add (fsound, comment) == NULL)
+	if (_fs_comment_add (fsound, comment) == NULL) {
+	  fs_free (nvalue);
           return FISH_SOUND_ERR_OUT_OF_MEMORY;
+	}
 
 	fs_free (nvalue);
       }
