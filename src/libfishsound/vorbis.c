@@ -411,6 +411,8 @@ fs_vorbis_reset (FishSound * fsound)
 
   vorbis_block_init (&fsv->vd, &fsv->vb);
 
+  fsv->packetno = 0;
+
   return 0;
 }
 
