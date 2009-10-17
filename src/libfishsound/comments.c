@@ -424,33 +424,33 @@ int
 fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
 			    long length)
 {
-   char *c= (char *)comments;
-   int i, nb_fields, n;
-   size_t len;
-   char *end;
-   char * name, * value, * nvalue = NULL;
-   FishSoundComment * comment;
-   
-   if (length<8)
-      return -1;
+  char *c= (char *)comments;
+  int i, nb_fields, n;
+  size_t len;
+  char *end;
+  char * name, * value, * nvalue = NULL;
+  FishSoundComment * comment;
 
-   end = c+length;
-   len=readint(c, 0);
+  if (length<8)
+    return -1;
 
-   c+=4;
-   if (len > (unsigned long) length - 4) return -1;
+  end = c+length;
+  len=readint(c, 0);
 
-   /* Vendor */
-   if (len > 0) {
-     if ((nvalue = fs_strdup_len (c, len)) == NULL)
-       return FISH_SOUND_ERR_OUT_OF_MEMORY;
-     if (fish_sound_comment_set_vendor (fsound, nvalue) == FISH_SOUND_ERR_OUT_OF_MEMORY) {
-       fs_free (nvalue);
-       return FISH_SOUND_ERR_OUT_OF_MEMORY;
-     }
+  c+=4;
+  if (len > (unsigned long) length - 4) return -1;
 
-     fs_free (nvalue);
-   }
+  /* Vendor */
+  if (len > 0) {
+    if ((nvalue = fs_strdup_len (c, len)) == NULL)
+      return FISH_SOUND_ERR_OUT_OF_MEMORY;
+    if (fish_sound_comment_set_vendor (fsound, nvalue) == FISH_SOUND_ERR_OUT_OF_MEMORY) {
+      fs_free (nvalue);
+      return FISH_SOUND_ERR_OUT_OF_MEMORY;
+    }
+
+    fs_free (nvalue);
+  }
 #ifdef DEBUG
    fwrite(c, 1, len, stderr); fputc ('\n', stderr);
 #endif
@@ -474,11 +474,17 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
       c+=4;
       if (len > (unsigned long) (end-c)) return -1;
 
-      name = c;
-      value = fs_index_len (c, '=', len);
-      if (value) {
-	*value = '\0';
-	value++;
+    name = c;
+    value = fs_index_len (c, '=', len);
+    if (value) {
+      *value = '\0';
+      value++;
+      nvalue = 0;
+      n = c+len - value;
+    }
+    if (n) {
+      *value = '\0';
+      value++;
 
 	n = c+len - value;
 	if ((nvalue = fs_strdup_len (value, n)) == NULL)
@@ -486,42 +492,42 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
 
 	debug_printf (1, "%s -> %s (length %d)", name, nvalue, n);
 
-	if ((comment = fs_comment_new (name, nvalue)) == NULL) {
-	  fs_free (nvalue);
-          return FISH_SOUND_ERR_OUT_OF_MEMORY;
-	}
-
-	if (_fs_comment_add (fsound, comment) == NULL) {
-	  fs_free (nvalue);
-          return FISH_SOUND_ERR_OUT_OF_MEMORY;
-	}
-
-	fs_free (nvalue);
-      } else {
-        debug_printf (1, "[%d] %s (no value)", i, name, len);
-
-	if ((nvalue = fs_strdup_len (name, len)) == NULL)
-          return FISH_SOUND_ERR_OUT_OF_MEMORY;
-
-	if ((comment = fs_comment_new (nvalue, NULL)) == NULL) {
-	  fs_free (nvalue);
-          return FISH_SOUND_ERR_OUT_OF_MEMORY;
-	}
-
-	if (_fs_comment_add (fsound, comment) == NULL) {
-	  fs_free (nvalue);
-          return FISH_SOUND_ERR_OUT_OF_MEMORY;
-	}
-
-	fs_free (nvalue);
+      if ((comment = fs_comment_new (name, nvalue)) == NULL) {
+        fs_free (nvalue);
+        return FISH_SOUND_ERR_OUT_OF_MEMORY;
       }
 
-      c+=len;
-   }
+      if (_fs_comment_add (fsound, comment) == NULL) {
+        fs_free (nvalue);
+        return FISH_SOUND_ERR_OUT_OF_MEMORY;
+      }
 
-   debug_printf (1, "OUT");
+      fs_free (nvalue);
+    } else {
+      debug_printf (1, "[%d] %s (no value)", i, name, len);
 
-   return FISH_SOUND_OK;
+      if ((nvalue = fs_strdup_len (name, len)) == NULL)
+        return FISH_SOUND_ERR_OUT_OF_MEMORY;
+
+      if ((comment = fs_comment_new (nvalue, "")) == NULL) {
+        fs_free (nvalue);
+        return FISH_SOUND_ERR_OUT_OF_MEMORY;
+      }
+
+      if (_fs_comment_add (fsound, comment) == NULL) {
+        fs_free (nvalue);
+        return FISH_SOUND_ERR_OUT_OF_MEMORY;
+      }
+
+      fs_free (nvalue);
+    }
+
+    c+=len;
+  }
+
+  debug_printf (1, "OUT");
+
+  return FISH_SOUND_OK;
 }
 
 /*
