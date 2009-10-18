@@ -503,7 +503,7 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
       }
 
       fs_free (nvalue);
-    } else {
+    } else if (len > 0) {
       debug_printf (1, "[%d] %s (no value)", i, name, len);
 
       if ((nvalue = fs_strdup_len (name, len)) == NULL)
