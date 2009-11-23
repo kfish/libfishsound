@@ -9,22 +9,45 @@ AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE(libfishsound, 0.9.2)
 AM_CONFIG_HEADER(config.h)
 
+################################################################################
+# Set the shared versioning info, according to section 6.3 of the libtool info #
+# pages. CURRENT:REVISION:AGE must be updated immediately before each release: #
+#                                                                              #
+#   * If the library source code has changed at all since the last             #
+#     update, then increment REVISION (`C:R:A' becomes `C:r+1:A').             #
+#                                                                              #
+#   * If any interfaces have been added, removed, or changed since the         #
+#     last update, increment CURRENT, and set REVISION to 0.                   #
+#                                                                              #
+#   * If any interfaces have been added since the last public release,         #
+#     then increment AGE.                                                      #
+#                                                                              #
+#   * If any interfaces have been removed since the last public release,       #
+#     then set AGE to 0.                                                       #
+#                                                                              #
+################################################################################
 SHARED_VERSION_INFO="4:0:3"
 SHLIB_VERSION_ARG=""
 
 # Checks for programs.
 AC_PROG_CC
-AC_PROG_LIBTOOL
+AC_PROG_CPP
 AC_PROG_INSTALL
+AC_PROG_LIBTOOL
 AC_PROG_MAKE_SET
 
 AC_C_CONST
 AC_C_BIGENDIAN
-AC_CHECK_HEADERS([stdint.h])
-AC_CHECK_TYPES([uintptr_t])
 
 dnl Add parameters for aclocal
 AC_SUBST(ACLOCAL_AMFLAGS, "-I m4")
+
+# Checks for header files.
+AC_CHECK_HEADERS([stdint.h])
+AC_CHECK_TYPES([uintptr_t])
+
+# Check for pkg-config
+AC_CHECK_PROG(HAVE_PKG_CONFIG, pkg-config, yes)
 
 # Check for doxygen
 AC_CHECK_PROG(HAVE_DOXYGEN, doxygen, true, false)
@@ -142,7 +165,9 @@ AC_ARG_ENABLE(vorbis,
      [ ac_enable_vorbis=no ], [ ac_enable_vorbis=yes] )
 
 if test "x${ac_enable_vorbis}" = xyes ; then
-  PKG_CHECK_MODULES(VORBIS, vorbis, HAVE_VORBIS="yes", HAVE_VORBIS="no")
+  if test "x$HAVE_PKG_CONFIG" = "xyes" ; then
+    PKG_CHECK_MODULES(VORBIS, vorbis, HAVE_VORBIS="yes", HAVE_VORBIS="no")
+  fi
 
   if test "x$HAVE_VORBIS" = "xno" ; then
     AC_CHECK_LIB(vorbis, vorbis_info_init, HAVE_VORBIS="maybe", , [-lm -logg])
@@ -162,7 +187,9 @@ if test "x${ac_enable_vorbis}" = xyes ; then
   fi
 
   if test "x${ac_enable_encode}" = xyes ; then
-    PKG_CHECK_MODULES(VORBISENC, vorbisenc, HAVE_VORBISENC="yes", HAVE_VORBISENC="no")
+    if test "x$HAVE_PKG_CONFIG" = "xyes" ; then
+      PKG_CHECK_MODULES(VORBISENC, vorbisenc, HAVE_VORBISENC="yes", HAVE_VORBISENC="no")
+    fi
 
     if test "x$HAVE_VORBISENC" = "xno" ; then
       AC_CHECK_LIB(vorbisenc, vorbis_encode_init, HAVE_VORBISENC="maybe", ,
@@ -217,7 +244,9 @@ AC_ARG_ENABLE(speex,
      [ ac_enable_speex=no ], [ ac_enable_speex=yes] )
 
 if test "x${ac_enable_speex}" = xyes ; then
-  PKG_CHECK_MODULES(SPEEX, speex, HAVE_SPEEX="yes", HAVE_SPEEX="no")
+  if test "x$HAVE_PKG_CONFIG" = "xyes" ; then
+    PKG_CHECK_MODULES(SPEEX, speex, HAVE_SPEEX="yes", HAVE_SPEEX="no")
+  fi
 
   if test "x$HAVE_SPEEX" = "xno" ; then
     AC_CHECK_LIB(speex, speex_encoder_init, HAVE_SPEEX="maybe", , [-lm])
@@ -289,7 +318,9 @@ AC_ARG_ENABLE(flac,
      [ ac_enable_flac=no ], [ ac_enable_flac=yes] )
 
 if test "x${ac_enable_flac}" = xyes ; then
-  PKG_CHECK_MODULES(FLAC, flac, HAVE_FLAC="yes", HAVE_FLAC="no")
+  if test "x$HAVE_PKG_CONFIG" = "xyes" ; then
+    PKG_CHECK_MODULES(FLAC, flac, HAVE_FLAC="yes", HAVE_FLAC="no")
+  fi
 
   if test "x$HAVE_FLAC" = "xno" ; then
     AC_CHECK_LIB(FLAC, FLAC__stream_decoder_init, HAVE_FLAC="maybe", , [-lm -logg])
@@ -373,8 +404,10 @@ dnl
 dnl  Detect oggz
 dnl
 
-PKG_CHECK_MODULES(OGGZ, oggz >= 0.5.40,
-                  HAVE_OGGZ="yes", HAVE_OGGZ="no")
+if test "x$HAVE_PKG_CONFIG" = "xyes" ; then
+  PKG_CHECK_MODULES(OGGZ, oggz >= 0.5.40,
+                    HAVE_OGGZ="yes", HAVE_OGGZ="no")
+fi
 
 if test "$HAVE_OGGZ" = "yes" ; then
   AC_DEFINE(HAVE_OGGZ, [], [Define if have liboggz])
@@ -405,9 +438,11 @@ AM_CONDITIONAL(HAVE_OGGZ, [test "x$HAVE_OGGZ" = "xyes"])
 dnl
 dnl Detect libsndfile1
 dnl
-
-PKG_CHECK_MODULES(SNDFILE, sndfile >= 1.0.0,
-                  HAVE_LIBSNDFILE1="yes", HAVE_LIBSNDFILE1="no")
+ 
+if test "x$HAVE_PKG_CONFIG" = "xyes" ; then
+  PKG_CHECK_MODULES(SNDFILE, sndfile >= 1.0.0,
+                    HAVE_LIBSNDFILE1="yes", HAVE_LIBSNDFILE1="no")
+fi
 
 if test "x$HAVE_LIBSNDFILE1" = xyes ; then
   AC_DEFINE(HAVE_LIBSNDFILE1, [], [Define if have libsndfile])
@@ -416,6 +451,39 @@ if test "x$HAVE_LIBSNDFILE1" = xyes ; then
 fi
 AM_CONDITIONAL(HAVE_LIBSNDFILE1, [test "x$HAVE_LIBSNDFILE1" = "xyes"])
 
+
+# Checks for typedefs, structures, and compiler characteristics.
+
+dnl Add some useful warnings if we have gcc.
+dnl changequote(,)dnl
+if test "x$ac_cv_prog_gcc" = xyes ; then
+  CFLAGS="$CFLAGS -Wall -Wextra -g -std=gnu99 -Wdeclaration-after-statement -Wno-unused"
+fi
+dnl changequote([,])dnl
+
+dnl
+dnl  Configuration option to add -Werror to all Makefiles
+dnl
+
+AC_ARG_ENABLE(gcc-werror,
+     AC_HELP_STRING([--enable-gcc-werror], [enable -Werror in all Makefiles]),
+     [ ac_enable_gcc_werror=yes ], [ ac_enable_gcc_werror=no] )
+
+if test "x${ac_enable_gcc_werror}" = xyes ; then
+  CFLAGS="-Werror $CFLAGS"
+fi
+
+dnl
+dnl Shared library symbol versioning and hiding
+dnl
+
+case "$target_os" in
+  linux* | solaris*|k*bsd*-gnu*|gnu*)
+    SHLIB_VERSION_ARG="-Wl,--version-script=Version_script"
+    ;;
+  *)
+    ;;
+esac
 
 dnl
 dnl  Configuration tests complete -- provide summary of results.
