@@ -74,18 +74,6 @@ main (int argc, char * argv[])
   INFO ("Initializing FishSound for comments (encode)");
   fsound = fish_sound_new (FISH_SOUND_ENCODE, &fsinfo);
 
-  INFO ("+ Testing add of invalid unstructured COMMENT byname");
-  err = fish_sound_comment_add_byname (fsound, COMMENT, NULL);
-  if (err != FISH_SOUND_ERR_COMMENT_INVALID)
-    FAIL ("Invalid comment not detected");
-
-  INFO ("+ Testing add of invalid unstructured COMMENT from local storage");
-  mycomment.name = COMMENT;
-  mycomment.value = NULL;
-  err = fish_sound_comment_add (fsound, &mycomment);
-  if (err != FISH_SOUND_ERR_COMMENT_INVALID)
-    FAIL ("Invalid comment not detected");
-
   INFO ("+ Adding ARTIST1 byname");
   err = fish_sound_comment_add_byname (fsound, "ARTIST", ARTIST1);
   if (err < 0) FAIL ("Operation failed");
@@ -144,6 +132,16 @@ main (int argc, char * argv[])
 
   if (strcmp (comment->value, LICENSE))
     FAIL ("Incorrect LICENSE value found");
+
+  INFO ("+ Testing add of valid plain (not key=value) COMMENT byname");
+  err = fish_sound_comment_add_byname (fsound, COMMENT, NULL);
+  if (err < 0) FAIL ("Operation failed");
+
+  INFO ("+ Testing add of valid plain (not key=value) COMMENT from local storage");
+  mycomment.name = COMMENT;
+  mycomment.value = NULL;
+  err = fish_sound_comment_add (fsound, &mycomment);
+  if (err < 0) FAIL ("Operation failed");
 
   INFO ("+ Adding ARTIST2 byname");  
   err = fish_sound_comment_add_byname (fsound, "ARTIST", ARTIST2);
