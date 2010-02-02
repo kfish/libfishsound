@@ -134,11 +134,11 @@ The comment header is decoded as follows:
                                  }while(0)
 
 static int
-fs_comment_validate_byname (const char * name, const char * value)
+fs_comment_validate_byname (const char * name)
 {
   const char * c;
 
-  if (!name || !value) return 0;
+  if (!name) return 0;
 
   for (c = name; *c; c++) {
     if (*c < 0x20 || *c > 0x7D || *c == 0x3D) {
@@ -157,8 +157,8 @@ fs_comment_new (const char * name, const char * value)
 {
   FishSoundComment * comment;
 
-  if (!fs_comment_validate_byname (name, value)) return NULL;
-  /* Ensures that name != NULL, value != NULL, and validates strings */
+  if (!fs_comment_validate_byname (name)) return NULL;
+  /* Ensures that name != NULL and contains only valid characters */
 
   comment = fs_malloc (sizeof (FishSoundComment));
   if (comment == NULL) return NULL;
@@ -169,11 +169,15 @@ fs_comment_new (const char * name, const char * value)
     return NULL;
   }
 
-  comment->value = fs_strdup (value);
-  if (comment->value == NULL) {
-    fs_free (comment->name);
-    fs_free (comment);
-    return NULL;
+  if (value) {
+    comment->value = fs_strdup (value);
+    if (comment->value == NULL) {
+      fs_free (comment->name);
+      fs_free (comment);
+      return NULL;
+    }
+  } else {
+    comment->value = NULL;
   }
 
   return comment;
@@ -241,7 +245,7 @@ fish_sound_comment_first_byname (FishSound * fsound, char * name)
 
   if (name == NULL) return fs_vector_nth (fsound->comments, 0);
 
-  if (!fs_comment_validate_byname (name, ""))
+  if (!fs_comment_validate_byname (name))
     return NULL;
   
   for (i = 0; i < fs_vector_size (fsound->comments); i++) {
@@ -298,7 +302,7 @@ fish_sound_comment_add (FishSound * fsound, FishSoundComment * comment)
     return FISH_SOUND_ERR_INVALID;
 
 #if FS_ENCODE
-  if (!fs_comment_validate_byname (comment->name, comment->value))
+  if (!fs_comment_validate_byname (comment->name))
     return FISH_SOUND_ERR_COMMENT_INVALID;
 
   if ((new_comment = fs_comment_new (comment->name, comment->value)) == NULL)
@@ -325,7 +329,7 @@ fish_sound_comment_add_byname (FishSound * fsound, const char * name,
     return FISH_SOUND_ERR_INVALID;
 
 #if FS_ENCODE
-  if (!fs_comment_validate_byname (name, value))
+  if (!fs_comment_validate_byname (name))
     return FISH_SOUND_ERR_COMMENT_INVALID;
 
   if ((comment = fs_comment_new (name, value)) == NULL)
@@ -484,7 +488,7 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
 	if ((nvalue = fs_strdup_len (value, n)) == NULL)
           return FISH_SOUND_ERR_OUT_OF_MEMORY;
 
-	debug_printf (1, "%s -> %s (length %d)", name, nvalue, n);
+	debug_printf (1, "[%d] %s -> %s (length %d)", i, name, nvalue, n);
 
 	if ((comment = fs_comment_new (name, nvalue)) == NULL) {
 	  fs_free (nvalue);
@@ -498,10 +502,15 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
 
 	fs_free (nvalue);
       } else {
-        debug_printf (1, "[%d] %s (no value)", i, name, len);
-
+	/* For the case of a comment which is not in key=value form,
+	 * duplicate exactly the length of the comment, as it is
+	 * not NUL-terminated. In the case of the last comment of the
+	 * packet, it will be followed immediately by a framing bit.
+	 */
 	if ((nvalue = fs_strdup_len (name, len)) == NULL)
           return FISH_SOUND_ERR_OUT_OF_MEMORY;
+
+        debug_printf (1, "[%d] %s (no value) (length %d)", i, nvalue, len);
 
 	if ((comment = fs_comment_new (nvalue, NULL)) == NULL) {
 	  fs_free (nvalue);
