@@ -478,13 +478,16 @@ fish_sound_comments_decode (FishSound * fsound, unsigned char * comments,
       c+=4;
       if (len > (unsigned long) (end-c)) return -1;
 
+      n = 0;
       name = c;
       value = fs_index_len (c, '=', len);
       if (value) {
 	*value = '\0';
 	value++;
-
 	n = c+len - value;
+      }
+
+      if (n != 0) {
 	if ((nvalue = fs_strdup_len (value, n)) == NULL)
           return FISH_SOUND_ERR_OUT_OF_MEMORY;
 
