@@ -84,7 +84,7 @@ debug_print_err (const char * func, int line, const char * fmt, ...)
 #undef MAXLINE
 
 #else
-#define debug_printf(x,y...)
+#define debug_printf(x,...)
 #endif
 
 #endif /* non-C99 */

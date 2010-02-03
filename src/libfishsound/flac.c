@@ -61,7 +61,7 @@ typedef struct _FishSoundFlacInfo {
   FLAC__StreamEncoder *fse;
   unsigned char * buffer;
   char header;
-  long bufferlength;
+  unsigned long bufferlength;
   unsigned long packetno;
   struct {
     unsigned char major, minor;
@@ -106,7 +106,7 @@ fs_flac_command (FishSound * fsound, int command, void * data, int datasize)
 #if FS_DECODE
 static FLAC__StreamDecoderReadStatus
 fs_flac_read_callback(const FLAC__StreamDecoder *decoder,
-                      FLAC__byte buffer[], unsigned *bytes,
+                      FLAC__byte buffer[], unsigned int *bytes,
                       void *client_data)
 {
   FishSound* fsound = (FishSound*)client_data;
@@ -121,7 +121,7 @@ fs_flac_read_callback(const FLAC__StreamDecoder *decoder,
   }
 
   memcpy(buffer, fi->buffer, fi->bufferlength);
-  *bytes = fi->bufferlength;
+  *bytes = (unsigned int)fi->bufferlength;
   fi->bufferlength = 0;
   return FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
 }
@@ -500,7 +500,8 @@ fs_flac_encode_vorbiscomments (FishSound * fsound)
   FishSoundFlacInfo * fi = fsound->codec_data;
   FLAC__StreamMetadata * metadata = NULL;
   const FishSoundComment * comment;
-  unsigned int i=0, length=0, total_length;
+  unsigned int length=0, total_length;
+  int i=0;
   FLAC__VCEntry * comments;
 
   /* libFLAC seems to require us to know the total length of the generated
@@ -709,8 +710,6 @@ fs_flac_delete (FishSound * fsound)
 {
   FishSoundFlacInfo * fi = (FishSoundFlacInfo *)fsound->codec_data;
   int i;
-
-  debug_printf("IN");
 
   if (fsound->mode == FISH_SOUND_DECODE) {
     if (fi->fsd) {

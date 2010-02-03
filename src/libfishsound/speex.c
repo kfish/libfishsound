@@ -304,7 +304,7 @@ fs_speex_decode (FishSound * fsound, unsigned char * buf, long bytes)
      * would wrap. In reality, frame_size is set by libspeex according to the
      * mode index specified in the file header, and is usually equal to 320.
      */
-    if (fss->frame_size > UINTPTR_MAX / (sizeof(float) * channels))
+    if ((unsigned int)fss->frame_size > UINTPTR_MAX / (sizeof(float) * channels))
       return FISH_SOUND_ERR_GENERIC;
 #endif
 
@@ -388,7 +388,7 @@ fs_speex_enc_headers (FishSound * fsound)
   SpeexMode * mode = NULL;
   SpeexHeader header;
   unsigned char * header_buf = NULL, * comments_buf = NULL;
-  int header_bytes, comments_bytes;
+  int header_bytes, comments_bytes=0;
   size_t buflen;
 
   modeID = 1;
@@ -667,7 +667,7 @@ fs_speex_update (FishSound * fsound, int interleave)
        * would wrap. In reality, frame_size is set by libspeex according to the
        * mode index specified in the file header, and is usually equal to 320.
        */
-      if (fss->frame_size > UINTPTR_MAX / pcm_size)
+      if ((unsigned int)fss->frame_size > UINTPTR_MAX / pcm_size)
         return FISH_SOUND_ERR_GENERIC;
 #endif
 
