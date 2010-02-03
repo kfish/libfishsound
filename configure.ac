@@ -6,7 +6,7 @@ AC_PREREQ(2.53)
 
 AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE(libfishsound, 0.9.2)
+AM_INIT_AUTOMAKE(libfishsound, 1.0.0)
 AM_CONFIG_HEADER(config.h)
 
 ################################################################################

@@ -1,3 +1,10 @@
+Wed Feb  3 22:00:58 JST 2010 Conrad Parker <conrad@metadecks.org>
+
+	* Version 1.0.0
+
+	* This is a stable maintenance release including the result of security review
+	  and bug fixes included in the Mozilla Firefox 3.5 release.
+
 Wed Apr 8 07:33:30 JST 2009 Conrad Parker <conrad@metadecks.org>
 
 	* Version 0.9.2
