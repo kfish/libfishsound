@@ -44,3 +44,22 @@ file README.win32 for installing under MS Windows.
 		     comments contained in <fishsound/fishsound.h>
   
   win32/             files necessary to compile under MS Windows.
+
+Developers
+----------
+
+libfishsound is maintained in git at git://git.xiph.org/libfishsound.git
+
+A list of outstanding tasks is maintained in the TODO file of this source
+distribution. When implementing anything listed in this file, please update
+it by deleting that entry, and include that as part of the patch or commit
+that implements the fix.
+
+Please send patches to vorbis-dev@xiph.org. Codec-specific patches can be
+sent to the appropriate list, eg. speex-dev@xiph.org or flac-dev@xiph.org.
+
+Contact
+-------
+
+The lead developer is Conrad Parker <conrad@metadecks.org>,
+kfish on #vorbis, #speex on irc.freenode.net.
