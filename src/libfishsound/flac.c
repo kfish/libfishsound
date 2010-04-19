@@ -541,6 +541,7 @@ fs_flac_encode_vorbiscomments (FishSound * fsound)
   metadata->is_last = true;
   metadata->length = total_length;
   /* Don't bother setting the vendor_string, as libFLAC ignores it */
+  metadata->data.vorbis_comment.vendor_string.length = 0;
   metadata->data.vorbis_comment.num_comments = length;
   metadata->data.vorbis_comment.comments = comments;
 
