@@ -1,0 +1,12 @@
+
+This is a loosely-categorized list of outstanding tasks and ideas for improving
+libfishsound and its examples. When implementing any of these, please include an
+update to this TODO file removing that task, in the same commit.
+
+Examples
+========
+
+WebM support
+	* configure check
+	* fishsound-encode webm support
+	* fishsound-decode webm support
